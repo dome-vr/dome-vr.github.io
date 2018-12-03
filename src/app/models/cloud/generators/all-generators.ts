@@ -1,4 +1,4 @@
-// _generators.ts
+// all-generators.ts
 // imports specific generator functions from models/cloud/generators/*.ts
 
 
