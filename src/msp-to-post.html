@@ -10,6 +10,7 @@
     <meta name="viewport" content=
     "width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <!-- <base href="/dome-vr.github.io/src/"> -->
+    <base href="/src/"> 
     <link href="./styles/css/normalize.css" rel="stylesheet">
     <link href="./styles/css/domeN.css" rel="stylesheet">
     <!-- System, socket.io async THREE -->
@@ -53,7 +54,7 @@
     .then((Scene) => {
       config = Scene.config;     // export - made global
       var state = Scene.state;   // export - injected where needed
-      console.log(`@@@ System.import(${_scene})`);
+      console.log(`@/src/ System.import(${_scene})`);
 
       // TEMP diagnostics !!!
       //console.dir(state);
