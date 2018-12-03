@@ -9,7 +9,7 @@
     </title>
     <meta name="viewport" content=
     "width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-    <base href="/dome-vr.github.io/src/">
+    <!-- <base href="/dome-vr.github.io/src/"> -->
     <link href="./styles/css/normalize.css" rel="stylesheet">
     <link href="./styles/css/domeN.css" rel="stylesheet">
     <!-- System, socket.io async THREE -->
@@ -36,10 +36,9 @@
     <script src=
     "https://cdnjs.cloudflare.com/ajax/libs/gsap/1.19.1/TweenMax.min.js"></script>
   </head>
-
-
   <body>
-    <canvas id='i3d' style='position:absolute; left:0px; top:0px;'></canvas>
+    <canvas id='i3d' style='position:absolute; left:0px; top:0px;'>
+    </canvas>
     <script>
     // NOTE: globals: config, THREE, System, socket.io, async, (_scene)
     // NOTE: injection: state, TWEEN, stats, (narrative)

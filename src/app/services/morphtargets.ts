@@ -2,6 +2,8 @@
 import {mediator} from '../services/mediator';
 import {generators} from '../models/cloud/generators/_generators';
 
+
+
 // constants - targets is all names of position generators
 const targets:string[] = Object.keys(generators);
 
