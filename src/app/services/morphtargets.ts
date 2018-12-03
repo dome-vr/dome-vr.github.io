@@ -1,7 +1,6 @@
 // morphTargets.ts - service 
 import {mediator} from '../services/mediator';
-import * as generators from '../models/cloud/generators/_generators';
-
+import {generators} from '../models/cloud/generators/_generators';
 
 // constants - targets is all names of position generators
 const targets:string[] = Object.keys(generators);
@@ -17,7 +16,6 @@ class MorphTargets {
   // ctor
   constructor(){
     morphTargets = this;
-    //console.log(`possible targets = ${targets}`);
   } //ctor
 
 
@@ -28,10 +26,12 @@ class MorphTargets {
 
 
     // generate positions 
+//    for(let s of targets){
+//      console.log(`type of generators[${s}] is ${typeof generators[s]}`);
+//    }
     for(let t of requestedTargets){
-      //console.log(`t = ${t}`);
-      //console.log(`generators[${t}] = ${generators[t]}`);
       vertices = generators[t](state);
+      //console.log(`vertices = ${vertices}`);
       mediator.log(`${t} generated vertices has length ${vertices.length}`);
       for(let i=0; i<vertices.length; i++){
         positions.push(vertices[i]);
