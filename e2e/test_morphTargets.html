@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>test import of generators</title>
+  <meta charset=utf-8>
+  <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+  <base href="/dome-vr/src/"/> 
+    <style>
+        body{
+            width:100vw;
+            height:100vh;
+            background-color: black;
+            display: block;
+            overflow: hidden;
+            top:0;
+            left:0;
+            margin:0;
+            padding:0;
+        }
+    </style>
+
+
+  <!-- System, socket.io async THREE -->
+  <script src="../node_modules/systemjs/dist/system.src.js"></script>
+  <script src="./systemjs/systemjs-dynamic-ts.config.js"></script>
+  </head>
+
+<body>
+<script>
+  var _scene = './app/scenes/test/test-cloud',
+      config,
+      state,
+      _morphTargets = './app/services/morphtargets',
+      morphTargets,
+      positions = [];
+
+
+  window.onload = System.import(_scene)
+    .then((Scene) => {
+      config = Scene.config;     // export - made global
+      state = Scene.state;      // export - injected where needed
+      console.log(`System.import(${_scene})`);
+
+      System.import(_morphTargets)
+        .then((Target) => {
+          var morphTargets = Target.morphTargets;  // export
+          //console.log(`System.import returns singleton instance morphTargets = ${morphTargets}`);
+          positions = morphTargets.generate(state['cloud']);
+          console.log(`positions.length = ${positions.length}`);
+      })
+      .catch((e) => {
+          console.error(`index: import of ${_morphTargets} caused error: ${e}`);
+      });
+    })
+    .catch((e) => {
+      console.error(`index: import of ${_scene} caused error: ${e}`);
+    });
+</script>
+</body>
+</html>
+

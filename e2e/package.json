@@ -1,0 +1,21 @@
+{
+  "name": "dome-vr studio",
+  "version": "0.1.0",
+  "description": "Nodejs development server",
+  "author": "Rudolph",
+  "license": "MIT",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/josefK128/dome-vr.git"
+  },
+  "scripts": {},
+  "dependencies": {
+    "socket.io": "^1.7.3"
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": "^7.8.0",
+    "npm": "^4.2.0"
+  }
+}
