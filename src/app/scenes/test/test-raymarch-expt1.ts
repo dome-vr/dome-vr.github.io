@@ -80,7 +80,7 @@ const config:Config = {
     antialias:false,
   
     // mock testTarget
-    test: true,
+    test: false,
     _testTarget: '../e2e/mocks/testTarget.ts',
     
     // communications
