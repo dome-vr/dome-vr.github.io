@@ -9,7 +9,7 @@
     </title>
     <meta name="viewport" content=
     "width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-    <base href="/dome-vr.github.io/src/">
+    <base href="/src/">
     <link href="./styles/css/normalize.css" rel="stylesheet">
     <link href="./styles/css/domeN.css" rel="stylesheet">
     <!-- System, socket.io async THREE -->
@@ -44,7 +44,7 @@
     var _scene = './app/scenes/dev/space/raymarch/dev-cantor-explore',
       config;
 
-    console.log(`@base href=dome-vr.github.io/src/  System = ${System}`);
+    //console.log(`@base href=dome-vr.github.io/src/  System = ${System}`);
 
     window.onload = System.import(_scene)
     .then((Scene) => {
