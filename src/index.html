@@ -9,22 +9,24 @@
     </title>
     <meta name="viewport" content=
     "width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-    <!--<base href="/src/">-->
-    <link href="/src/styles/css/normalize.css" rel="stylesheet">
-    <link href="/src/styles/css/domeN.css" rel="stylesheet">
+    <base href="/src/">
+    <link href="/styles/css/normalize.css" rel="stylesheet">
+    <link href="/styles/css/domeN.css" rel="stylesheet">
     <!-- System, socket.io async THREE -->
 
     <script src=
-    "/node_modules/systemjs/dist/system.src.js"></script>
+      "/node_modules/systemjs/dist/system.src.js"></script>
+    <!-- <script src=
+      "/src/utils/systemjs/dist/system.src.js"></script> -->
     <script src=
-    "/src/systemjs/systemjs-dynamic-ts.config.js"></script>
+    "./systemjs/systemjs-dynamic-ts.config.js"></script>
     <script src="/node_modules/async/dist/async.js"></script>
     <script src=
     "/node_modules/socket.io-client/dist/socket.io.js"></script><!-- <script src="https:/cdnjs.cloudflare.com/ajax/libs/three.js/r83/three.js"></script> -->
 
-    <script src="/src/utils/three.js/build/three.js"></script>
+    <script src="./utils/three.js/build/three.js"></script>
     <script src=
-    "/src/utils/three.js/examples/js/vr/WebVR.js"></script><!-- Leap Motion - leapjs -->
+    "./utils/three.js/examples/js/vr/WebVR.js"></script><!-- Leap Motion - leapjs -->
 
     <script src="/node_modules/leapjs/leap-0.6.4.js"></script>
     <!-- GSAP - TimelineMax -->
@@ -41,7 +43,7 @@
 
     // SCENE
     //var _scene = './app/scenes/test/test-cloud-minimal',
-    var _scene = '/src/app/scenes/dev/space/raymarch/dev-cantor-explore',
+    var _scene =  '/app/scenes/dev/space/raymarch/dev-cantor-explore',
       config;
 
     //console.log(`@base href=dome-vr.github.io/src/  System = ${System}`);
