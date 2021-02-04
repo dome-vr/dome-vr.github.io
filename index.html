@@ -18,7 +18,12 @@
     <script src=
     "/node_modules/systemjs/dist/system.src.js">
       console.log(`dome-vr home: System = ${System}`);
+      function clickAlert() {
+        alert(`Alert! System = ${System}`);
+      }
     </script>
+    <input type="button" onclick="clickAlert()" value="Click-2-Alert">
+
   </head>
 
   <body>
