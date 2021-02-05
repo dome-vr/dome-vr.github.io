@@ -59,11 +59,12 @@ const config:Config = {
     // RECALL base-href=dome-vr/src so need '..' prefix for node_modules
     // NOTE: _three not currently used - THREE is loaded as <script> global 
     // with address as follows:
-    _three: '../node_modules/three/dist/three.js',
-    _stats: '../node_modules/three/examples/js/libs/stats.min.js',
+    _three: './libs/three/dist/three.js',
+    _stats: './libs/three/examples/js/libs/stats.min.js',
 
     // used in cloud - otherwise GSAP is used
-    _tween: '../node_modules/tween.js/src/Tween.js',
+    // NOTE: default ext for Tween is .js - looking for Tween.js
+    _tween: './libs/tween.js/src/Tween',
   
     // root component url 
     _narrative: './app/narrative',

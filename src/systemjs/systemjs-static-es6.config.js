@@ -11,9 +11,12 @@ System.config({
   },
 
   // for systemjs to correctly substitute for truncated paths
+  // for correct remote dome-vr.gihub.io server behavior must
+  // substitute ../node_modules/*.*  by ./libs/*.* (and of course
+  // copy (exp) node_modules/typescript/*.* to libs/typescript/*.*
   map: {
-    'app-es6' : './',
-    '@angular': '../node_modules/@angular'
+    'app-es6' : './'
+    //'@angular': '../node_modules/@angular'
   },
 
   // for systemjs to correctly substitute for implied files and/or ts/js
