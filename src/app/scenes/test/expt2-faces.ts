@@ -58,9 +58,9 @@ const config:Config = {
     // libs
     // RECALL base-href=dome-vr/src so need .. prefix for node_modules
     // NOTE: _three not currently used - THREE is loaded as global
-    _three: '../node_modules/three/build/three.js',
-    _stats: './utils/three.js/examples/js/libs/stats.min',
-    _tween: '../node_modules/tween.js/src/Tween.js',
+    _three: './libs/three/build/three.js',
+    _stats: './libs/three.js/examples/js/libs/stats.min',
+    _tween: './libs/tween.js/src/Tween',
   
     // root component url 
     _narrative: './app/narrative',

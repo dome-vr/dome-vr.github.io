@@ -17,27 +17,27 @@
     <!-- js-scripts -->
     <!-- System, async, socket.io -->
     <script src=
-    "../node_modules/systemjs/dist/system.src.js"></script>
+    "./libs/systemjs/dist/system.src.js"></script>
     <script src=
     "./systemjs/systemjs-dynamic-ts.config.js"></script>
-    <script src="../node_modules/async/dist/async.js"></script>
+    <script src="./libs/async/dist/async.js"></script>
     <script src=
-    "../node_modules/socket.io-client/dist/socket.io.js"></script>
+    "./libs/socket.io-client/dist/socket.io.js"></script>
 
     <!-- three.js -->
-    <script src="../node_modules/three/build/three.js"></script>
+    <script src="./libs/three/build/three.js"></script>
     <script src=
-    "../node_modules/three/examples/js/controls/OrbitControls.js"></script>
+    "./libs/three/examples/js/controls/OrbitControls.js"></script>
     <script src=
-    "../node_modules/three/examples/js/vr/WebVR.js"></script>
+    "./libs/three/examples/js/vr/WebVR.js"></script>
     <script src=
-    "../node_modules/three/examples/js/libs/stats.min.js"></script>
+    "./libs/three/examples/js/libs/stats.min.js"></script>
     <script src=
-    "../node_modules/three/examples/js/libs/dat.gui.min.js"></script>
+    "./libs/three/examples/js/libs/dat.gui.min.js"></script>
 
     <!-- GSAP-TweenMax, Leap -->
-    <script src="../node_modules/gsap/umd/TweenMax.js"></script>
-    <script src="../node_modules/leapjs/leap-0.6.4.js"></script>
+    <script src="./libs/gsap/umd/TweenMax.js"></script>
+    <script src="./libs/leapjs/leap-0.6.4.js"></script>
   </head>
 
 
@@ -48,7 +48,7 @@
     // injection: config, state, narrative, stats, dat.gui
 
     // SCENE
-    const _scene = './app/scenes/test-fail/expt2-faces';
+    const _scene = './app/scenes/test/expt2-faces';
     var config;
 
     window.onload = System.import(_scene)
