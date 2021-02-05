@@ -2,93 +2,114 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-    <base href="/src/"> <!-- all urls relative to base href='./src/'> -->
+    <meta name="generator" content=
+    "HTML Tidy for HTML5 for Windows version 5.6.0">
     <title>
-      app/scenes/scene.ts-cantor&spriteclouds
+      dome-vr
     </title>
-    
-
-    <!-- styles -->
+    <meta name="viewport" content=
+    "width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <base href="/src/">
     <link href="./styles/css/normalize.css" rel="stylesheet">
     <link href="./styles/css/domeN.css" rel="stylesheet">
+    <!-- System, socket.io async THREE -->
 
-
-    <!-- js-scripts -->
-    <!-- System, async, socket.io -->
-    <!-- <script src=
-      "../node_modules/systemjs/dist/system.src.js"></script> 
-      etc: async, socket.io-client, leapjs, gsap, three
-    --> 
     <script src=
-      "./utils/systemjs/dist/system.src.js"></script>
+    "../node_modules/systemjs/dist/system.src.js"></script>
     <script src=
     "./systemjs/systemjs-dynamic-ts.config.js"></script>
-    <script src="./utils/async/dist/async.js"></script>
+    <script src="../node_modules/async/dist/async.js"></script>
     <script src=
-    "./utils/socket.io-client/dist/socket.io.js"></script>
+    "../node_modules/socket.io-client/dist/socket.io.js"></script><!-- <script src="https:/cdnjs.cloudflare.com/ajax/libs/three.js/r83/three.js"></script> -->
 
-    <!-- three.js -->
-    <script src="./utils/three/build/three.js"></script>
+    <script src="./utils/three.js/build/three.js"></script>
     <script src=
-    "./utils/three/examples/js/controls/OrbitControls.js"></script>
-    <script src=
-    "./utils/three/examples/js/vr/WebVR.js"></script>
-    <script src=
-    "./utils/three/examples/js/libs/stats.min.js"></script>
-    <script src=
-    "./utils/three/examples/js/libs/dat.gui.min.js"></script>
+    "./utils/three.js/examples/js/vr/WebVR.js"></script><!-- Leap Motion - leapjs -->
 
-    <!-- GSAP-TweenMax, Leap -->
-    <script src="./utils/gsap/umd/TweenMax.js"></script>
-    <script src="./utils/leapjs/leap-0.6.4.js"></script>
+    <script src="../node_modules/leapjs/leap-0.6.4.js"></script>
+    <!-- GSAP - TimelineMax -->
+
+    <script src=
+    "https://cdnjs.cloudflare.com/ajax/libs/gsap/1.19.1/TweenMax.min.js"></script>
   </head>
-
-
   <body>
     <canvas id='i3d' style='position:absolute; left:0px; top:0px;'>
     </canvas>
     <script>
-    // injection: config, state, narrative, stats, dat.gui
+    // NOTE: globals: config, THREE, System, socket.io, async, (_scene)
+    // NOTE: injection: state, TWEEN, stats, (narrative)
 
     // SCENE
-    const _scene = './app/scenes/scene';
-    var config;
+    //var _scene = './app/scenes/test/test-cloud-minimal',
+    var _scene = './app/scenes/dev/space/raymarch/dev-cantor-explore',
+      config;
+
+    //console.log(`@base href=dome-vr.github.io/src/  System = ${System}`);
 
     window.onload = System.import(_scene)
     .then((Scene) => {
-      console.log(`System.import ${_scene}`);
-      console.dir(Scene);
       config = Scene.config;     // export - made global
+      var state = Scene.state;   // export - injected where needed
+      console.log(`System.import ${_scene}`);
+      console.log(`_webvr = ${config.webvr} !!!!!!!!!`);
 
-      // TEMP diagnostics
-      //console.log(`config = ${config}:`);
+      // TEMP diagnostics !!!
+      //console.dir(state);
       //console.dir(config);
-      //console.log(`Scene.state = ${Scene.state}:`);
-      //console.dir(Scene.state);
+      //console.log(`System.import(${_scene}) returns config = ${config} state = ${state}`);
+      //console.log(`TweenMax = ${TweenMax}`);
+      //console.log(`TimelineMax = ${TimelineMax}`);
+      //console.log(`Quad = ${Quad}`);
 
-      // returns injection object with properties the tasknames 
-      // injection['TWEEN'] and injection['narative']
+      // state components
       async.parallel({
         narrative: function(callback){
           // import module whose property is the module export 'narrative'
           System.import(config._narrative)
             .then((Narrative) => {
-              callback(null, Narrative.narrative);   //export
-              //console.log(`System.import(_narrative) returns singleton instance Narrative.narrative = ${Narrative.narrative}`);
+              var narrative = Narrative.narrative;  // export
+              callback(null, narrative);
+              //console.log(`System.import(_narrative) returns singleton instance narrative = ${narrative}`);
           })
           .catch((e) => {
             console.error(`index: import of narrative module caused error: ${e}`);
           });
         },
+
+    //        THREE: function(callback){
+    //          // RECALL: base-href is 'dome-vr/src' so need '..' prefix on n_m
+    //          System.import(config._three)
+    //           .then((Three) => {
+    //            var THREE = Three.THREE;
+    //            callback(null, THREE);
+    //            //console.log(`System.import(config.three) returns module Three = ${Three}`);
+    //          })
+    //          .catch((e) => {
+    //            console.error(`narrative: import of Three-component caused error: ${e}`);
+    //          });
+    //        },
+
         TWEEN: function(callback){
           System.import(config._tween)
            .then((Tween) => {
-            callback(null, Tween);  // export
+            var TWEEN = Tween;
+            callback(null, TWEEN);
             //console.log(`System.import(config._tween) returns module Tween = ${Tween}`);
           })
           .catch((e) => {
             console.error(`narrative: import of Tween-component caused error: ${e}`);
+          });
+        },
+
+        stats: function(callback){
+          System.import(config._stats)   
+            .then((Stats) => {
+              var stats = new Stats();     // export
+              callback(null, stats);
+              //console.log(`System.import(config.stats) returns singleton instance stats = ${stats}`);
+          })
+          .catch((e) => {
+            console.error(`index: import of Stats-component caused error: ${e}`);
           });
         }
       },
@@ -97,18 +118,19 @@
           console.error("error: " + err);
           return;
         }
+        injection['state'] = state;
         injection['config'] = config; // global
-        injection['state'] = Scene.state;
-        injection['datgui'] = new dat.GUI(); // dat.GUI global
-        injection['stats'] = new Stats(); // Stats global
-
+    //        for(var p in injection){
+    //          //console.log(`injection component ${p} = ${injection[p]}`);
+    //        }
         // initialize narrative
         injection.narrative.bootstrap(injection);
-      });
-      //async.parallel
+      }
+    );
+    //async.parallel
     })
     .catch((e) => {
-      console.error(`index: import of config module caused error: ${e}`);
+    console.error(`index: import of config module caused error: ${e}`);
     });
     //import config
 
