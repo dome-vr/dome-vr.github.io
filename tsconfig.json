@@ -10,5 +10,7 @@
     "noImplicitAny": false
   },
   "include": ["**/*"],
-  "exclude": ["node_modules", "doc", "e2e", "NOTES", "src/utils", "src/assets",     "src/app/scenes"] 
+  "exclude": ["node_modules", "dist", "doc", "e2e", "logs", "NOTES", 
+    "src-app-es6", "src/assets", "src/libs", "src/styles", "src/systemjs",
+    "src/utils"] 
 }
