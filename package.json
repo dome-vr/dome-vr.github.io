@@ -26,7 +26,7 @@
     "async": "^2.6.1",
     "gsap": "^2.0.2",
     "leapjs": "^0.6.4",
-    "socket.io": "^1.7.4",
+    "socket.io": "^2.4.0",
     "socket.io-client": "^1.7.4",
     "systemjs": "^0.19.47",
     "three": "^0.99.0",
