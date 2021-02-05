@@ -15,8 +15,8 @@ var timeline = (shot) => {
       tlp = _timeline['p'] || {},
       actors = _timeline['actors'] || {},
       ntuple:string[],
-      target:Object,  // target obj for property to be tweened - animated
-      tweens:Object[],
+      target:object,  // target obj for property to be tweened - animated
+      tweens:object[],
       quad_m:THREE.ShaderMaterial,
       hud_m:THREE.ShaderMaterial;
 
@@ -184,7 +184,7 @@ class Animation {
 
   // NOTE: reverse=true if back-button, but also if choosing scene sequence
   // such as: (1) sceneA, (2) sceneB, (3) sceneA => reverse=true
-  perform(shot:Object={}, reverse:boolean=false){
+  perform(shot:object={}, reverse:boolean=false){
     var tl:TimelineMax;
 
     // diagnostics

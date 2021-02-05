@@ -22,7 +22,7 @@ System.config({
   // for systemjs to correctly substitute for implied files and/or ts/js
   packages: {
     'app'  : {main: 'narrative', defaultExtension: 'ts'},
-    'app/models/scenes'  : {main: 'test', defaultExtension: 'ts'},
+    'app/scenes'  : {main: 'scene', defaultExtension: 'ts'},
     'socket.io-client' : {defaultExtension: 'js'}, // doesn't work ?!
     'jasmine' : {defaultExtension: 'js'}, // doesn't work ?!
     '@angular/core'                    : {main: 'index.js'},

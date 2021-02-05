@@ -84,8 +84,6 @@ function WebGLCapabilities( gl, extensions, parameters ) {
 	var floatFragmentTextures = isWebGL2 || !! extensions.get( 'OES_texture_float' );
 	var floatVertexTextures = vertexTextures && floatFragmentTextures;
 
-	var maxSamples = isWebGL2 ? gl.getParameter( gl.MAX_SAMPLES ) : 0;
-
 	return {
 
 		isWebGL2: isWebGL2,
@@ -108,9 +106,7 @@ function WebGLCapabilities( gl, extensions, parameters ) {
 
 		vertexTextures: vertexTextures,
 		floatFragmentTextures: floatFragmentTextures,
-		floatVertexTextures: floatVertexTextures,
-
-		maxSamples: maxSamples
+		floatVertexTextures: floatVertexTextures
 
 	};
 

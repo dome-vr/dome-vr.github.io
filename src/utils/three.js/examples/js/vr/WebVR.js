@@ -5,15 +5,9 @@
  * Based on @tojiro's vr-samples-utils.js
  */
 
-THREE.WEBVR = {
+var WEBVR = {
 
 	createButton: function ( renderer, options ) {
-
-		if ( options && options.referenceSpaceType ) {
-
-			renderer.vr.setReferenceSpaceType( options.referenceSpaceType );
-
-		}
 
 		function showEnterVR( device ) {
 
@@ -25,17 +19,8 @@ THREE.WEBVR = {
 
 			button.textContent = 'ENTER VR';
 
-			button.onmouseenter = function () {
-
-				button.style.opacity = '1.0';
-
-			};
-
-			button.onmouseleave = function () {
-
-				button.style.opacity = '0.5';
-
-			};
+			button.onmouseenter = function () { button.style.opacity = '1.0'; };
+			button.onmouseleave = function () { button.style.opacity = '0.5'; };
 
 			button.onclick = function () {
 
@@ -47,22 +32,25 @@ THREE.WEBVR = {
 
 		}
 
-		function showEnterXR( /*device*/ ) {
+		function showEnterXR( device ) {
 
 			var currentSession = null;
 
 			function onSessionStarted( session ) {
 
+				if ( options === undefined ) options = {};
+				if ( options.frameOfReferenceType === undefined ) options.frameOfReferenceType = 'stage';
+
 				session.addEventListener( 'end', onSessionEnded );
 
-				renderer.vr.setSession( session );
+				renderer.vr.setSession( session, options );
 				button.textContent = 'EXIT XR';
 
 				currentSession = session;
 
 			}
 
-			function onSessionEnded( /*event*/ ) {
+			function onSessionEnded( event ) {
 
 				currentSession.removeEventListener( 'end', onSessionEnded );
 
@@ -83,31 +71,14 @@ THREE.WEBVR = {
 
 			button.textContent = 'ENTER XR';
 
-			button.onmouseenter = function () {
-
-				button.style.opacity = '1.0';
-
-			};
-
-			button.onmouseleave = function () {
-
-				button.style.opacity = '0.5';
-
-			};
+			button.onmouseenter = function () { button.style.opacity = '1.0'; };
+			button.onmouseleave = function () { button.style.opacity = '0.5'; };
 
 			button.onclick = function () {
 
 				if ( currentSession === null ) {
 
-					// WebXR's requestReferenceSpace only works if the corresponding feature
-					// was requested at session creation time. For simplicity, just ask for
-					// the interesting ones as optional features, but be aware that the
-					// requestReferenceSpace call will fail if it turns out to be unavailable.
-					// ('local' is always available for immersive sessions and doesn't need to
-					// be requested separately.)
-
-					var sessionInit = { optionalFeatures: [ 'local-floor', 'bounded-floor' ] };
-					navigator.xr.requestSession( 'immersive-vr', sessionInit ).then( onSessionStarted );
+					device.requestSession( { exclusive: true } ).then( onSessionStarted );
 
 				} else {
 
@@ -117,9 +88,11 @@ THREE.WEBVR = {
 
 			};
 
+			renderer.vr.setDevice( device );
+
 		}
 
-		function disableButton() {
+		function showVRNotFound() {
 
 			button.style.display = '';
 
@@ -127,28 +100,14 @@ THREE.WEBVR = {
 			button.style.left = 'calc(50% - 75px)';
 			button.style.width = '150px';
 
+			button.textContent = 'VR NOT FOUND';
+
 			button.onmouseenter = null;
 			button.onmouseleave = null;
 
 			button.onclick = null;
 
-		}
-
-		function showVRNotFound() {
-
-			disableButton();
-
-			button.textContent = 'VR NOT FOUND';
-
 			renderer.vr.setDevice( null );
-
-		}
-
-		function showXRNotFound() {
-
-			disableButton();
-
-			button.textContent = 'XR NOT FOUND';
 
 		}
 
@@ -159,7 +118,7 @@ THREE.WEBVR = {
 			element.style.padding = '12px 6px';
 			element.style.border = '1px solid #fff';
 			element.style.borderRadius = '4px';
-			element.style.background = 'rgba(0,0,0,0.1)';
+			element.style.background = 'transparent';
 			element.style.color = '#fff';
 			element.style.font = 'normal 13px sans-serif';
 			element.style.textAlign = 'center';
@@ -169,14 +128,22 @@ THREE.WEBVR = {
 
 		}
 
-		if ( 'xr' in navigator && 'supportsSession' in navigator.xr ) {
+		if ( 'xr' in navigator ) {
 
 			var button = document.createElement( 'button' );
 			button.style.display = 'none';
 
 			stylizeElement( button );
 
-			navigator.xr.supportsSession( 'immersive-vr' ).then( showEnterXR ).catch( showXRNotFound );
+			navigator.xr.requestDevice().then( function ( device ) {
+
+				device.supportsSession( { exclusive: true } ).then( function () {
+
+					showEnterXR( device );
+
+				} ).catch( showVRNotFound );
+
+			} ).catch( showVRNotFound );
 
 			return button;
 
@@ -193,7 +160,7 @@ THREE.WEBVR = {
 
 			}, false );
 
-			window.addEventListener( 'vrdisplaydisconnect', function ( /*event*/ ) {
+			window.addEventListener( 'vrdisplaydisconnect', function ( event ) {
 
 				showVRNotFound();
 
@@ -244,6 +211,27 @@ THREE.WEBVR = {
 
 		}
 
+	},
+
+	// DEPRECATED
+
+	checkAvailability: function () {
+		console.warn( 'WEBVR.checkAvailability has been deprecated.' );
+		return new Promise( function () {} );
+	},
+
+	getMessageContainer: function () {
+		console.warn( 'WEBVR.getMessageContainer has been deprecated.' );
+		return document.createElement( 'div' );
+	},
+
+	getButton: function () {
+		console.warn( 'WEBVR.getButton has been deprecated.' );
+		return document.createElement( 'div' );
+	},
+
+	getVRDisplay: function () {
+		console.warn( 'WEBVR.getVRDisplay has been deprecated.' );
 	}
 
 };

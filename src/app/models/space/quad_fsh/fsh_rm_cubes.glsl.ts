@@ -1,6 +1,6 @@
 // fragment shader
 // raymarch - cubes
-export var uniforms:Object = {
+export var uniforms:object = {
               tDiffuse: {type: 't', value: null},
               uVertex: {type: 'v3', value: new THREE.Vector3()}, //rm_point.getWorldPosition(),
               uAspect: {type: 'f', value: 1.0}, //aspect,

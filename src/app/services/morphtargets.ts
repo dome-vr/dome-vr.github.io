@@ -1,8 +1,6 @@
 // morphTargets.ts - service 
 import {mediator} from '../services/mediator';
-import {generators} from '../models/cloud/generators/all-generators';
-
-
+import {generators} from '../models/cloud/generators/_generators';
 
 // constants - targets is all names of position generators
 const targets:string[] = Object.keys(generators);
@@ -22,7 +20,7 @@ class MorphTargets {
 
 
   // generate positions array = [x,y,z, ...]
-  generate(state:Object){
+  generate(state:object){
     var vertices:number[] = [],
         requestedTargets = state['morphtargets'] || targets;
 

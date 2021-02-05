@@ -2,14 +2,17 @@
 import {mediator} from '../services/mediator';
 
 // shaders
-import {vsh} from '../models/space/quad_vsh/vsh_default.glsl';
-import {fsh} from '../models/space/quad_fsh/fsh_default.glsl';
-import {uniforms} from '../models/space/quad_fsh/fsh_default.glsl';
+import {vsh as _vsh} from '../models/space/quad_vsh/vsh_default.glsl';
+import {fsh as _fsh} from '../models/space/quad_fsh/fsh_default.glsl';
+import {uniforms as _uniforms} from '../models/space/quad_fsh/fsh_default.glsl';
 
 
 
 // singleton closure-instance variable
-var space:Space;
+var space:Space,
+    vsh:string = _vsh,
+    fsh:string = _fsh,
+    uniforms:object = _uniforms;
 
 
 class Space {
@@ -20,7 +23,7 @@ class Space {
   } //ctor
 
  
-  delta(state:Object, sgTarget:THREE.WebGLRenderTarget, callback:Function){
+  delta(state:object, sgTarget:THREE.WebGLRenderTarget, callback:Function){
     mediator.log(`space delta: state = ${state}`);
     
     // function builds ShaderMaterial to return in callback
@@ -40,9 +43,9 @@ class Space {
       }
     };
 
-    mediator.log(`^^^^ space: state['_raymarch'] = ${state['_raymarch']}`);
-    if(state['_raymarch'] !== undefined){  
-      if(state['_raymarch']){  // true => replace fsh & ShaderMaterial 
+    mediator.log(`^^^^ space: state['_space'] = ${state['_space']}`);
+    if(state['_space'] !== undefined){  
+      if(state['_space']){  // true => replace fsh & ShaderMaterial 
         if(state['fsh']){
           console.log(`importing fsh ${state['fsh']}`);
           System.import(state['fsh'])

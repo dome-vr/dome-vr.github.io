@@ -1,6 +1,6 @@
 // morphtarget generators
 // plane
-export var plane = (state:Object) => {
+export var plane = (state:object) => {
   var vertices:number[] = [],
       amountX:number = 12,
       amountZ:number = 16,

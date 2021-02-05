@@ -1,12 +1,8 @@
 // actor: pointcloud-lines
 
-import {camera} from "../../../state/camera";
-
-//import {THREE.OrbitControls} from "../../../../utils/three.js/controls/OrbitControls";
-
 
 // closure vars
-var effectController:Object,
+var effectController:object,
     particlesData = [],
     positions, 
     colors,
@@ -17,29 +13,36 @@ var effectController:Object,
   
   
 // create
-export var create = (options:Object = {}) => {
+export var create = (options:object = {}) => {
 
-    var lens = camera.lens,
-
-        // options
-        maxParticleCount = 1000,
+    // options
+    var maxParticleCount = 1000,
         particleCount = options['particleCount'] || 500,  // no effect ?!
-        maxConnections = options['maxConnections'] || 1,  //20,  // *
         showDots = options['showDots'] || true,  // no effect ?!
         showLines = options['showLines'] || true,     // no effect ?!
-        minDistance = options['minDistance'] || 250, //90,  //150,    // *
-        limitConnections = options['limitConnections'] || true,  //false, // *
+        maxConnections = options['maxConnections'] || 20,  //1,  
+        minDistance = options['minDistance'] || 250, //90,  //150,    
+        limitConnections = options['limitConnections'] || true,  //false,
 
         particles,
         r = 800,
         rHalf = r / 2,
-        //controls = new THREE.OrbitControls(lens),
         group = new THREE.Group(),
         helper = new THREE.BoxHelper( new THREE.Mesh( new THREE.BoxGeometry( r, r, r ) ) );
 
     return new Promise((resolve, reject) => {
 
-      effectController = options;
+      //effectController = options;  //might be missing properties not supplied!
+      effectController = {
+          maxParticleCount: maxParticleCount,
+          particleCount: particleCount,
+          showDots: showDots,
+          showLines: showLines,
+          maxConnections: maxConnections,
+          minDistance: minDistance,    
+          limitConnections: limitConnections
+      }
+
   
       helper.material.color.setHex( 0x080808 );
       helper.material.blending = THREE.AdditiveBlending;
@@ -107,7 +110,7 @@ export var create = (options:Object = {}) => {
   
   
       // render method
-      group['render'] = (et:number=0, options:Object={}) => {
+      group['render'] = (et:number=0, options:object={}) => {
         var vertexpos = 0,
             colorpos = 0,
             numConnected = 0;
@@ -132,7 +135,7 @@ export var create = (options:Object = {}) => {
           if ( particlePositions[ i * 3 + 2 ] < -rHalf || particlePositions[ i * 3 + 2 ] > rHalf ){
             particleData.velocity.z = -particleData.velocity.z;
           }     
-          if ( effectController.limitConnections && particleData.numConnections >= effectController.maxConnections ){
+          if ( effectController['limitConnections'] && particleData.numConnections >= effectController['maxConnections'] ){
             continue;
           }
 
@@ -140,7 +143,7 @@ export var create = (options:Object = {}) => {
           for ( var j = i + 1; j < particleCount; j++ ) {
      
             var particleDataB = particlesData[ j ];
-            if ( effectController.limitConnections && particleDataB.numConnections >= effectController.maxConnections ){
+            if ( effectController['limitConnections'] && particleDataB.numConnections >= effectController['maxConnections'] ){
               continue;
             }
             var dx = particlePositions[ i * 3     ] - particlePositions[ j * 3     ];
@@ -148,12 +151,12 @@ export var create = (options:Object = {}) => {
             var dz = particlePositions[ i * 3 + 2 ] - particlePositions[ j * 3 + 2 ];
             var dist = Math.sqrt( dx * dx + dy * dy + dz * dz );
      
-            if ( dist < effectController.minDistance ) {
+            if ( dist < effectController['minDistance'] ) {
      
               particleData.numConnections++;
               particleDataB.numConnections++;
      
-              var alpha = 1.0 - dist / effectController.minDistance;
+              var alpha = 1.0 - dist / effectController['minDistance'];
      
               positions[ vertexpos++ ] = particlePositions[ i * 3     ];
               positions[ vertexpos++ ] = particlePositions[ i * 3 + 1 ];

@@ -1,5 +1,5 @@
 // unitcube.ts
-export var create = (options:Object={}) => {
+export var create = (options:object={}) => {
   var cube_g:THREE.Geometry,
       cube_m:THREE.Material,
       cube:THREE.Mesh,
@@ -26,14 +26,14 @@ export var create = (options:Object={}) => {
   
   
      // delta method for modifying properties
-     cube['delta'] = (options:Object={}) => {
+     cube['delta'] = (options:object={}) => {
        cube_m.wireframe = options['wireframe'] || cube_m.wireframe;
        cube_m.color = options['color'] || cube_m.color;
        cube_m.transparent = options['transparent'] || cube_m.transparent;
      };
   
      // render method - not needed in this case
-     //cube['render'] = (et:number=0, options:Object={}) => {}
+     //cube['render'] = (et:number=0, options:object={}) => {}
   
      // return actor ready to be added to scene
      resolve(cube);

@@ -1,8 +1,7 @@
 // mediator.ts 
 
-// socket.io-client
-//import * as io from '../../../socket.io-client/dist/socket.io.js';
-import * as io from 'socket.io-client';
+// socket.io-client is global
+//import * as io from '../../../node_modules/socket.io-client/dist/socket.io.js';
 
 
 // config
@@ -59,7 +58,7 @@ export class Mediator {
 
   // quick method for emit('actions', action)
   // record to server - used to record application actions to actions-files
-  record(action:Object){
+  record(action:object){
     this.socket.emit('actions', action);
   }
 
@@ -90,6 +89,7 @@ export class Mediator {
   // quick method for emit('log', s) AND console.error
   // record to server - used to record application log strings to log-files
   loge(s:string){
+    console.trace();
     console.error(s);
     if(config.log){
       s = s.replace(/(\r\n|\n|\r)/gm,"");  // remove line breaks

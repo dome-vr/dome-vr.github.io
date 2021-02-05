@@ -24,18 +24,18 @@ class N_exec {
     console.assert(o['b'] === 'foo', `${o['b']} !== 'foo'`); 
   }
   
-  f_as(as:[string]){ 
+  f_as(as:string[]){ 
     console.assert(as[0] === 'test0', `${as[0]} !== 'test0'`); 
     console.assert(as[1] === 'test1', `${as[1]} !== 'test1'`); 
   }
   
-  f_an(an:[number]){ 
+  f_an(an:number[]){ 
     console.assert(an[0] === 1, `${an[0]} !== 1`); 
     console.assert(an[1] === 2, `${an[1]} !== 2`); 
     console.assert(an[2] === 3, `${an[2]} !== 3`); 
   }
   
-  f_ao(ao:[Object]){ 
+  f_ao(ao:object[]){ 
     console.assert(ao[0]['a'] === 0, `${ao[0]['a']} !== 0`); 
     console.assert(ao[0]['b'] === 'foo', `${ao[0]['b']} !== 'foo'`); 
     console.assert(ao[1]['c'] === 1, `${ao[1]['c']} !== 1`); 

@@ -3,13 +3,15 @@ import {mediator} from'../services/mediator';
 
 // shaders
 import {vsh} from '../models/space/quad_vsh/vsh_default.glsl';
-import {fsh} from '../models/space/quad_fsh/fsh_default.glsl';
-import {uniforms} from '../models/space/quad_fsh/fsh_default.glsl';
+import {fsh as _fsh} from '../models/space/quad_fsh/fsh_default.glsl';
+import {uniforms as _uniforms} from '../models/space/quad_fsh/fsh_default.glsl';
 
 
 
 // singleton closure-instance variable
-var vrcamera:VrCamera;
+var vrcamera:VrCamera,
+    fsh:string = _fsh,
+    uniforms:object = _uniforms;
 
 
 // vrcamera instrument components - csphere, controls, lens, hud, key, fill, back
@@ -62,8 +64,8 @@ class VrCamera {
 
   // initialize and return csphere, lens, hud, key, fill, back
   initialize(){        
-    var state:Object = config['initial_vrcamera'],
-        o:Object = {};  // used to return csphere, lens, controls, lights. hud
+    var state:object = config['initial_vrcamera'],
+        o:object = {};  // used to return csphere, lens, controls, lights. hud
 
     return new Promise((resolve, reject) => {
       async.series({
@@ -244,7 +246,7 @@ class VrCamera {
 
 
 
-  delta(state:Object, hud:THREE.Mesh, callback:Function){
+  delta(state:object, hud:THREE.Mesh, callback:Function){
     mediator.log(`VrCamera.delta: state = ${state} hud = ${hud}`);
 
     // controls

@@ -1,0 +1,61 @@
+
+> ~dome-vr@1.0.0 tsc C:\public\~dome-vr
+> tsc --outDir ./src/app-es6
+
+src/app/services/animation.ts(108,16): error TS2339: Property 'dur' does not exist on type 'Object'.
+src/app/services/animation.ts(109,15): error TS2339: Property 'dur' does not exist on type 'Object'.
+src/app/services/animation.ts(113,13): error TS2339: Property 'p' does not exist on type 'Object'.
+src/app/services/animation.ts(116,13): error TS2339: Property 'p' does not exist on type 'Object'.
+src/app/services/animation.ts(116,33): error TS2339: Property 'p' does not exist on type 'Object'.
+src/app/services/animation.ts(117,13): error TS2339: Property 'p' does not exist on type 'Object'.
+src/app/services/animation.ts(117,30): error TS2339: Property 'p' does not exist on type 'Object'.
+src/app/services/animation.ts(118,13): error TS2339: Property 'p' does not exist on type 'Object'.
+src/app/services/animation.ts(118,35): error TS2339: Property 'p' does not exist on type 'Object'.
+src/app/services/animation.ts(119,13): error TS2339: Property 'p' does not exist on type 'Object'.
+src/app/services/animation.ts(119,28): error TS2339: Property 'p' does not exist on type 'Object'.
+src/app/services/animation.ts(120,13): error TS2339: Property 'p' does not exist on type 'Object'.
+src/app/services/animation.ts(120,28): error TS2339: Property 'p' does not exist on type 'Object'.
+src/app/services/animation.ts(122,13): error TS2339: Property 'p' does not exist on type 'Object'.
+src/app/services/animation.ts(122,39): error TS2339: Property 'p' does not exist on type 'Object'.
+src/app/services/animation.ts(123,13): error TS2339: Property 'p' does not exist on type 'Object'.
+src/app/services/animation.ts(126,13): error TS2339: Property 'p' does not exist on type 'Object'.
+src/app/services/animation.ts(126,31): error TS2339: Property 'p' does not exist on type 'Object'.
+src/app/services/animation.ts(127,13): error TS2339: Property 'p' does not exist on type 'Object'.
+src/app/services/animation.ts(127,37): error TS2339: Property 'p' does not exist on type 'Object'.
+src/app/services/animation.ts(134,17): error TS2339: Property 'p' does not exist on type 'Object'.
+src/app/services/animation.ts(143,17): error TS2339: Property 'p' does not exist on type 'Object'.
+src/app/services/animation.ts(149,15): error TS2339: Property 'p' does not exist on type 'Object'.
+src/app/services/animation.ts(149,34): error TS2339: Property 'p' does not exist on type 'Object'.
+src/app/services/animation.ts(151,13): error TS2339: Property 'p' does not exist on type 'Object'.
+src/app/services/animation.ts(151,38): error TS2339: Property 'p' does not exist on type 'Object'.
+src/app/services/animation.ts(154,13): error TS2339: Property 'p' does not exist on type 'Object'.
+src/app/services/animation.ts(154,34): error TS2339: Property 'p' does not exist on type 'Object'.
+src/app/services/animation.ts(155,13): error TS2339: Property 'p' does not exist on type 'Object'.
+src/app/services/animation.ts(155,40): error TS2339: Property 'p' does not exist on type 'Object'.
+src/app/services/animation.ts(156,13): error TS2339: Property 'p' does not exist on type 'Object'.
+src/app/services/animation.ts(156,41): error TS2339: Property 'p' does not exist on type 'Object'.
+src/app/services/animation.ts(157,13): error TS2339: Property 'p' does not exist on type 'Object'.
+src/app/services/animation.ts(157,47): error TS2339: Property 'p' does not exist on type 'Object'.
+src/app/services/animation.ts(160,49): error TS2339: Property 'dur' does not exist on type 'Object'.
+src/app/services/animation.ts(160,60): error TS2339: Property 'p' does not exist on type 'Object'.
+src/app/services/camera3d.ts(13,9): error TS2314: Generic type 'Map<K, V>' requires 2 type argument(s).
+src/app/services/camera3d.ts(42,86): error TS1009: Trailing comma not allowed.
+src/app/services/mediator.ts(5,21): error TS2307: Cannot find module 'socket.io-client'.
+src/app/state/audio.ts(69,16): error TS2339: Property 'coneInnerAngle' does not exist on type 'Object'.
+src/app/state/audio.ts(70,16): error TS2339: Property 'coneOuterAngle' does not exist on type 'Object'.
+src/app/state/audio.ts(72,18): error TS2339: Property 'coneOuterGain' does not exist on type 'Object'.
+src/app/state/audio.ts(74,18): error TS2339: Property 'coneOuterGain' does not exist on type 'Object'.
+src/app/state/audio.ts(126,16): error TS2339: Property 'coneInnerAngle' does not exist on type 'Object'.
+src/app/state/audio.ts(127,16): error TS2339: Property 'coneOuterAngle' does not exist on type 'Object'.
+src/app/state/audio.ts(129,18): error TS2339: Property 'coneOuterGain' does not exist on type 'Object'.
+src/app/state/audio.ts(131,18): error TS2339: Property 'coneOuterGain' does not exist on type 'Object'.
+src/app/state/camera.ts(363,13): error TS2364: Invalid left-hand side of assignment expression.
+src/app/state/camera.ts(364,13): error TS2364: Invalid left-hand side of assignment expression.
+src/app/state/space.ts(50,15): error TS2364: Invalid left-hand side of assignment expression.
+src/app/state/space.ts(51,15): error TS2364: Invalid left-hand side of assignment expression.
+src/app/state/space.ts(65,9): error TS2364: Invalid left-hand side of assignment expression.
+src/app/state/space.ts(66,9): error TS2364: Invalid left-hand side of assignment expression.
+src/app/state/space.ts(67,9): error TS2364: Invalid left-hand side of assignment expression.
+src/app/narrative.ts(890,13): error TS2346: Supplied parameters do not match any signature of call target.
+src/app/state/vrcamera.ts(363,13): error TS2364: Invalid left-hand side of assignment expression.
+src/app/state/vrcamera.ts(364,13): error TS2364: Invalid left-hand side of assignment expression.

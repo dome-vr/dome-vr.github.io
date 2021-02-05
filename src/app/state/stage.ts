@@ -8,7 +8,7 @@ import {actors} from '../services/actors';
 // singleton closure-instance variables 
 // defaults for ambient_light, fog, skycube and skydome
 var stage:Stage,
-    axes:THREE.AxisHelper,
+    axes:THREE.AxesHelper,
     ambient_light:THREE.AmbientLight,
     ambient_color:string = 'white',
     ambient_intensity:number = 1.0,
@@ -32,7 +32,7 @@ var stage:Stage,
         // axes
         if(state['axes']){
           let _axes = state['axes']['_axes'];                   // t/f
-          axes = (_axes ? new THREE.AxisHelper(100000) : null);
+          axes = (_axes ? new THREE.AxesHelper(100000) : null);
         }
 
         // ambient_light
@@ -201,7 +201,7 @@ class Stage {
     stage = this;
   } //ctor
 
-  delta(state:Object={}, narrative:Narrative, callback:Function){
+  delta(state:object={}, narrative:Narrative, callback:Function){
     mediator.log(`Stage.delta: state = ${state}`);
 
     async.parallel({

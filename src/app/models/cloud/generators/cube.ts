@@ -1,6 +1,6 @@
 // morphtarget generators
 // cube
-export var cube = (state:Object) => {
+export var cube = (state:object) => {
   var vertices:number[] = [],
       amount:number = 8,
       separation:number = 0.15 * state['cloudRadius'],  //150 

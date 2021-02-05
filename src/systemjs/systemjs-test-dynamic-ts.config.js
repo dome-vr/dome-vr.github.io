@@ -19,7 +19,7 @@ System.config({
   // for systemjs to correctly substitute for implied files and/or ts/js
   packages: {
     'app'  : {main: 'narrative.spec.ts', defaultExtension: 'ts'},
-    'app/models/scenes'  : {main: 'test', defaultExtension: 'ts'},
+    'app/scenes'  : {main: 'scene', defaultExtension: 'ts'},
     '@angular/core'                    : {main: 'index.js'},
     '@angular/common'                  : {main: 'index.js'},
     '@angular/compiler'                : {main: 'index.js'},
@@ -28,3 +28,4 @@ System.config({
     '@angular/platform-browser-dynamic': {main: 'index.js'}
   }
 });
+

@@ -19,7 +19,7 @@ System.config({
   // for systemjs to correctly substitute for implied files and/or ts/js
   packages: {
     'app-es6'  : {main: 'narrative', defaultExtension: 'js'},
-    'app-es6/models/scenes'  : {main: 'test', defaultExtension: 'ts'},
+    'app-es6/scenes'  : {main: 'scene', defaultExtension: 'ts'},
     '@angular/core'                    : {main: 'index.js'},
     '@angular/common'                  : {main: 'index.js'},
     '@angular/compiler'                : {main: 'index.js'},

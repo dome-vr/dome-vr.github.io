@@ -1,6 +1,6 @@
 // Fragment shader program 
 // fsh_post - color variation of postTarget
-export var uniforms:Object = {
+export var uniforms:object = {
   tDiffuse: {type: 't', value: null}
 };
 

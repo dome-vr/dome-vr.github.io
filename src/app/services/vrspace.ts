@@ -1,4 +1,7 @@
 // vrspace.ts - creates enclosing spaces (cube, dome) for webVR
+import {mediator} from './mediator';
+
+
 var vrspace:Vrspace,
     cube:THREE.Mesh;
 
@@ -116,7 +119,7 @@ class Vrspace {
             //depthWrite: false,
             opacity: 1.0,
             //fog:true,
-            side: THREE.BackSide
+            side: THREE.BackSide,
             //side: THREE.DoubleSide,
             visible:true
           }),

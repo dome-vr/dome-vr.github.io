@@ -6,11 +6,17 @@
 
 # NOTE: ./node_modules can be built from package.json
 # build node_modules locally from package.json by:
-# root> npm install
-# however, for exact versions make node_modules stageable
-#node_modules
+# root (exp:dome-vr)> npm install 
+# However, save node_modules since the github repo will be used as a webVR
+# server on github pages
+node_modules
 docs
 logs
+test
+test-fail
+spec
+NOTES
+@*
 
 # internal notes - last change
 # dome resources, notes, printer-versions, hide from transpile, etc.

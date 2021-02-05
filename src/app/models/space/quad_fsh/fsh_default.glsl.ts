@@ -1,6 +1,6 @@
 // Fragment shader program 
 // fsh_default - texture map
-export var uniforms:Object = {
+export var uniforms:object = {
   tDiffuse: {type: 't', value: null},
   uTime:{type: 'f', value: 0.0},
   uResolution:{type: 'v2', value: new THREE.Vector2(960,1080)}

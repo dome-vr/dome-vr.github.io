@@ -12,7 +12,7 @@ class Action {
     action = this;
   } //ctor
 
-  delta(state:Object, callback:Function){
+  delta(state:object, callback:Function){
     mediator.log(`Action.delta: state = ${state}`);
 
     // return Queue of timed actions - future: may need additions?

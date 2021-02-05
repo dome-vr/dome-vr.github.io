@@ -1,6 +1,6 @@
 // fragment shader
 // raymarch - expt1-fogcubes
-export var uniforms:Object = {
+var uniforms:object = {
               tDiffuse: {type: 't', value: null},
               uVertex: {type: 'v3', value: new THREE.Vector3()}, //rm_point.getWorldPosition(),
               uAspect: {type: 'f', value: 1.0}, //aspect,
@@ -13,7 +13,7 @@ export var uniforms:Object = {
               uResolution:{type: 'v2', value: new THREE.Vector2(960,1080)}
             };
 
-export var fsh:string =`
+var fsh:string =`
      #ifdef GL_ES
      precision mediump float;
      #endif
@@ -115,7 +115,10 @@ export var fsh:string =`
 ;
 
 
-export {fsh:fsh,
-        uniforms:uniforms};
+//export {fsh:_fsh, 
+//        uniforms:_uniforms};
+
+export {fsh, 
+        uniforms};
 
 

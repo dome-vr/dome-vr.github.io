@@ -1,4 +1,5 @@
-// narrative-webvr.ts 
+// narrative.ts 
+// controller for 3D/Webvr dome-vr-dev
 // substates
 import {camera} from './state/camera';
 import {stage} from './state/stage';
@@ -6,6 +7,7 @@ import {cloud} from './state/cloud';
 import {space} from './state/space';
 import {audio} from './state/audio';
 import {vrstage} from './state/vrstage';
+import {vrcloud} from './state/vrcloud';
 import {action} from './state/action';
 
 //services
@@ -32,6 +34,7 @@ var narrative:Narrative,
     // needed in animate-render-loop
     _stats:boolean = true,
     _cloud:boolean = false,
+    _vrcloud:boolean = false,
     // start time (first nar.changeState()) and elapsed time from start
     // animating is flag indicating whether animation has begun (t) or not (f)
     clock = new THREE.Clock(),
@@ -52,7 +55,7 @@ var narrative:Narrative,
     rm_scene:THREE.Scene,
     renderer:THREE.WebGLRenderer,
     clearColor:number = 0xffffff,
-    alpha:number = 0.0,  // opaque so see clearColor white
+    alpha:number = 1.0,  // opaque so see clearColor white
     antialias:boolean = false,
 
     // camera instrument components - built and returned by camera.initialize
@@ -62,6 +65,7 @@ var narrative:Narrative,
     back:THREE.Light,
     controls:any,
     lens:THREE.Camera,
+    orbitcontrols:THREE.OrbitControls,
     hud_g:THREE.PlaneGeometry,
     hud_m:THREE.ShaderMaterial,
     hud:THREE.Mesh,
@@ -78,21 +82,10 @@ var narrative:Narrative,
     height:number = window.innerHeight,
 
     // animate-render
-    _raymarch:boolean = false,
+    _space:boolean = false,
     a:any,
-    period:number,
-    sprite:THREE.Sprite,
-    material:THREE.SpriteMaterial,
-    scale:number,
-    imageWidth:number,
-    imageHeight:number,
-    i:number,
-    l:number,
     sgTarget: THREE.WebGLRenderTarget,
-    postTarget: THREE.WebGLRenderTarget, // post-processing
-
-    // for cloud rotations
-    cloud_pivot:THREE.Object3D,
+    rmTarget: THREE.WebGLRenderTarget, // post-processing
 
     // returned by stage.delta
     cube:THREE.Mesh,
@@ -101,12 +94,17 @@ var narrative:Narrative,
     ambient_light:THREE.AmbientLight,
     fog:THREE.Fog,
 
-    // returned by cloud.delta
-    group:THREE.Group,
+    // for cloud, vrcloud rotations
+    cloud_pivot:THREE.Object3D,
+    vrcloud_pivot:THREE.Object3D,
+
+    // returned by cloud.delta, vrcloud.delta
+    spritegroup:THREE.Group,
+    vr_spritegroup:THREE.Group,
 
     // returned by action.delta
     _action:boolean,
-    actions:Object[],
+    actions:object[],
 
     // render variables
     rm_point:THREE.Object3D = new THREE.Object3D(),
@@ -146,6 +144,9 @@ var narrative:Narrative,
     vive_controller1:THREE.ViveController,
     vive_controller2:THREE.ViveController,
 
+    // send sg-scenegraph to headset => no raymarch/gpgpu and no vrstage
+    _sg3D:boolean = false,
+
     // vr_scene
     vr_ambient_light:THREE.AmbientLight,
     vr_axes:THREE.AxesHelper,
@@ -156,7 +157,7 @@ var narrative:Narrative,
     frame:number = 0,
     //test_texture:THREE.Texture = (new THREE.TextureLoader()).load('./assets/images/glad.png'),
     // useless Vector3 copy in getWorldDirection and getworldPosition
-    vcopy:Vector3 = new THREE.Vector3,
+    vcopy:THREE.Vector3 = new THREE.Vector3,
 
     onWindowResize:any = () => {
       var aspect;
@@ -226,29 +227,29 @@ var narrative:Narrative,
         }
         for(let actor in narrative.vractors){
           let _actor = narrative.vractors[actor];
-          let options = {texture: postTarget.texture}; // could be ignored!
+          let options = {texture: rmTarget.texture}; // could be ignored!
           if(_actor['render']){
             //console.log(`${actor} is rendering`);
             _actor['render'](et, options);
           }
         }
 
-        // animate spritecloud
+        // animate sg scene spritecloud
         if(_cloud){
           //period = 0.1 + Math.random() * 0.1;  //period = 0.001;
-          period = 0.01 + 0.01*Math.random();  //period = 0.001;
-          for (i = 0, l = group.children.length; i < l; i ++ ) {
-            sprite = group.children[ i ];
-            material = sprite.material;
+          let period = 0.01 + 0.01*Math.random();  //period = 0.001;
+          for (let i = 0, l = spritegroup.children.length; i < l; i ++ ) {
+            let sprite = spritegroup.children[ i ];
+            let material = sprite.material;
             // orig - exceeds screen to much
             //scale = Math.sin( et + sprite.position.x * 0.01 ) * 0.3 + 1.0;
             // more constrained
             // orig
             //scale = Math.sin( et + sprite.position.x * 0.01 ) * 0.3 + 0.5;
             //scale = Math.sin( et + sprite.position.z * 0.01 ) * 0.3 + 0.5;
-            scale = Math.sin( et + sprite.position.z * 0.1 ) * 0.3 + 0.5;
-            imageWidth = 1;
-            imageHeight = 1;
+            let scale = Math.sin( et + sprite.position.z * 0.1 ) * 0.3 + 0.5;
+            let imageWidth = 1;
+            let imageHeight = 1;
             if(material.map && material.map.image && material.map.image.width){
               imageWidth = material.map.image.width;
               imageHeight = material.map.image.height;
@@ -257,18 +258,52 @@ var narrative:Narrative,
             material.rotation += period * 0.1;     // ( i / l ); 
             sprite.scale.set( scale * imageWidth, scale * imageHeight, 1.0 );
           }
-          // EXPT!!!!! - no group rotation in X or Y
-          //group.rotation.x = et * 0.5;
-          //group.rotation.y = et * 0.75;
-          //group.rotation.z = et * 1.0;
+          // EXPT!!!!! - no spritegroup rotation in X or Y
+          //spritegroup.rotation.x = et * 0.5;
+          //spritegroup.rotation.y = et * 0.75;
+          //spritegroup.rotation.z = et * 1.0;
           cloud_pivot.rotation.x = et * 0.2;
           //cloud_pivot.rotation.y = et * 0.4;
           cloud_pivot.rotation.z = et * 0.3; //0.6;
         }
   
+        // animate vr_scene spritecloud
+        if(_vrcloud){
+          //period = 0.1 + Math.random() * 0.1;  //period = 0.001;
+          let period = 0.01 + 0.01*Math.random();  //period = 0.001;
+          for (let i = 0, l = vr_spritegroup.children.length; i < l; i ++ ) {
+            let sprite = vr_spritegroup.children[ i ];
+            let material = sprite.material;
+            // orig - exceeds screen to much
+            //scale = Math.sin( et + sprite.position.x * 0.01 ) * 0.3 + 1.0;
+            // more constrained
+            // orig
+            //scale = Math.sin( et + sprite.position.x * 0.01 ) * 0.3 + 0.5;
+            //scale = Math.sin( et + sprite.position.z * 0.01 ) * 0.3 + 0.5;
+            let scale = Math.sin( et + sprite.position.z * 0.1 ) * 0.3 + 0.5;
+            let imageWidth = 1;
+            let imageHeight = 1;
+            if(material.map && material.map.image && material.map.image.width){
+              imageWidth = material.map.image.width;
+              imageHeight = material.map.image.height;
+            }
+  
+            material.rotation += period * 0.1;     // ( i / l ); 
+            sprite.scale.set( scale * imageWidth, scale * imageHeight, 1.0 );
+          }
+          // EXPT!!!!! - no vr_spritegroup rotation in X or Y
+          //vr_spritegroup.rotation.x = et * 0.5;
+          //vr_spritgroup.rotation.y = et * 0.75;
+          //vr_spritegroup.rotation.z = et * 1.0;
+          vrcloud_pivot.rotation.x = et * 0.2;
+          //vrcloud_pivot.rotation.y = et * 0.4;
+          vrcloud_pivot.rotation.z = et * 0.3; //0.6;
+        }
+
+
 
         // if quad shading-raymarch
-        if(_raymarch){
+        if(_space){
           // update uVertex = rm_point.position for csphere dolly
           if(!lens.getWorldPosition(vcopy).equals(lens_posp)){
             delta_pos.copy(lens_posp);
@@ -329,29 +364,37 @@ var narrative:Narrative,
           // since rm_point is a root-child of scene
           quad.material.uniforms.uVertex.value = rm_point.getWorldPosition(vcopy);
           quad.material.uniforms.uVertex.needsUpdate = true;
-        }//if(_raymarch)
+        }//if(_space)
+
+
+
+
+
 
         // @@@@render scene to target
         renderer.render(scene, lens, sgTarget);
         quad.material.uniforms.tDiffuse.value = sgTarget.texture;
         quad.material.uniforms.tDiffuse.needsUpdate = true;
 
-
-        // if _webvr texture vrspace with postTarget.texture 
+        // if _webvr texture vrspace with rmTarget.texture 
         // and render vr_scene to webVR output
         // else, render rm_scene to webGL output
-        if(_webvr || hud['post']){
-          renderer.render(rm_scene, lens, postTarget);
+        if(_webvr || hud['_post']){
 
-          // post-processing - postTarget.texture to hud ShaderMaterial
-          if(hud['post']){
-            hud.material.uniforms.tDiffuse.value = postTarget.texture;
+          // render rm_scene to rmTarget
+          renderer.render(rm_scene, lens, rmTarget);
+
+          // post-processing - rmTarget.texture to hud ShaderMaterial
+          if(hud['_post']){
+            //if(frame%1000===0){console.log(`^^^^^^^^^^^^^^^ wr hud rmT.tx`)}; 
+            hud.material.uniforms.tDiffuse.value = rmTarget.texture;
             hud.material.uniforms.tDiffuse.needsUpdate = true;
           }
 
-          // webvr - postTarget.texture to vrspace ShaderMaterial/Material
+          // webvr - rmTarget.texture to vrspace ShaderMaterial/Material
           // turn on vr for third 'webvr' render of vr_scene to webvr display 
           if(_webvr){
+            if(frame%1000===0){console.log(`_webvr:t _webvr_skycube=${_webvr_skycube} _sg3D=${_sg3D}`)};
             renderer.vr.enabled = true;
 
             // update ViveControllers
@@ -371,24 +414,58 @@ var narrative:Narrative,
               let i = 0;
               ['bottom','top','left','right','back','front'].map((n) => {
                 vr_face[i] = vr_group.getObjectByName(n);
-                vr_face[i].material.map = postTarget.texture;
+                if(_sg3D){
+                  if(frame%1000===0){console.log(`_webvr_skycube_faces uses sgT.tx in vr_scene`)};
+                  vr_face[i].material.map = sgTarget.texture;
+                }else{
+                  vr_face[i].material.map = rmTarget.texture;
+                } 
+                //vr_face[i].material.map = rmTarget.texture;
                 vr_face[i].material.needsUpdate = true;
               });
             }
             if(_webvr_skycube){
-              vr_cube.material.map = postTarget.texture;
+              if(frame%1000===0){console.log(`!!!! _webvr:t _webvr_skycube=${_webvr_skycube} _sg3D:${_sg3D} (t=>sgT.tx f=>rmT.tx)`)};
+              if(_sg3D){
+                vr_cube.material.map = sgTarget.texture;
+              }else{
+                vr_cube.material.map = rmTarget.texture;
+              }
+              //vr_cube.material.map = rmTarget.texture;
               vr_cube.material.needsUpdate = true;
             }
             if(_webvr_skydome){
-              vr_dome.material.map = postTarget.texture;
+              if(_sg3D){
+                if(frame%1000===0){console.log(`_webvr_skydome uses sgT.tx in vr_scene`)};
+                vr_dome.material.map = sgTarget.texture;
+              }else{
+                vr_dome.material.map = rmTarget.texture;
+              }
+              //vr_dome.material.map = rmTarget.texture;
               vr_dome.material.needsUpdate = true;  
             }
 
+            // _sg3D => render scene VR-OUT;  else vr_scene VR-OUT
+//            if(_sg3D){
+//              if(frame%1000){console.log(`^^^^&&&& webvr:t post:${hud._post} sg3D:t => scene-VR`)};
+//              renderer.render(scene, lens);
+//            }else{
+//              if(frame%1000){console.log(`webvr:t post:${hud._post} sg3D:f => scene-VR`)};
+//              renderer.render(vr_scene, lens);
+//            }
+            // _webvr true _post:t or f => render scene VR-OUT;  else vr_scene VR-OUT
+            if(frame%1000===0){console.log(`webvr:t post:t-or-f sg3D:t-or-f => vr_scene`)};
             renderer.render(vr_scene, lens);
+
+          }else{ // _webvr:f => hud._post:t 
+            // _webvr:f => render scene&post 3D-OUT 
+            if(frame%1000===0){console.log(`webvr:f post:t sg3D:t-or-f => scene-3D`)};
+            renderer.render(scene, lens);
           }
-        }else{
-          // else, render rm_scene to webGL output
-          renderer.render(rm_scene, lens);
+        }else{ // _webvr:f AND hud._post:f
+          // _webvr:f _post:f => render scene 3D-OUT
+          if(frame%1000===0){console.log(`webvr:f post:f sg3D:t => scene-3D`)};
+          renderer.render(scene, lens);
         }
 
 
@@ -490,10 +567,10 @@ class Narrative {
    
 
   // narrative.exec targets 't' in actions 
-  targets:Object = {};
+  targets:object = {};
   // named management(add, remove, properties, animation) of objects in scene
-  actors:Object = {};
-  vractors:Object = {};
+  actors:object = {};
+  vractors:object = {};
 
 
   // ctor
@@ -502,20 +579,22 @@ class Narrative {
   } //ctor
 
 
-  bootstrap(injection:Object){
-    mediator.logc(`\n\n*** narrative-three.js-expswebvr.bootstrap`);
+  // ingest injection vars, set testTarget if test
+  bootstrap(injection:object){
     _webvr = config.webvr;
     _vive = config.vive;
-    console.log(`*** _webvr is ${_webvr} !!!!!!!!`);
+    _sg3D = config.sg3D;
+    console.log(`\n*** n.bootstrap: _webvr is ${_webvr} _sg3D=${_sg3D}!!!!!`);
     console.log(`*** WEBVR is ${WEBVR} !!!!!!!!`);
-
-    for(var p in injection){
-      mediator.logc(`injection component ${p} = ${injection[p]}`);
-    }
+    console.log(`*** injection:`);
     console.dir(injection);
     state = injection['state'];
     TWEEN = injection['TWEEN'];
     stats = injection['stats'];
+
+    // freeze config => no modifications of scene.config properties
+    Object.freeze(config);
+    console.log(`!!!!!! config is frozen is ${Object.isFrozen(config)}`);
 
     if(config.test){
       System.import(config._testTarget)   
@@ -553,7 +632,12 @@ class Narrative {
     // to the space fragmentshader as sgTarget.texture uniform 'tDiffuse'
     scene = new THREE.Scene();
     rm_scene = new THREE.Scene();
+
+    // WebGLRenderTarget for initial quad for gpgpu/rm fsh-rendering,
     sgTarget = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight, {minFilter:THREE.LinearFilter, maxFilter:THREE.NearestFilter});
+
+    // WebGLRenderTarget for post-process feedback and vrspace texturing
+    rmTarget = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight, {minFilter:THREE.LinearFilter, maxFilter:THREE.NearestFilter});
 
 
     // initialize rm_scene output 'screen' quad
@@ -601,6 +685,8 @@ class Narrative {
     hud = new THREE.Mesh(hud_g, hud_m);
     // post and visible
     hud._post = config.initial_camera.hud['_post'] || false;
+    console.log(`^^^^^^^^^^^^^^^^^ config.init_c.hud[_post] = ${config.initial_camera.hud['_post']}`); 
+    console.log(`^^^^^^^^^^^^^^^^^ hud[_post] = ${hud['_post']}`); 
     hud.visible = config.initial_camera['_hud_rendered'] || true;
     // scale hud to aspect ratio
     aspect = window.innerWidth/window.innerHeight;
@@ -609,10 +695,6 @@ class Narrative {
     // renderOrder
     hud.renderOrder = 10;  //rendered after dome rO=9, skybox,objects rO=0
 
-
-
-    // WebGLRenderTarget for post-process feedback
-    postTarget = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight, {minFilter:THREE.LinearFilter, maxFilter:THREE.NearestFilter});
 
 
     // renderer
@@ -625,15 +707,13 @@ class Narrative {
     //renderer.autoClear = false; // To allow render overlay on top of sprited sphere
 
     // webvr
-    // disable vr for sgTarget and postTarget passes - set true in render
+    // disable vr for sgTarget and rmTarget passes - set true in render
     renderer.vr.enabled = false; 
     if(_webvr){
-      console.log(`\n\n!!!!!!!!!!!!!!!!!!!! _webvr true!`);
 
       // initialize WebVR and create 'enter VR' button
       document.body.appendChild(WEBVR.createButton(renderer, {}));
-      console.log(`!!!!!!!!!!!!!!!!!!!! VR display set and button added!`);
-
+      console.log(`\n!!!!! _webvr is true - VR display set and button added!`);
 
       // create vr_scene
       vr_scene = new THREE.Scene();
@@ -678,7 +758,7 @@ class Narrative {
 
         console.log(`vr_group is ${vr_group}`);
         console.dir(vr_group);
-        //vr_scene.add(vr_group);
+        vr_scene.add(vr_group);
         let i:number = 0;
         ['bottom','top','left','right','back','front'].map((n) => {
           vr_face[i] = vr_group.getObjectByName(n);
@@ -712,7 +792,12 @@ class Narrative {
       fovp = lens.fov;   // used to detect need for HUD quad re-size
       fov_initial = lens.fov;
       lens.lookAt(csphere.position);   // origin
-  
+
+      // if _sg3D and NOT _webvr - attach orbitcontrols
+      if(_sg3D && !_webvr){
+        orbitcontrols = new THREE.OrbitControls(lens);
+      }
+
       // construct csphere 
       lens.add(hud);
       csphere.add(lens);
@@ -841,7 +926,7 @@ class Narrative {
         try{
           if(state['cloud'] !== undefined && Object.keys(state['cloud']).length > 0 ){
             //console.log(`^^^^^^^^^^^^^^ narrative CALLING cloud.delta!`);
-            cloud.delta(state['cloud'], TWEEN, csphere, callback);
+            cloud.delta(state['cloud'], TWEEN, callback);
           }else{
             //console.log(`^^^^^^^^^^^^^^ narrative NOT calling cloud.delta!`);
             callback(null, null);
@@ -889,22 +974,46 @@ class Narrative {
       },
 
       vrstage: function(callback){
+        if(_webvr){
+          try{
+            if(state['vrstage'] !== undefined && Object.keys(state['vrstage']).length > 0 ){
+              console.log(`^^^^^^^^^^^^^^ narrative CALLING vrstage.delta!`);
+              // fourth var (boolean) true => vrstage in vr_scene
+              vrstage.delta(state['vrstage'], narrative, callback);
+            }else{
+              console.log(`^^^^^^^^^^^^^^ narrative NOT calling vrstage.delta!`);
+              callback(null, null);
+            }
+          }
+          catch(e) {
+            mediator.loge(`changeState: vrstage.delta caused error: ${e}`);
+            console.trace();
+            callback(e, null);
+          }
+        }else{
+          callback(null, null);
+        }
+      },
+
+
+      vrcloud: function(callback){
         try{
-          if(state['vrstage'] !== undefined && Object.keys(state['vrstage']).length > 0 ){
-            console.log(`^^^^^^^^^^^^^^ narrative CALLING vrstage.delta!`);
-            // fourth var (boolean) true => vrstage in vr_scene
-            vrstage.delta(state['vrstage'], narrative, callback, true);
+          if(state['vrcloud'] !== undefined && Object.keys(state['vrcloud']).length > 0 ){
+            //console.log(`^^^^^^^^^^^ narrative CALLING vrcloud.delta!`);
+            vrcloud.delta(state['vrcloud'], TWEEN, callback);
           }else{
-            console.log(`^^^^^^^^^^^^^^ narrative NOT calling vrstage.delta!`);
+            //console.log(`^^^^^^^^^^^ narrative NOT calling vrcloud.delta!`);
             callback(null, null);
           }
         }
         catch(e) {
-          mediator.loge(`changeState: vrstage.delta caused error: ${e}`);
+          mediator.loge(`changeState: vrcloud.delta caused error: ${e}`);
           console.trace();
           callback(e, null);
         }
       },
+
+
 
       action: function(callback){
         try{
@@ -936,6 +1045,8 @@ class Narrative {
         // RECALL: transparent_texture is a texture NOT a url
         if(o['camera']){
           let _p = o['camera']['_post'];
+          //console.log(`^^^^^^^^^^^^^^^^^ 985 _p = ${_p}`); 
+          // if there exists camera['post'] then change the hud._post value
           if(_p !== undefined){
             if(_p === false){
               hud['_post'] = false;
@@ -945,6 +1056,7 @@ class Narrative {
               hud['_post'] = true;
             }
           }
+          //console.log(`^^^^^^^^^^^^ 995 hud._post = ${hud._post}`); 
         }
         
         // returned by Stage.delta
@@ -962,7 +1074,10 @@ class Narrative {
             }
           }
 
-          // actors returns nothing - adds/removes from narrative.actors
+          // stage[actors] returns nothing 
+          // However _actor:t => narrative.addActor(a=name, o) to scene 
+          // _actor:f => narrative.removeActor(a=name) from scene 
+          // _actor:undefined => modifies narrative.actors(a=name) 
 
           //skycube
           cube = o['stage']['skycube'];
@@ -1015,35 +1130,39 @@ class Narrative {
             }
           }
         }
-    
+
+
+
         // returned by cloud
         //mediator.log(`o['cloud'] = ${o['cloud']}`);
         if(o['cloud']){
           _cloud = o['cloud']['_cloud'] || _cloud;
           mediator.log(`_cloud = ${_cloud}`);
           if(o['cloud']['group']){
-            group = o['cloud']['group'];
-            mediator.log(`cloud group = ${group}`); 
-            if(group){
+            spritegroup = o['cloud']['group'];
+            mediator.log(`cloud spritegroup = ${spritegroup}`); 
+            if(spritegroup){
               if(!cloud_pivot){
                 cloud_pivot = new THREE.Object3D();
                 cloud_pivot.translateZ(state['cloud']['translateZ'] || -1000);
               }
-              cloud_pivot.add(group);
+              cloud_pivot.add(spritegroup);
               narrative.addActor('cloud_pivot', cloud_pivot, true);
             }
           }else{
             narrative.removeActor('cloud_pivot');
           }
         }
+
+
     
         // returned by Space.delta - don't add to scene!
         //mediator.log(`o['space'] = ${o['space']}`);
         if(o['space']){
           // set render flag if needed
-          if(state['space']['_raymarch'] !== undefined){  // t or f
-            _raymarch = state['space']['_raymarch'];
-            //console.log(`((((((((((((((((( _raymarch set to ${_raymarch}`);
+          if(state['space']['_space'] !== undefined){  // t or f
+            _space = state['space']['_space'];
+            //console.log(`((((((((((((((((( _space set to ${_space}`);
           }
           if(o['space']['rm_shMat']){
             mediator.log(`space returns shMat with fsh = ${o['space']['rm_shMat'].fragmentShader}`);
@@ -1059,46 +1178,73 @@ class Narrative {
         // returned by VrStage.delta
         //mediator.log(`o['vrstage'] = ${o['vrstage']}`);
         if(o['vrstage']){
-
-          // actors returns nothing - adds/removes from narrative.actors
-          for(let actor in narrative.vractors){
-            console.log(`@@@@@ vr_scene actor = ${actor}`);
-            //for(let p in narrative.vractors[actor]){
-            //  console.log(`actor[${p}] = ${narrative.vractors[actor][p]}`);
-            //}
-          }
-
-          // ambient_light
-          vr_ambient_light = o['vrstage']['ambient_light'];
-          mediator.log(`vrstage: vr_ambient_light = ${vr_ambient_light}`);
-          if(vr_ambient_light !== undefined){
-            if(vr_ambient_light){
-              narrative.addvrActor('vr_ambient_light', vr_ambient_light, true);
-            }else{
-              narrative.removevrActor('vr_ambient_light');
+          if(_webvr){
+  
+            // vrstage[actors] returns nothing 
+            // However _vractor:t => narrative.addvrActor(a=name, o) to vrscene 
+            // _vractor:f => narrative.removevrActor(a=name) from vrscene 
+            // _vractor:undefined => modifies narrative.vractors(a=name) 
+  
+            // ambient_light
+            vr_ambient_light = o['vrstage']['ambient_light'];
+            mediator.log(`vrstage: vr_ambient_light = ${vr_ambient_light}`);
+            if(vr_ambient_light !== undefined){
+              if(vr_ambient_light){
+                narrative.addvrActor('vr_ambient_light', vr_ambient_light, true);
+              }else{
+                narrative.removevrActor('vr_ambient_light');
+              }
             }
-          }
-          // axes
-          vr_axes = o['vrstage']['axes'];
-          mediator.log(`vrstage: vr_axes = ${vr_axes}`);
-          if(vr_axes !== undefined){
-            if(vr_axes){
-              narrative.addvrActor('vr_axes', vr_axes, true);
-            }else{
-              narrative.removevrActor('vr_axes');
+            // axes
+            vr_axes = o['vrstage']['axes'];
+            mediator.log(`vrstage: vr_axes = ${vr_axes}`);
+            if(vr_axes !== undefined){
+              if(vr_axes){
+                narrative.addvrActor('vr_axes', vr_axes, true);
+              }else{
+                narrative.removevrActor('vr_axes');
+              }
             }
-          }
-          // fog
-          vr_fog = o['vrstage']['fog'];
-          mediator.log(`vrstage: vr_fog = ${vr_fog}`);
-          if(vr_fog !== undefined){
-            if(vr_fog){
-              vr_scene.fog = vr_fog;
-            }else{
-              vr_scene.fog = null;
+            // fog
+            vr_fog = o['vrstage']['fog'];
+            mediator.log(`vrstage: vr_fog = ${vr_fog}`);
+            if(vr_fog !== undefined){
+              if(vr_fog){
+                vr_scene.fog = vr_fog;
+              }else{
+                vr_scene.fog = null;
+              }
             }
           }
         }
+
+
+
+        // returned by vrcloud
+        //mediator.log(`o['vrcloud'] = ${o['vrcloud']}`);
+        if(o['vrcloud']){
+          if(_webvr){
+            _vrcloud = o['vrcloud']['_vrcloud'] || _vrcloud;
+            mediator.log(`_vrcloud = ${_vrcloud}`);
+            if(o['vrcloud']['group']){
+              vr_spritegroup = o['vrcloud']['group'];
+              console.log(`%%%%%%%%%%%%%%%%% vrcloud vr_spritegroup = ${vr_spritegroup}`); 
+              console.dir(vr_spritegroup); 
+              mediator.log(`vrcloud vr_spritegroup = ${vr_spritegroup}`); 
+              if(vr_spritegroup){
+                if(!vrcloud_pivot){
+                  vrcloud_pivot = new THREE.Object3D();
+                  vrcloud_pivot.translateZ(state['vrcloud']['translateZ'] || -1000);
+                }
+                vrcloud_pivot.add(vr_spritegroup);
+                narrative.addvrActor('vrcloud_pivot', vrcloud_pivot, true);
+              }
+            }else{
+              narrative.removevrActor('vrcloud_pivot');
+            }
+          }
+        }
+
 
 
         // returned Action.delta
@@ -1160,7 +1306,7 @@ class Narrative {
       mediator.log(`addActor: before add sc.ch.l = ${scene.children.length}`);
       o['name'] = name;
       if(addToScene){
-        //console.log(`!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! added actor ${name}`);
+        console.log(`!!!!!!!!!!!!!!!****************** added actor ${name}`);
         scene.add(o);
       }
       narrative.actors[name] = o;
@@ -1209,7 +1355,7 @@ class Narrative {
       mediator.log(`addvrActor: before add vr_sc.ch.l = ${vr_scene.children.length}`);
       o['name'] = name;
       if(addToScene){
-        //console.log(`!!!!!!!!!!!!!!!!!!!!!!!!!!! added vractor ${name}`);
+        console.log(`!!!!!!!!!!!!!!********** added vractor ${name}`);
         vr_scene.add(o);
       }
       narrative.vractors[name] = o;
@@ -1273,7 +1419,7 @@ class Narrative {
   //   narrative.animate() for queue handling.
   // RECALL narrative.animate() - the single point which invokes narrative.exec
   //   does so in a try-catch block to immediately catch throws from exec
-  exec(action:Object){
+  exec(action:object){
     var target,  // target = narrative.targets[action.t] or actors[action.id] 
         f,       // f = target[action.f]
         arg,     // f(arg) where arg is one of seven types above

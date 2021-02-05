@@ -10,7 +10,7 @@ import {mediator} from './mediator';
 // resets the execution context (this) to 'window' and thus fails
 var c3d:Camera3d,
     csphere:THREE.Mesh,
-    map:Map,
+    map:Keymap,
     lens:THREE.PerspectiveCamera,
     animation:Animation,
     zoom:number = 90.0,      // zoom - dynamic tracking
@@ -21,7 +21,7 @@ var c3d:Camera3d,
     pitch:number = 0.0,   // examine-pitch (rotation of csphere around x-axis)
     yaw:number = 0.0,       // examine-yaw (rotation of csphere around y-axis)
     roll:number = 0.0,      // roll - dynamic tracking
-    shot:Object,
+    shot:object,
     // faster conditional
     record_shots:boolean = false,
     // tmp matrices used in diagnostics transforms and diagnostics
@@ -39,15 +39,15 @@ class Camera3d {
   }
 
 
-  initialize(_lens:THREE.PerspectiveCamera, _csphere:THREE.Mesh, _animation:Animation,){   
+  initialize(_lens:THREE.PerspectiveCamera, _csphere:THREE.Mesh, _animation:Animation){   
     lens = _lens;
     csphere = _csphere;
     animation = _animation;
     
     // keyboard functions - use imported map
     System.import(config._map)   
-      .then((Map) => {
-        map = Map.map; // export
+      .then((Keymap) => {
+        map = Keymap.map; // export
         map.initialize(c3d, csphere, lens, config.record_shots);
         window.addEventListener("keyup", map.keys);
     })

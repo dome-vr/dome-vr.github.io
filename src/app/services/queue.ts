@@ -2,7 +2,7 @@
 var queue:Queue;
 
 class Queue {
-  fifo:Object[];
+  fifo:object[];
   ready:boolean;
 
   constructor() {
@@ -10,7 +10,7 @@ class Queue {
     this.ready = true;
   }
 
-  load(actions:Object[] = []){
+  load(actions:object[] = []){
     this.fifo = actions;
   }
 

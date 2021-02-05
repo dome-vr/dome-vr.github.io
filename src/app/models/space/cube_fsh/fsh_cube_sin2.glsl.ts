@@ -1,6 +1,6 @@
 // Fragment shader program 
 // fsh_cube - texture map
-export var uniforms:Object = {
+export var uniforms:object = {
   tCube:{type:'samplerCube', value:''},
   tFlip:{type:'float', value:0.0},
   opacity:{type:'float', value:1.0},

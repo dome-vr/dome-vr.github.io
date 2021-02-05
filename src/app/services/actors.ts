@@ -1,4 +1,20 @@
 // actors.ts - holds timed actions 
+//
+// from state/stage.ts
+//      actors: function(callback){
+//        try{
+//          if(state['actors']){
+//            actors.create(state['actors'], narrative, callback);
+//          }else{
+//            callback(null, {});
+//          }
+//        }
+//        catch(e) {
+//          mediator.loge(`stage.delta caused error: ${e}`);
+//          callback(e, {});
+//        }
+//      }, 
+
 
 // transform3d
 //import {mediator} from './mediator';
@@ -10,18 +26,23 @@ var actors:Actors;
 
 class Actors {
 
-  create(state:Object={}, narrative:Narrative, callback:Function,
+  create(state:object={}, narrative:Narrative, callback:Function,
          vr:boolean=false){
 
     var actor:THREE.Object3D;   // actor-instance
 
+
     // iterate through actor names-options
     // three cases: _actor = f/t/undefined => create/remove/modify
-    for(let a of Object.keys(state)){
-      let _actor = state[a]['_actor'];
+    // NOTE: _actors:true not needed so _actors ignored if used
+    for(let a of Object.keys(state)){       
+      if(a === '_actors'){   // obviously skip _actors - not an actor name
+        console.log(`key is '_actors'!`);
+        continue;
+      }
       console.log(`actor-name is a = ${a}`);
-      console.log(`_actor = ${_actor}`);
 
+      let _actor = state[a]['_actor'];
       // f => remove
       if(_actor === false){             
           if(vr){
@@ -31,7 +52,6 @@ class Actors {
             console.log(`_actor=f ~ removing actor ${a} from scene`);
             narrative.removeActor(a);
           }
-          callback(null, {});
       }//f=>remove                      
 
 
@@ -48,7 +68,6 @@ class Actors {
             actor = narrative.actors[a];
           }
           actor.delta(options);
-          callback(e, null);
       }//undef=>modify
 
 
@@ -57,7 +76,7 @@ class Actors {
 
       // true => create
       if(_actor){                         
-        console.log(`!!!!!!!!!!!!!!!!!!!! actor url = ${url}`);            
+        console.log(`\n!!!!!!!!!!!!!!!!!!!! actor url = ${url}`);            
         System.import(url).then((Actor) => {
 
           //actor = Actor.create(options);   // actor-instance
@@ -86,10 +105,11 @@ class Actors {
               console.log(`after add: reportActorsInScene = ${narrative.reportActorsInScene()}`);
             }
   
-            callback(null, {});
           });//Actor.create.then
         });//System.import.then
       }//_actor=t => create
+      callback(null, {});
+
     }//for(a of state['actors'])
   }//create
 }//Actor

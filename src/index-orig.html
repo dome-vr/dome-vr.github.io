@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <base href="/src/"> <!-- all urls relative to base href='./src/'> -->
+    <title>
+      app/scenes/scene-orig.ts
+    </title>
+    
+
+    <!-- styles -->
+    <link href="./styles/css/normalize.css" rel="stylesheet">
+    <link href="./styles/css/domeN.css" rel="stylesheet">
+
+
+    <!-- js-scripts -->
+    <!-- System, async, socket.io -->
+    <script src=
+    "../node_modules/systemjs/dist/system.src.js"></script>
+    <script src=
+    "./systemjs/systemjs-dynamic-ts.config.js"></script>
+    <script src="../node_modules/async/dist/async.js"></script>
+    <script src=
+    "../node_modules/socket.io-client/dist/socket.io.js"></script>
+
+    <!-- three.js -->
+    <script src="../node_modules/three/build/three.js"></script>
+    <script src=
+    "../node_modules/three/examples/js/controls/OrbitControls.js"></script>
+    <script src=
+    "../node_modules/three/examples/js/vr/WebVR.js"></script>
+    <script src=
+    "../node_modules/three/examples/js/libs/stats.min.js"></script>
+    <script src=
+    "../node_modules/three/examples/js/libs/dat.gui.min.js"></script>
+
+    <!-- GSAP-TweenMax, Leap -->
+    <script src="../node_modules/gsap/umd/TweenMax.js"></script>
+    <script src="../node_modules/leapjs/leap-0.6.4.js"></script>
+  </head>
+
+
+  <body>
+    <canvas id='i3d' style='position:absolute; left:0px; top:0px;'>
+    </canvas>
+    <script>
+    // injection: config, state, narrative, stats, dat.gui
+
+    // SCENE
+    const _scene = './app/scenes/scene-orig';
+    var config;
+
+    window.onload = System.import(_scene)
+    .then((Scene) => {
+      console.log(`System.import ${_scene}`);
+      console.dir(Scene);
+      config = Scene.config;     // export - made global
+
+      // TEMP diagnostics
+      //console.log(`config = ${config}:`);
+      //console.dir(config);
+      //console.log(`Scene.state = ${Scene.state}:`);
+      //console.dir(Scene.state);
+
+      // returns injection object with properties the tasknames 
+      // injection['TWEEN'] and injection['narative']
+      async.parallel({
+        narrative: function(callback){
+          // import module whose property is the module export 'narrative'
+          System.import(config._narrative)
+            .then((Narrative) => {
+              callback(null, Narrative.narrative);   //export
+              //console.log(`System.import(_narrative) returns singleton instance Narrative.narrative = ${Narrative.narrative}`);
+          })
+          .catch((e) => {
+            console.error(`index: import of narrative module caused error: ${e}`);
+          });
+        },
+        TWEEN: function(callback){
+          System.import(config._tween)
+           .then((Tween) => {
+            callback(null, Tween);  // export
+            //console.log(`System.import(config._tween) returns module Tween = ${Tween}`);
+          })
+          .catch((e) => {
+            console.error(`narrative: import of Tween-component caused error: ${e}`);
+          });
+        }
+      },
+      (err, injection) => {
+        if(err){
+          console.error("error: " + err);
+          return;
+        }
+        injection['config'] = config; // global
+        injection['state'] = Scene.state;
+        injection['datgui'] = new dat.GUI(); // dat.GUI global
+        injection['stats'] = new Stats(); // Stats global
+
+        // initialize narrative
+        injection.narrative.bootstrap(injection);
+      });
+      //async.parallel
+    })
+    .catch((e) => {
+      console.error(`index: import of config module caused error: ${e}`);
+    });
+    //import config
+
+    </script>
+  </body>
+</html>

@@ -14,7 +14,7 @@ var pointcloud:THREE.Points,
     j:number;
   
 // create
-export var create = (options:Object = {}) => {
+export var create = (options:object = {}) => {
     // options
     image_url = options['image_url'] || './assets/images/sprites/disc.png';
     n_vertices = options['n_vertices'] || 121;   //|| 121;
@@ -38,7 +38,7 @@ export var create = (options:Object = {}) => {
   
   
       // pointcloud.render()
-      pointcloud['render'] = (et:number=0, options:Object={}) => {
+      pointcloud['render'] = (et:number=0, options:object={}) => {
         for ( var i = 0, l = geometry.vertices.length; i < l; i ++ ) {
           //geometry.vertices[ i ].y = 35 * Math.sin( i / 5 + ( et + i ) / 7 );
           geometry.vertices[i].y = 100 * Math.sin(i/5 + (0.5*et + i)/7);

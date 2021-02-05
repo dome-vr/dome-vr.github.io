@@ -37,7 +37,7 @@ var cloud:Cloud,
           j:number;
           //tween1,
           //tween2,
-          //o:Object={x:0};
+          //o:object={x:0};
   
       mediator.log(`current target = ${current} offset=${offset}`);
       for (i = 0, j = offset; i < particles; i++, j += 3 ) {
@@ -85,14 +85,14 @@ class Cloud {
     cloud = this;
   } //ctor
 
-  delta(state:Object, TWEEN_:any, csphere:THREE.Mesh, callback:Function){
+  delta(state:object, TWEEN_:any, callback:Function){
     mediator.log(`delta: state = ${state} TWEEN_ = ${TWEEN_}`);
     var _cloud:boolean = state['_cloud'],
         loaded:number = 0,
         mat:THREE.Material,
         spr:THREE.Object3D,
         textureLoader:THREE.TextureLoader = new THREE.TextureLoader(),
-        o:Object = {};
+        o:object = {};
 
     // globals
     TWEEN = TWEEN_;

@@ -23,7 +23,7 @@ var audio:Audio,
     playbackRate:number = 1.0,
     delay:number = 0.0,
     loop:boolean = true,
-    panner:Object,
+    panner:object,
     coneInnerAngle:number = 360,   // webAudio default 
     coneOuterAngle:number = 360,   // webAudio default 
     coneOuterGain:number = 0,   // webAudio default 
@@ -47,7 +47,7 @@ class Audio {
   }
 
 
-  delta(state:Object, narrative:Narrative, callback:Function){
+  delta(state:object, narrative:Narrative, callback:Function){
     mediator.log(`Audio.delta: state = ${state} _audio = ${state['_audio']}`);
     //for(let p of Object.keys(state)){
     //  console.log(`audio: state has property ${p} val ${state[p]}`);

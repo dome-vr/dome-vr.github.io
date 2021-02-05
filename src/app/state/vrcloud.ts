@@ -20,7 +20,7 @@ var vrcloud:VrCloud,
     particlesByN:number = particles/N,
     duration:number = 1000,  // 2000
     targets:number,
-    vrcloudRadius:number = 500,
+    cloudRadius:number = 500,
     translateZ:number = 1000,
     objects:THREE.Object3D[] = [],
     object:THREE.Object3D,
@@ -37,7 +37,7 @@ var vrcloud:VrCloud,
           j:number;
           //tween1,
           //tween2,
-          //o:Object={x:0};
+          //o:object={x:0};
   
       mediator.log(`current target = ${current} offset=${offset}`);
       for (i = 0, j = offset; i < particles; i++, j += 3 ) {
@@ -85,14 +85,14 @@ class VrCloud {
     vrcloud = this;
   } //ctor
 
-  delta(state:Object, TWEEN_:any, csphere:THREE.Mesh, callback:Function){
+  delta(state:object, TWEEN_:any, callback:Function){
     mediator.log(`delta: state = ${state} TWEEN_ = ${TWEEN_}`);
     var _vrcloud:boolean = state['_vrcloud'],
         loaded:number = 0,
         mat:THREE.Material,
         spr:THREE.Object3D,
         textureLoader:THREE.TextureLoader = new THREE.TextureLoader(),
-        o:Object = {};
+        o:object = {};
 
     // globals
     TWEEN = TWEEN_;
@@ -109,7 +109,7 @@ class VrCloud {
       urls = state['urls'] || urls;
       duration =state['duration'] || duration;
       state_positions = state['positions'] || [];
-      vrcloudRadius = state['vrcloudRadius'] || vrcloudRadius;
+      cloudRadius = state['cloudRadius'] || cloudRadius;
       translateZ = state['translateZ'] || translateZ;
 
       if(state['options']){
@@ -135,7 +135,7 @@ class VrCloud {
                 let z = Math.random() - 0.5;
                 spr.position.set( x, y, z );
                 spr.position.normalize();
-                spr.position.multiplyScalar(vrcloudRadius);
+                spr.position.multiplyScalar(cloudRadius);
                 x = spr.position.x;
                 y = spr.position.y;
                 z = spr.position.z;
@@ -165,7 +165,8 @@ class VrCloud {
                 targets = positions.length/(particles * 3);
 
                 // start animation cycle
-                mediator.log(`at cld.transition: pos.l=${positions.length}`);
+                console.log(`######## at vrcloud.transition: pos.l=${positions.length}`);
+                mediator.log(`######## at vrcloud.transition: pos.l=${positions.length}`);
                 transition();
 
                 // create vrcloud

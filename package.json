@@ -1,0 +1,46 @@
+{
+  "name": "~dome-vr",
+  "version": "1.0.0",
+  "description": "webGL-webVR",
+  "author": "Rudolph",
+  "license": "MIT",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/josefK128/dome-vr-dev.git"
+  },
+  "scripts": {
+    "live-server": "live-server",
+    "live-server-public": "cd c:/public && live-server",
+    "scss": "node-sass --output-style compressed -o src/styles/css src/styles/scss",
+    "test": "jasmine ./spec/*.spec",
+    "tsc": "tsc --outDir ./src/app-es6|sed '/TS2304/d;/TS2503/d'",
+    "tsc-log": "tsc --outDir ./src/app-es6|sed '/TS2304/d;/TS2503/d' > ./logs/tsc.log",
+    "tsc-log-name-errors": "tsc --outDir ./src/app-es6 > ./logs/tsc-name-errors.log",
+    "build": "tsc --out ./dist/app.js|sed '/TS2304/d;/TS2503/d'",
+    "build-log": "tsc --out ./dist/app.js|sed '/TS2304/d;/TS2503/d' > ./logs/build.log",
+    "build-log-name-errors": "tsc --out ./dist/app.js > ./logs/build-name-errors.log",
+    "tslint-faulty": "tslint --project ./tslint.json src/app/**/*.ts"
+  },
+  "dependencies": {
+    "async": "^2.6.1",
+    "gsap": "^2.0.2",
+    "leapjs": "^0.6.4",
+    "socket.io": "^1.7.4",
+    "socket.io-client": "^1.7.4",
+    "systemjs": "^0.19.47",
+    "three": "^0.99.0",
+    "tween.js": "^16.6.0"
+  },
+  "devDependencies": {
+    "jasmine": "^2.6.0",
+    "jasmine-core": "^2.4.1",
+    "live-server": "^0.8.2",
+    "node-sass": "^4.11.0",
+    "typescript": "^1.8.0"
+  },
+  "engines": {
+    "node": "^8.11.1",
+    "npm": "^6.0.1"
+  }
+}

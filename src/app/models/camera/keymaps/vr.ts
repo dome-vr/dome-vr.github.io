@@ -4,15 +4,15 @@ import {mediator} from '../../../services/mediator';
 
 
 // singleton instance and param object
-var map:Map,
+var map:Keymap,
     c3d:Camera3d,
     csphere:THREE.Mesh,
     camera:THREE.PerspectiveCamera,
     record_shots:boolean,
-    a:Object;
+    a:object;
 
 
-class Map {
+class Keymap {
 
   constructor(){
     map = this;
@@ -192,7 +192,7 @@ class Map {
 
 // enforce singleton
 if(!map){
-  map = new Map();
+  map = new Keymap();
 }
 
 export {map};

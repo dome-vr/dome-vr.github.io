@@ -1,6 +1,6 @@
 // fragment shader
 // raymarch - mengersponge
-export var uniforms:Object = {
+var uniforms:object = {
               tDiffuse: {type: 't', value: null},
               uVertex: {type: 'v3', value: new THREE.Vector3()}, //rm_point.getWorldPosition(),
               uAspect: {type: 'f', value: 1.0}, //aspect,
@@ -15,7 +15,7 @@ export var uniforms:Object = {
 
 
 
-export var fsh:string = `
+var fsh:string = `
 #ifdef GL_ES
 precision highp float;
 #endif
@@ -227,3 +227,6 @@ void main()
    gl_FragColor = vec4(res.xyz, 1.0);
 }
 `;//fsh
+
+
+export {fsh, uniforms};
