@@ -1,46 +1,53 @@
 {
-  "name": "~dome-vr",
+  "name": "dome-vr4",
   "version": "1.0.0",
-  "description": "webGL-webVR",
-  "author": "Rudolph",
-  "license": "MIT",
-  "private": true,
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/josefK128/dome-vr-dev.git"
-  },
+  "main": "./dist/narrative.js",
+  "type": "module",
+  "private": "true",
+  "description": "",
+  "keywords": [],
+  "author": "mark rudolph",
+  "license": "ISC",
   "scripts": {
-    "live-server": "live-server",
-    "live-server-public": "cd c:/public && live-server",
-    "scss": "node-sass --output-style compressed -o src/styles/css src/styles/scss",
-    "test": "jasmine ./spec/*.spec",
-    "tsc": "tsc --outDir ./src/app-es6|sed '/TS2304/d;/TS2503/d'",
-    "tsc-log": "tsc --outDir ./src/app-es6|sed '/TS2304/d;/TS2503/d' > ./logs/tsc.log",
-    "tsc-log-name-errors": "tsc --outDir ./src/app-es6 > ./logs/tsc-name-errors.log",
-    "build": "tsc --out ./dist/app.js|sed '/TS2304/d;/TS2503/d'",
-    "build-log": "tsc --out ./dist/app.js|sed '/TS2304/d;/TS2503/d' > ./logs/build.log",
-    "build-log-name-errors": "tsc --out ./dist/app.js > ./logs/build-name-errors.log",
-    "tslint-faulty": "tslint --project ./tslint.json src/app/**/*.ts"
+    "nodemon": "nodemon",
+    "http": "http-server --port=8081",
+    "live": "live-server --port=8081",
+    "lint": "eslint . --config ./.eslintrc.js --ext .ts",
+    "ltsc": "npm run lint && npm run tsc-log",
+    "lt": "npm run lint && npm run tsc-log",
+    "list": "npm list --depth=0",
+    "listg": "npm -g list --depth=0",
+    "tsc": "tsc|sed '/TS2307/d;/TS2304/d;/TS2503/d' ",
+    "tsc-log": "tsc|sed '/TS2307/d;/TS2304/d;/TS2503/d' > ./logs/tsc.log",
+    "tsc-log-name-errors": "tsc > ./logs/tsc-name-errors.log",
+    "test": "node --experimental-modules  --es-module-specifier-resolution=node ./test/test.js",
+    "test-simple": "node --experimental-modules  --es-module-specifier-resolution=node ./test/test-simple.js",
+    "webpack": "webpack --mode=production"
   },
   "dependencies": {
-    "async": "^2.6.1",
-    "gsap": "^2.0.2",
-    "leapjs": "^0.6.4",
-    "socket.io": "^1.7.4",
-    "socket.io-client": "^1.7.4",
-    "systemjs": "^0.19.47",
-    "three": "^0.99.0",
-    "tween.js": "^16.6.0"
+    "gsap": "^3.6.0",
+    "socket.io-client": "^3.1.1",
+    "three": "^0.125.2"
   },
   "devDependencies": {
-    "jasmine": "^2.6.0",
-    "jasmine-core": "^2.4.1",
+    "@typescript-eslint/eslint-plugin": "^4.14.2",
+    "@typescript-eslint/parser": "^4.14.2",
+    "eslint": "^7.19.0",
+    "eslint-plugin-async-await": "0.0.0",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-json": "^2.1.2",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "http-server": "^0.12.3",
     "live-server": "^0.8.2",
-    "node-sass": "^4.11.0",
-    "typescript": "^1.8.0"
+    "nodemon": "^2.0.7",
+    "ts-node": "^9.1.1",
+    "typescript": "^3.9.7",
+    "webpack": "^4.46.0",
+    "webpack-cli": "^3.3.12"
   },
   "engines": {
-    "node": "^8.11.1",
-    "npm": "^6.0.1"
+    "node": "^12.13.0",
+    "npm": "^6.9.0"
   }
 }

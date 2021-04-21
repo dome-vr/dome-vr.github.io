@@ -1,16 +1,18 @@
 {
   "compilerOptions": {
-    "target": "es6",
-    "rootDir": "src/app",
-    "module": "system",
+    "noImplicitAny": false,
+    "strictPropertyInitialization": false,
+    "target": "esnext",
+    "module": "esnext",
+    "outDir": "./dist/app",
     "sourceMap": true,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "removeComments": false,
-    "noImplicitAny": false
+    "lib":[
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ]
   },
-  "include": ["**/*"],
-  "exclude": ["node_modules", "dist", "doc", "e2e", "logs", "NOTES", 
-    "src-app-es6", "src/assets", "src/libs", "src/styles", "src/systemjs",
-    "src/utils"] 
+  "include": ["./src/app/**/*"],
+  "exclude": ["./test/**/*"]
 }
+
