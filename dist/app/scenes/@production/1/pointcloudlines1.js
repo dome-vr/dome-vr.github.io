@@ -91,7 +91,8 @@ const state = {
                 fov: 90,
                 near: 0.01,
                 far: 100000,
-                transform: { 't': [0, .01, 2] } //y=.01 allows blue z-axis to be seen
+                //            transform: {'t':[0,.01,2]}  //y=.01 allows blue z-axis to be seen
+                transform: { 't': [0, -10, 20] } //y=.01 allows blue z-axis to be seen
             },
         }
     },
@@ -108,20 +109,20 @@ const state = {
                     factory: 'Axes',
                     url: '../models/stage/actors/objects/axes.js',
                     options: {
-                        length: 10000,
-                        transform: { t: [0.0, 0.0, 0.0] }
+                        length: 10000
+                        //transform: { t: [0.0, 0.0, 0.0] }
                     }
                 },
-                'unitcube': {
-                    factory: 'Unitcube',
-                    url: '../models/stage/actors/objects/unitcube.js',
-                    options: { wireframe: false,
-                        color: 'white',
-                        opacity: 0.7,
-                        map: './app/media/images/glad.png',
-                        transform: { t: [0, 0, -2], e: [0.0, 0.0, 0.0], s: [0.5, 1, 0.5] }
-                    }
-                },
+                //                'unitcube': {
+                //                    factory: 'Unitcube',
+                //                    url: '../models/stage/actors/objects/unitcube.js',
+                //                    options: { wireframe: false,
+                //                        color: 'white',
+                //                        opacity: 0.7,
+                //                        map: './app/media/images/glad.png',
+                //                        transform: { t: [0, 0, -2], e: [0.0, 0.0, 0.0], s: [0.5, 1, 0.5] }
+                //                    }
+                //                },
                 'sgpointcloudlines': {
                     factory: 'Pointcloudlines',
                     url: '../models/stage/actors/cloud/pointcloud-lines.js',
@@ -132,7 +133,31 @@ const state = {
                         limitConnections: false,
                         maxConnections: 20,
                         particleCount: 512,
-                        transform: { t: [0.0, 0.0, -800.0001], s: [2.0, 12.0, 2.0] } // -300 
+                    }
+                },
+                'vrskybox': {
+                    factory: 'Skybox',
+                    url: '../models/stage/actors/environment/skybox.js',
+                    options: {
+                        size: 10000,
+                        color: 'white',
+                        opacity: 1.0,
+                        //                     textures:[     // url | null for each of 6 
+                        //                       './app/media/images/skybox/sky/sky_posX.jpg',
+                        //                       './app/media/images/skybox/sky/sky_negX.jpg',
+                        //                       './app/media/images/skybox/sky/sky_posY.jpg',
+                        //                       './app/media/images/skybox/sky/sky_negY.jpg',
+                        //                       './app/media/images/skybox/sky/sky_posZ.jpg',
+                        //                       './app/media/images/skybox/sky/sky_negZ.jpg'
+                        //                     ]
+                        textures: [
+                            './app/media/images/skybox/MilkyWay/dark-s_px.jpg',
+                            './app/media/images/skybox/MilkyWay/dark-s_nx.jpg',
+                            './app/media/images/skybox/MilkyWay/dark-s_py.jpg',
+                            './app/media/images/skybox/MilkyWay/dark-s_ny.jpg',
+                            './app/media/images/skybox/MilkyWay/dark-s_pz.jpg',
+                            './app/media/images/skybox/MilkyWay/dark-s_nz.jpg'
+                        ]
                     }
                 }
             } //actors
