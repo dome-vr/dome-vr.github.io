@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "noImplicitAny": false,
+    "strictPropertyInitialization": false,
+    "target": "esnext",
+    "module": "esnext",
+    "outDir": "./dist/app",
+    "sourceMap": true,
+    "lib":[
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ]
+  },
+  "include": ["./src/app/**/*"],
+  "exclude": ["./test/**/*"]
+}
+

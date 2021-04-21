@@ -1,0 +1,53 @@
+{
+  "name": "dome-vr4",
+  "version": "1.0.0",
+  "main": "./dist/narrative.js",
+  "type": "module",
+  "private": "true",
+  "description": "",
+  "keywords": [],
+  "author": "mark rudolph",
+  "license": "ISC",
+  "scripts": {
+    "nodemon": "nodemon",
+    "http": "http-server --port=8081",
+    "live": "live-server --port=8081",
+    "lint": "eslint . --config ./.eslintrc.js --ext .ts",
+    "ltsc": "npm run lint && npm run tsc-log",
+    "lt": "npm run lint && npm run tsc-log",
+    "list": "npm list --depth=0",
+    "listg": "npm -g list --depth=0",
+    "tsc": "tsc|sed '/TS2307/d;/TS2304/d;/TS2503/d' ",
+    "tsc-log": "tsc|sed '/TS2307/d;/TS2304/d;/TS2503/d' > ./logs/tsc.log",
+    "tsc-log-name-errors": "tsc > ./logs/tsc-name-errors.log",
+    "test": "node --experimental-modules  --es-module-specifier-resolution=node ./test/test.js",
+    "test-simple": "node --experimental-modules  --es-module-specifier-resolution=node ./test/test-simple.js",
+    "webpack": "webpack --mode=production"
+  },
+  "dependencies": {
+    "gsap": "^3.6.0",
+    "socket.io-client": "^3.1.1",
+    "three": "^0.125.2"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^4.14.2",
+    "@typescript-eslint/parser": "^4.14.2",
+    "eslint": "^7.19.0",
+    "eslint-plugin-async-await": "0.0.0",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-json": "^2.1.2",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "http-server": "^0.12.3",
+    "live-server": "^0.8.2",
+    "nodemon": "^2.0.7",
+    "ts-node": "^9.1.1",
+    "typescript": "^3.9.7",
+    "webpack": "^4.46.0",
+    "webpack-cli": "^3.3.12"
+  },
+  "engines": {
+    "node": "^12.13.0",
+    "npm": "^6.9.0"
+  }
+}
