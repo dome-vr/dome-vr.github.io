@@ -1,4 +1,4 @@
-// topology7/capri-rmcantor-vrskybox7.ts
+// topology2/capri-rmcantor-vrskybox7.ts
 // webGL2, es300 three.js ==0.125.2
 const config = {
     // rendering topology
@@ -14,7 +14,7 @@ const config = {
         //use frame n-1 sgTarget.tex ('sg') 
         _sgpost: false,
         // rmstage or vrstage actors 
-        sgTargetNames: ['rmquad', 'rmhud'],
+        sgTargetNames: ['rmquad'],
         // render rmscene to display, or to rmTarget offscreen for texturing 
         // in vrscene - either skybox/skydome/etc. or actors
         // NOTE! true=>must define rmquad and rmTargetName(s)
@@ -93,7 +93,19 @@ const state = {
                 near: 0.01,
                 far: 100000,
                 transform: { 't': [0, 0.01, 2] } //y=.01 allows blue z-axis to be seen
-            },
+            }
+            //          fog: {
+            //            _fog: true,
+            //            color: 'white', //0x00ff00,
+            //            near: 0.1,
+            //            far: 1000 //default:100
+            //          }
+            //controls: {
+            //  _controls: true,
+            //  controls: 'vr'
+            //},
+            //csphere: {
+            //}
         },
         vr: {
             lens: {
@@ -130,12 +142,33 @@ const state = {
                 //                        transform: { t: [0, 0, -2], e: [0.0, 0.0, 0.0], s: [0.5, 1, 0.5] }
                 //                    }
                 //                },
-                'panorama': {
-                    factory: 'Panorama',
-                    url: '../models/stage/actors/environment/panorama.js',
+                //                'panorama':{
+                //                    factory:'Panorama',
+                //                    url:'../models/stage/actors/environment/panorama.js',
+                //                    options:{
+                //                      texture_url:'./app/media/images/cube/sun_temple_stripe_stereo.jpg',
+                //                      ntextures:12
+                //                    }
+                //                }
+                // spritecloud
+                'sgcloud': {
+                    factory: 'Spritecloud',
+                    url: '../models/stage/actors/cloud/spritecloud.js',
                     options: {
-                        texture_url: './app/media/images/cube/sun_temple_stripe_stereo.jpg',
-                        ntextures: 12
+                        N: 4,
+                        urls: ["./app/media/images/cloud/sprite_redlight.png",
+                            "./app/media/images/illusions_transparent/necker_cube2.png",
+                            "./app/media/images/cloud/lotus_64.png",
+                            "./app/media/images/sprites/ball.png"],
+                        transparent: true,
+                        opacity: 1.0,
+                        cloudRadius: 1000,
+                        //translateZ:-3500,  //does nothing ?! used to translate ?!
+                        morphtargets: [],
+                        positions: [],
+                        particles: 128,
+                        duration: 10000,
+                        transform: { t: [0.0, 0.0, -300.0] }
                     }
                 }
             } //actors
@@ -150,42 +183,25 @@ const state = {
                     factory: 'Rmquad',
                     url: '../models/stage/actors/raymarch/rmquad.js',
                     options: {
-                        opacity: 1.0,
-                        //                      vsh:'../../../stage/shaders/webgl2/vertex/vsh_default.glsl.js',
-                        //                      fsh:'../../../stage/shaders/webgl2/fragment/fsh_color.glsl.js',
+                        opacity: 0.5,
+                        transparent: true,
                         vsh: '../../../stage/shaders/webgl1/quad_vsh/vsh_default.glsl.js',
-                        //fsh:'../../../stage/shaders/webgl1/quad_fsh/fsh_rm_mengersponge.glsl.js',
-                        fsh: '../../../stage/shaders/webgl1/quad_fsh/fsh_rm_expt1.glsl.js',
-                        //fsh:'../../../stage/shaders/webgl1/quad_fsh/fsh_rm_expt2.glsl.js',
-                        texture: './app/media/images/cloud/moon_256.png'
+                        fsh: '../../../stage/shaders/webgl1/quad_fsh/fsh_rm_mengersponge-nav.glsl.js',
                     }
-                }
-                //                'rmhud': {
-                //                    factory: 'Rmquad',
-                //                    url: '../models/stage/actors/raymarch/rmquad.js',
-                //                    options: {
-                //                        opacity:0.5,
-                ////                      vsh:'../../../stage/shaders/webgl2/vertex/vsh_default.glsl.js',
-                ////                      fsh:'../../../stage/shaders/webgl2/fragment/fsh_color.glsl.js',
-                //                      vsh:'../../../stage/shaders/webgl1/quad_vsh/vsh_default.glsl.js',
-                //                      fsh:'../../../stage/shaders/webgl1/quad_fsh/fsh_tDiffuse.glsl.js',
-                //                      //texture:'./app/media/images/glad.png',
-                //                      transform:{t:[0.0,0.0,0.001]}
-                //                    }
-                //                }
+                },
             } //actors
         },
         vrscene: {
             _actors: true,
             actors: {
-                'axes': {
-                    factory: 'Axes',
-                    url: '../models/stage/actors/objects/axes.js',
-                    options: {
-                        length: 10000,
-                        transform: { t: [0.0, 0.0, 0.0] }
-                    }
-                },
+                //                'axes': {
+                //                    factory: 'Axes',
+                //                    url: '../models/stage/actors/objects/axes.js',
+                //                    options: {
+                //                        length: 10000,
+                //                        transform: { t: [0.0, 0.0, 0.0] }
+                //                    }
+                //                },
                 //                'unitcube': {
                 //                    factory: 'Unitcube',
                 //                    url: '../models/stage/actors/objects/unitcube.js',
@@ -225,21 +241,41 @@ const state = {
                 //                        transform:{t:[0.0,2.0,-3.0001],e:[0.0,1.0,0.0],s:[1.0,3.0,1.0]}
                 //                  } 
                 //                },
+                // spritecloud
+                //                'vrcloud':{ 
+                //                  factory:'Spritecloud',
+                //                  url:'../models/stage/actors/cloud/spritecloud.js',
+                //                  options:{ 
+                //                    N:4,
+                //                    urls:["./app/media/images/cloud/sprite_redlight.png",
+                //                      //"./app/media/images/illusions_transparent/necker_cube2.png" ,
+                //                      "./app/media/images/cloud/moon_256.png" ,
+                //                      "./app/media/images/cloud/lotus_64.png" ,
+                //                      "./app/media/images/sprites/ball.png" ],
+                //                    transparent:true,
+                //                    opacity:0.6,
+                //                    cloudRadius:1000,
+                //                    //translateZ:-3500,  //does nothing ?! used to translate ?!
+                //                    morphtargets:[], //all                     //options
+                //                    positions:[], //positions.len = particles*mTargets.len*3
+                //                    particles:128,  // 128,  // 256    //options
+                //                    duration:10000,  // 2000           //options
+                //                    transform:{t:[0.0,0.0,-300.0]}
+                //                  }
+                //                },
                 'vrskybox': {
                     factory: 'Skybox',
                     url: '../models/stage/actors/environment/skybox.js',
                     options: {
-                        size: 1000,
+                        size: 10000,
                         color: 'white',
                         opacity: 1.0,
-                        textures: [
-                            './app/media/images/skybox/sky/sky_posX.jpg',
-                            './app/media/images/skybox/sky/sky_negX.jpg',
-                            './app/media/images/skybox/sky/sky_posY.jpg',
-                            './app/media/images/skybox/sky/sky_negY.jpg',
-                            './app/media/images/skybox/sky/sky_posZ.jpg',
-                            './app/media/images/skybox/sky/sky_negZ.jpg'
-                        ]
+                        textures: [null, null, null, null, null, null]
+                        // url | null for each of 6
+                        //texture vrskybox with image-texture from url
+                        //null => use given color and not an image-texture
+                        //overridden if vrskybox is in rmTargetNames array
+                        //for all faces named in rmvrskyboxfaces/sgvrskyboxfaces
                     }
                 }
             } //actors
@@ -260,4 +296,4 @@ const state = {
 };
 export { config, state };
 //# sourceMappingURL=scene.js.map
-//# sourceMappingURL=capri-rmexpt1-vrskybox7.js.map
+//# sourceMappingURL=sgcloud-rmcantor-vrskybox7.js.map

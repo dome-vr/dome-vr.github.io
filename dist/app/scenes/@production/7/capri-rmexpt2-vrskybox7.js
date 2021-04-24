@@ -178,14 +178,14 @@ const state = {
         vrscene: {
             _actors: true,
             actors: {
-                'axes': {
-                    factory: 'Axes',
-                    url: '../models/stage/actors/objects/axes.js',
-                    options: {
-                        length: 10000,
-                        transform: { t: [0.0, 0.0, 0.0] }
-                    }
-                },
+                //                'axes': {
+                //                    factory: 'Axes',
+                //                    url: '../models/stage/actors/objects/axes.js',
+                //                    options: {
+                //                        length: 10000,
+                //                        transform: { t: [0.0, 0.0, 0.0] }
+                //                    }
+                //                },
                 //                'unitcube': {
                 //                    factory: 'Unitcube',
                 //                    url: '../models/stage/actors/objects/unitcube.js',
