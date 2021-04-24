@@ -131,7 +131,7 @@ const state = {
                     options: {
                         showDots: true,
                         showLines: true,
-                        minDistance: 150,
+                        minDistance: 160,
                         limitConnections: false,
                         maxConnections: 20,
                         particleCount: 512,
@@ -144,8 +144,8 @@ const state = {
                     factory: 'Skydome',
                     url: '../models/stage/actors/environment/skydome.js',
                     options: {
-                        width: 8000,
-                        height: 12000,
+                        width: 6000,
+                        height: 9000,
                         color: 'white',
                         opacity: 1.0,
                         transparent: true,
