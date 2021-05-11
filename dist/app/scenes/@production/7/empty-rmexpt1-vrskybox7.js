@@ -14,13 +14,13 @@ const config = {
         //use frame n-1 sgTarget.tex ('sg') 
         _sgpost: false,
         // rmstage or vrstage actors 
-        sgTargetNames: ['rmquad', 'rmhud'],
+        sgTargetNames: ['rmquad'],
         // render rmscene to display, or to rmTarget offscreen for texturing 
         // in vrscene - either skybox/skydome/etc. or actors
         // NOTE! true=>must define rmquad and rmTargetName(s)
         _rm: true,
         // rmstage or vrstage actors 
-        _rmpost: false,
+        _rmpost: true,
         rmTargetNames: ['vrskybox'],
         //skyfaces:string[];  //used if actor 'skyfaces' exists and is rmTgtName
         //value is some subset of ['px','nx','py','ny','pz','nz']
@@ -121,8 +121,8 @@ const state = {
             //                    }
             //                },
             //                'unitcube': {
-            //                    factory: 'Unitcube',
-            //                    url: '../models/stage/actors/objects/unitcube.js',
+            //                   factory: 'Unitcube',
+            //                   url: '../models/stage/actors/objects/unitcube.js',
             //                    options: { wireframe: false,
             //                        color: 'white',
             //                        opacity: 0.7,
@@ -130,6 +130,23 @@ const state = {
             //                        transform: { t: [0, 0, -2], e: [0.0, 0.0, 0.0], s: [0.5, 1, 0.5] }
             //                    }
             //                },
+            //                'sgskybox':{ 
+            //                  factory:'Skybox',
+            //                  url:'../models/stage/actors/environment/skybox.js',
+            //                  options:{
+            //                     size:1000,       // default=10000
+            //                     color:'white',
+            //                     opacity: 1.0,    // default 1.0
+            //                     textures:[     // url | null for each of 6 
+            //                       './app/media/images/skybox/grimnight/grimnight_posX.png',
+            //                       './app/media/images/skybox/grimnight/grimnight_negX.png',
+            //                       './app/media/images/skybox/grimnight/grimnight_posY.png',
+            //                       './app/media/images/skybox/grimnight/grimnight_negY.png',
+            //                       './app/media/images/skybox/grimnight/grimnight_posZ.png',
+            //                       './app/media/images/skybox/grimnight/grimnight_negZ.png'
+            //                     ]
+            //                  }
+            //                }
             //                'panorama':{
             //                    factory:'Panorama',
             //                    url:'../models/stage/actors/environment/panorama.js',
@@ -156,23 +173,21 @@ const state = {
                         vsh: '../../../stage/shaders/webgl1/quad_vsh/vsh_default.glsl.js',
                         //fsh:'../../../stage/shaders/webgl1/quad_fsh/fsh_rm_mengersponge.glsl.js',
                         fsh: '../../../stage/shaders/webgl1/quad_fsh/fsh_rm_expt1.glsl.js',
-                        //fsh:'../../../stage/shaders/webgl1/quad_fsh/fsh_rm_expt2.glsl.js',
-                        texture: './app/media/images/cloud/moon_256.png'
+                    }
+                },
+                'rmhud': {
+                    factory: 'Rmquad',
+                    url: '../models/stage/actors/raymarch/rmquad.js',
+                    options: {
+                        opacity: 1.0,
+                        //                      vsh:'../../../stage/shaders/webgl2/vertex/vsh_default.glsl.js',
+                        //                      fsh:'../../../stage/shaders/webgl2/fragment/fsh_color.glsl.js',
+                        vsh: '../../../stage/shaders/webgl1/quad_vsh/vsh_default.glsl.js',
+                        fsh: '../../../stage/shaders/webgl1/quad_fsh/fsh_tDiffuse.glsl.js',
+                        //texture:'./app/media/images/glad.png',
+                        transform: { t: [0.0, 0.0, 0.001] }
                     }
                 }
-                //                'rmhud': {
-                //                    factory: 'Rmquad',
-                //                    url: '../models/stage/actors/raymarch/rmquad.js',
-                //                    options: {
-                //                        opacity:0.5,
-                ////                      vsh:'../../../stage/shaders/webgl2/vertex/vsh_default.glsl.js',
-                ////                      fsh:'../../../stage/shaders/webgl2/fragment/fsh_color.glsl.js',
-                //                      vsh:'../../../stage/shaders/webgl1/quad_vsh/vsh_default.glsl.js',
-                //                      fsh:'../../../stage/shaders/webgl1/quad_fsh/fsh_tDiffuse.glsl.js',
-                //                      //texture:'./app/media/images/glad.png',
-                //                      transform:{t:[0.0,0.0,0.001]}
-                //                    }
-                //                }
             } //actors
         },
         vrscene: {

@@ -1,4 +1,5 @@
 var _a;
+import { transform3d } from '../../../../services/transform3d.js';
 // closure vars
 let pcloudlines, effectController, positions, colors, particles, particlePositions, linesMesh;
 //flag:boolean = true;   // TEMP !!!!
@@ -14,7 +15,8 @@ export const Pointcloudlines = (_a = class {
         maxConnections = options['maxConnections'] || 20, //1,  
         minDistance = options['minDistance'] || 250, //90,  //150,    
         limitConnections = options['limitConnections'] || true, //false,  
-        r = 800, rHalf = r / 2, group = new THREE.Group(), helper = new THREE.BoxHelper(new THREE.Mesh(new THREE.BoxGeometry(r, r, r)));
+        transform = options['transform'], r = 1600, //r = 800,
+        rHalf = r / 2, group = new THREE.Group(), helper = new THREE.BoxHelper(new THREE.Mesh(new THREE.BoxGeometry(r, r, r)));
         return new Promise((resolve, reject) => {
             //effectController = options;  //might be missing properties not supplied!
             effectController = {
@@ -145,7 +147,12 @@ export const Pointcloudlines = (_a = class {
                 linesMesh.geometry.attributes.position.needsUpdate = true;
                 linesMesh.geometry.attributes.color.needsUpdate = true;
                 pcloudlines.geometry.attributes.position.needsUpdate = true;
-            }; //render
+            }; //group['animate']
+            //transform
+            if (transform) {
+                transform3d.apply(transform, group);
+            }
+            //return actor
             resolve(group);
         }); //return new Promise
     } //create

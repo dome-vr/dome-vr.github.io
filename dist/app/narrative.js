@@ -19,8 +19,6 @@ import { gsap } from '../external/gsap/all.js';
 import TWEEN from '../external/tween.js/tween.esm.js';
 // make exterior modules available globally 
 window['THREE'] = THREE;
-//window['VRButton'] = VRButton;
-//window['Stats'] = Stats;
 window['TWEEN'] = TWEEN;
 // at compile time tsc is smart enough to load <module>.ts even though the 
 // file-extension is .js - note that .js is needed for runtime usage
@@ -73,8 +71,7 @@ actor,
 // fps-performance meter
 stats;
 // const - initialized
-// dictionary of all scenes
-const initial_width = window.innerWidth, initial_height = window.innerHeight, scenes = {}, 
+const initial_width = window.innerWidth, initial_height = window.innerHeight, dpr = window.devicePixelRatio, tVector = new THREE.Vector2(), 
 // dictionary of all actors.
 cast = {}, 
 //state/stage creates name-actor entries & registers them in cast 
@@ -86,7 +83,10 @@ startAudio = document.getElementById('startAudio'),
 // AudioListener - needed to create audio actors 
 audioListener = new THREE.AudioListener(), 
 // renderTargets
-sgTarget = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight), rmTarget = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight), vrTarget = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight), 
+sgTarget = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight), 
+//causes three.module.js:24784 WebGL: INVALID_OPERATION: readPixels: no PIXEL_PACK buffer bound
+//sgTarget = new THREE.WebGLRenderTarget(window.innerWidth*dpr, window.innerHeight*dpr),
+rmTarget = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight), 
 // test-textures
 tloader = new THREE.TextureLoader(), escher = tloader.load('./app/media/images/escher.jpg'), glad = tloader.load('./app/media/images/glad.png'), lotus = tloader.load('./app/media/images/lotus_64.png'), moon = tloader.load('./app/media/images/moon_tr.png'), 
 // time
@@ -112,7 +112,12 @@ create_renderer = () => {
     return renderer;
 };
 //dynamic
-let _stats = false, aspect = 1.0, // dynamic measure of window.innerW/window.innerH
+let tw = window.innerWidth * dpr, th = window.innerHeight * dpr, tData = new Uint8Array(tw * th * 4), //RGBA => 4  NOTE- dpr scale NEEDED
+//since creating from Framebuffer
+dTexture = new THREE.DataTexture(tData, tw, th, THREE.RGBAFormat), iData = new Uint8Array(tw * th * 4), //RGBA => 4 NOTE-dpr scale not needed
+//since creating from sgTarget.texture
+rtTexture, image, //HTMLImageElement? - as returned by ImageLoader
+_stats = false, aspect = 1.0, // dynamic measure of window.innerW/window.innerH
 animating = false, // animation => render-loop running
 et = 0, // elapsed time - clock starts at render start
 frame = 0; // frame index (as in rendered frames - fps)
@@ -219,6 +224,16 @@ class Narrative {
         //console.log(`n['displayed_scene'] = ${narrative['displayed_scene']}`);
         // create WebGLRenderer for all scenes
         renderer = create_renderer();
+        //EXPT!
+        renderer.setPixelRatio(dpr); // critically important for post!!
+        //renderer.autoClear = false;
+        //DataTexture filters
+        dTexture.minFilter = THREE.NearestFilter;
+        dTexture.magFilter = THREE.NearestFilter;
+        //initial center (x,y) of DataTexture 
+        tVector.x = 0.0; //0.5*tw;
+        tVector.y = 0.0; //0.5*th;
+        //console.log(`dpr = ${dpr} tVector.x = ${tVector.x} tVector.y = ${tVector.y}`);
         // populate Narrative instance for use in state modules
         narrative['devclock'] = devclock;
         if (_sg) {
@@ -262,6 +277,7 @@ class Narrative {
             // stage prepares scenes - all actors and associated media
             // actions prepares sequences - music, animation and changes
             try {
+                //console.log('\n\n ######## camera-stage-actions');
                 const results = await Promise.all([
                     camera.delta(state['camera'], narrative),
                     stage.delta(state['stage'], narrative),
@@ -333,8 +349,12 @@ class Narrative {
                 }
                 // build rendering components, actors
                 sghud = narrative.findActor('sghud');
+                //console.log(`_sgpost = ${_sgpost}`);
                 if (sghud) {
                     sghud_tDiffuse = sghud.material.uniforms.tDiffuse;
+                    sghud_tDiffuse['value'] = dTexture;
+                    sghud_tDiffuse['needsUpdate'] = true;
+                    //console.log(`sghud_tDiffuse = ${sghud_tDiffuse}`);
                 }
                 else {
                     _sgpost = false;
@@ -373,6 +393,7 @@ class Narrative {
                         rmhud_tDiffuse = rmhud.material.uniforms.tDiffusePost;
                     }
                     transform3d.apply({ s: [initial_width, initial_height, 1.0] }, rmhud);
+                    //console.log(`rmhud_tDiffuse = ${rmhud_tDiffuse}`);
                 }
                 if (!rmquad && !rmhud) {
                     _rm = false;
@@ -420,12 +441,38 @@ class Narrative {
             resolve(devclock.getElapsedTime());
         }); //return new Promise
     } //prerender()
-    // render- without post !!!!!!
     // render current frame - frame holds current frame number
     render() {
+        //TEMP! get displayed_scene lens worldPosition - after 'enterVR'
+        //the headset worldPosition/Orientation is written into the 
+        //displayed_scene lens worldPosition, i.e. in this case sglens.matrixWorld
+        //since topology for test was 1 - for {4,5,6,7} it is vrlens.matrixWorld.
+        //see: https://stackoverflow.com/questions/64639081/how-do-you-get-the-position-of-the-vr-headset-in-three-js
+        //    if(frame%6000 === 0){   //10sec period
+        //      //test is using topology1 and hence sglens - {4,5,6,7} would use vrlens
+        //      const p = new THREE.Vector3(),
+        //            q = new THREE.Quaternion(),
+        //            s = new THREE.Vector3();
+        //
+        //      //p.setFromMatrixPosition(sglens.matrixWorld );
+        //      sglens.matrixWorld.decompose(p,q,s);
+        //      console.log(`p.x=${p.x}  p.y=${p.y}  p.z=${p.z}`);
+        //      //console.log(`q.x=${q.x}  q.y=${q.y}  q.z=${q.z}  q.w=${q.w}`);
+        //      //console.log(`s.x=${s.x}  s.y=${s.y} `r s.z=${s.z}`);
+        //      console.log(`------------------------`);
+        //      
+        ////      //test is using topology1 and hence sglens - {4,5,6,7} would use vrlens
+        ////      //FAILS - sglens is not the correct arg for 'camera'
+        ////      const vp = renderer.xr.getCamera(sglens).getWorldPosition(wvp);
+        ////      console.log(`wvp = ${wvp.x}  ${wvp.y}  ${wvp.z}`);
+        //    }
         // time-ms, check msgs
         et = 1000. * clock.getElapsedTime();
-        if (frame % 10 === 0) { // period is approximately 160ms 
+        //    if(rmquad && rmquad.material.uniforms.uTime){
+        //      rmquad.material.uniforms.uTime.value = et;
+        //      rmquad.material.uniforms.uTime.needsUpdate = true;
+        //    }
+        if (frame % 10 === 0) { //check for pending msgs - period is approx 160ms 
             director.look(et);
         }
         // fps
@@ -445,36 +492,51 @@ class Narrative {
         // render config-defined topology using defined rendering functions
         switch (topology) {
             case 7: // sg-rm-vr
-                //        if(_sgpost){  // FAILS BADLY - DO NOT set true !!!
-                //          sghud_tDiffuse['value'] = sgTarget.texture;
-                //          sghud_tDiffuse['needsUpdate'] = true;
-                //        }
-                renderer.xr.enabled = false; //7f
+                renderer.xr.enabled = false; //5f
                 renderer.setRenderTarget(sgTarget);
                 renderer.render(sgscene, sglens);
+                if (_sgpost) {
+                    //if(frame%600===0){console.log(`_sgpost:rtTexture to sghud`);}
+                    image = sgTarget.texture.image;
+                    const w = image.width, h = image.height;
+                    iData = new Uint8Array(w * h * 4);
+                    renderer.readRenderTargetPixels(sgTarget, 0, 0, w, h, iData);
+                    rtTexture = new THREE.DataTexture(iData, w, h, THREE.RGBAFormat);
+                    sghud_tDiffuse['value'] = rtTexture;
+                    sghud_tDiffuse['needsUpdate'] = true;
+                }
                 //sgTargetNames - 'rmquad' a/o 'rmhud'
                 for (const actorname of sgTargetNames) {
                     if (actorname === 'rmquad') {
+                        //if(frame%600===0){console.log(`sgTarget to rmquad`);}
                         if (rmquad_tDiffuse) {
                             rmquad_tDiffuse['value'] = sgTarget.texture; // both WORK!
                             rmquad_tDiffuse['needsUpdate'] = true;
                         }
                     }
                     if (actorname === 'rmhud') {
+                        //if(frame%600===0){console.log(`sgTarget to rmhud`);}
                         if (rmhud_tDiffuse) {
                             rmhud_tDiffuse['value'] = sgTarget.texture;
                             rmhud_tDiffuse['needsUpdate'] = true;
                         }
                     }
                 }
-                //        if(_rmpost){  // FAILS BADLY - DO NOT set true !!!
-                //          rmhud_tDiffuse['value'] = rmTarget.texture;
-                //          rmhud_tDiffuse['needsUpdate'] = true;
-                //        }
                 renderer.setRenderTarget(rmTarget);
                 renderer.render(rmscene, rmlens);
+                if (_rmpost) {
+                    //if(frame%600===0){console.log(`_rmpost:rtTexture to rmhud`);}
+                    image = rmTarget.texture.image;
+                    const w = image.width, h = image.height;
+                    iData = new Uint8Array(w * h * 4);
+                    renderer.readRenderTargetPixels(rmTarget, 0, 0, w, h, iData);
+                    rtTexture = new THREE.DataTexture(iData, w, h, THREE.RGBAFormat);
+                    rmhud_tDiffuse['value'] = rtTexture;
+                    rmhud_tDiffuse['needsUpdate'] = true;
+                } //if(_rmpost)
                 for (const actorname of rmTargetNames) {
                     if (actorname === 'vrskybox') {
+                        //if(frame%600===0){console.log(`rmTarget.tex to vrskybox`);}
                         const faces = config.topology.rmvrSkyboxFaces;
                         //console.log(`faces = ${faces} faces.length = ${faces.length}`)
                         if (faces && faces.length > 0) {
@@ -528,13 +590,18 @@ class Narrative {
                 renderer.render(vrscene, vrlens);
                 break;
             case 6: // rm-vr
-                //        if(_rmpost){  // FAILS
-                //          //rmhud_tDiffuse['value'] = rmTarget.texture;
-                //          //rmhud_tDiffuse['needsUpdate'] = true;
-                //        }
                 renderer.xr.enabled = false; //6f
                 renderer.setRenderTarget(rmTarget);
                 renderer.render(rmscene, rmlens);
+                if (_rmpost) {
+                    image = rmTarget.texture.image;
+                    const w = image.width, h = image.height;
+                    iData = new Uint8Array(w * h * 4);
+                    renderer.readRenderTargetPixels(rmTarget, 0, 0, w, h, iData);
+                    rtTexture = new THREE.DataTexture(iData, w, h, THREE.RGBAFormat);
+                    rmhud_tDiffuse['value'] = rtTexture;
+                    rmhud_tDiffuse['needsUpdate'] = true;
+                } //if(_rmpost)
                 for (const actorname of rmTargetNames) {
                     if (actorname === 'vrskybox') {
                         const faces = config.topology.rmvrSkyboxFaces;
@@ -590,13 +657,19 @@ class Narrative {
                 renderer.render(vrscene, vrlens);
                 break;
             case 5: // sg-vr
-                //        if(_sgpost){  // FAILS BADLY - DO NOT set true !!!
-                //          sghud_tDiffuse['value'] = sgTarget.texture;
-                //          sghud_tDiffuse['needsUpdate'] = true;
-                //        }
                 renderer.xr.enabled = false; //5f
                 renderer.setRenderTarget(sgTarget);
                 renderer.render(sgscene, sglens);
+                if (_sgpost) {
+                    image = sgTarget.texture.image;
+                    const w = image.width, h = image.height;
+                    iData = new Uint8Array(w * h * 4);
+                    renderer.readRenderTargetPixels(sgTarget, 0, 0, w, h, iData);
+                    rtTexture = new THREE.DataTexture(iData, w, h, THREE.RGBAFormat);
+                    sghud_tDiffuse['value'] = rtTexture;
+                    sghud_tDiffuse['needsUpdate'] = true;
+                }
+                //possibly map (post) sgTarget.texture to vrskybox
                 for (const actorname of sgTargetNames) {
                     if (actorname === 'vrskybox') {
                         const faces = config.topology.sgvrSkyboxFaces;
@@ -637,22 +710,29 @@ class Narrative {
                 renderer.setRenderTarget(null);
                 renderer.render(vrscene, vrlens);
                 break;
+            //no '_vrpost' - framebuffer is stereo - cannot use to render renderTgt
             case 4: // vr
                 renderer.render(vrscene, vrlens);
                 break;
+            //_webxr:false - rmscene output is on near plane - flat and mono
             case 3: // sg-rm
-                //        if(_sgpost){  // FAILS BADLY - DO NOT set true !!!
-                //          sghud_tDiffuse['value'] = sgTarget.texture;
-                //          sghud_tDiffuse['needsUpdate'] = true;
-                //        }
-                //        if(_rmpost){  // FAILS
-                //          //rmhud_tDiffuse['value'] = rmTarget.texture;
-                //          //rmhud_tDiffuse['needsUpdate'] = true;
-                //        }
-                //sgTargetNames - 'rmquad' a/o 'rmhud'
-                renderer.xr.enabled = false; //3f always - rm is mono
+                renderer.xr.enabled = false; //5f top3 cannot be webxr:t - rm is FLAT
                 renderer.setRenderTarget(sgTarget);
                 renderer.render(sgscene, sglens);
+                //if(frame%600===0){console.log(`\nrendered to sgTarget`);}
+                //_sgpost=f => only fsh-rmquad as rmscene
+                if (_sgpost) {
+                    image = sgTarget.texture.image;
+                    const w = image.width, h = image.height;
+                    iData = new Uint8Array(w * h * 4);
+                    renderer.readRenderTargetPixels(sgTarget, 0, 0, w, h, iData);
+                    rtTexture = new THREE.DataTexture(iData, w, h, THREE.RGBAFormat);
+                    sghud_tDiffuse['value'] = rtTexture;
+                    sghud_tDiffuse['needsUpdate'] = true;
+                }
+                //if(frame%600===0){console.log(`wrote rtTexture to sghud`);}
+                //texture map rmquad a/o rmhud with sgTarget.texture
+                //if(frame%600===0){console.log(`sgTNames.l=${sgTargetNames.length}`);}
                 for (const actorname of sgTargetNames) {
                     if (actorname === 'rmquad') {
                         if (rmquad_tDiffuse) {
@@ -667,48 +747,56 @@ class Narrative {
                         }
                     }
                 }
+                //if(frame%600===0){console.log(`rmq_tD['v']===sgT.tex=${rmquad_tDiffuse['value']===sgTarget.texture}`);}
+                //if(frame%600===0){console.log(`wrote sgTarget.tex to rmquad`);}
+                //render rmscene to framebuffer
+                renderer.clear();
                 renderer.setRenderTarget(null);
                 renderer.render(rmscene, rmlens);
-                //        if(_rmpost){  // FAILS BADLY - DO NOT set true !!!
-                //          renderer.setRenderTarget(rmTarget);
-                //          renderer.render(rmscene, rmlens);
-                //        }
+                //if(frame%600===0){console.log(`rendered rmscene to framebuffer`);}
+                if (_rmpost) {
+                    renderer.copyFramebufferToTexture(tVector, dTexture);
+                    rmhud_tDiffuse['value'] = dTexture;
+                    rmhud_tDiffuse['needsUpdate'] = true;
+                } //if(_rmpost)
+                //if(frame%600===0){console.log(`wrote dTexture to rmhud`);}
                 break;
+            //_webxr:false - rmscene output is on near plane - flat and mono
             case 2: // rm:  k shader-layers (in this case k=2)
-                renderer.xr.enabled = false; //3f always - rm is mono
-                //        if(_rmpost){  //cannot read from and write to the same texture
-                //          rmhud_tDiffuse['value'] = rmTarget.texture;
-                //          rmhud_tDiffuse['needsUpdate'] = true;
+                //TEMP!!!
+                //        if(frame%1200 < 600){
+                //          rmquad_tDiffuse['value'] = glad;
+                //          rmquad_tDiffuse['needsUpdate'] = true;
+                //          if(_rmpost){
+                //            rmhud_tDiffuse['value'] = moon;
+                //            rmhud_tDiffuse['needsUpdate'] = true;
+                //          }
+                //        }else{
+                //          rmquad_tDiffuse['value'] = moon;
+                //          rmquad_tDiffuse['needsUpdate'] = true;
+                //          if(_rmpost){
+                //            rmhud_tDiffuse['value'] = glad;
+                //            rmhud_tDiffuse['needsUpdate'] = true;
+                //          }
                 //        }
-                if (frame % 1200 < 600) {
-                    rmquad_tDiffuse['value'] = glad;
-                    rmquad_tDiffuse['needsUpdate'] = true;
-                    if (_rmpost) {
-                        rmhud_tDiffuse['value'] = moon;
-                        rmhud_tDiffuse['needsUpdate'] = true;
-                    }
-                }
-                else {
-                    rmquad_tDiffuse['value'] = moon;
-                    rmquad_tDiffuse['needsUpdate'] = true;
-                    if (_rmpost) {
-                        rmhud_tDiffuse['value'] = glad;
-                        rmhud_tDiffuse['needsUpdate'] = true;
-                    }
-                }
-                renderer.setRenderTarget(null);
                 renderer.render(rmscene, rmlens);
-                //        if(_rmpost){  //cannot read from and write to the same texture
-                //          renderer.setRenderTarget(rmTarget);
-                //          renderer.render(rmscene, rmlens);
-                //        }
+                if (_rmpost) {
+                    renderer.copyFramebufferToTexture(tVector, dTexture);
+                    rmhud_tDiffuse['value'] = dTexture;
+                    rmhud_tDiffuse['needsUpdate'] = true;
+                } //if(_rmpost)
                 break;
+            //if _sgpost then _webxr:false - sghud is on near plane - flat and mono
+            //webxf:f - working
+            //webxf:t - working - but not viewable in VR since flat sghud is on
+            //the near camera plane
             case 1: // sg
-                //        if(_sgpost){  // FAILS BADLY - DO NOT set true !!!
-                //          sghud_tDiffuse['value'] = sgTarget.texture;
-                //          sghud_tDiffuse['needsUpdate'] = true;
-                //        }
                 renderer.render(sgscene, sglens);
+                if (_sgpost) {
+                    renderer.copyFramebufferToTexture(tVector, dTexture);
+                    sghud_tDiffuse['value'] = dTexture;
+                    sghud_tDiffuse['needsUpdate'] = true;
+                } //if(_sgpost)
                 break;
             default: // error
                 console.log(`unrecognized topology ${topology}`);
@@ -718,12 +806,29 @@ class Narrative {
     } //render
     // reset params based on window resize event
     onWindowResize() {
-        const width_ = window.innerWidth, height_ = window.innerHeight, ratiow = width_ / initial_width, ratioh = height_ / initial_height;
-        console.log(`resize: initial_width=${initial_width}`);
-        console.log(`resize: initial_height=${initial_height}`);
+        const width_ = window.innerWidth, height_ = window.innerHeight;
+        //ratiow:number = width_/initial_width,
+        //ratioh:number = height_/initial_height;
+        //diagnostics
+        //console.log(`resize: init_w=${initial_width} init_h=${initial_height}`);
         console.log(`resize: width=${width_} height=${height_}`);
-        console.log(`resize: ratiow=${ratiow}`);
-        console.log(`resize: ratioh=${ratioh}`);
+        // renderTargets
+        sgTarget.setSize(width_, height_);
+        rmTarget.setSize(width_, height_);
+        //diagnostics for post textures from renderer.copyRenderTargetToTexture
+        ////          image = sgTarget.texture.image;
+        ////          const w = image.width,
+        ////                h = image.height,
+        ////                iData = new Uint8Array(w * h * 4 );
+        ////          renderer.readRenderTargetPixels(sgTarget, 0,0,w,h, iData);
+        ////          rtTexture = new THREE.DataTexture(iData, w, h, THREE.RGBAFormat);
+        //    console.log(`sgTg.w=${sgTarget.width} sgTg.h=${sgTarget.height}`);
+        //    console.log(`sgT.tex.im.w=${sgTarget.texture.image.width}`); 
+        //    console.log(`sgT.tex.im.h=${sgTarget.texture.image.height}`);
+        //    console.log(`iData.length=${iData.length}`);
+        //    if(rtTexture){
+        //      console.log(`rtTx.im.w=${rtTexture.image.width} rtTx.im.h=${rtTexture.image.height}`);
+        //    }
         //rmquad
         //    if(rmquad){
         //      const t = {s:[ratiow, ratioh, 1.0]};
@@ -734,16 +839,21 @@ class Narrative {
         //      const t = {s:[ratiow, ratioh, 1.0]};
         //      transform3d.apply(t, rmhud);
         //    }
+        //post textures from renderer.copyFramebufferToTexture
+        if (_sgpost || _rmpost) {
+            //console.log(`_sgpost || _rmpost true!!!`);
+            tw = width_ * dpr;
+            th = height_ * dpr;
+            tData = new Uint8Array(tw * th * 4);
+            dTexture = new THREE.DataTexture(tData, tw, th, THREE.RGBAFormat);
+            dTexture.minFilter = THREE.NearestFilter;
+            dTexture.magFilter = THREE.NearestFilter;
+        }
+        //canvas
         canvas.width = width_;
         canvas.height = height_;
+        //cameras
         aspect = width_ / height_;
-        // renderTargets
-        sgTarget.width = width_;
-        rmTarget.width = width_;
-        vrTarget.width = width_;
-        sgTarget.height = height_;
-        rmTarget.height = height_;
-        vrTarget.height = height_;
         if (sglens) {
             sglens.aspect = aspect;
             sglens.updateProjectionMatrix();
@@ -756,6 +866,7 @@ class Narrative {
             vrlens.aspect = aspect;
             vrlens.updateProjectionMatrix();
         }
+        //renderer
         renderer.setSize(width_, height_);
     }
     // method to allow infinite seq-loop mainly for music sequence playing
@@ -769,7 +880,7 @@ class Narrative {
      ms:15000}
     */
     sequence(sequence_url) {
-        console.log(`\n\n****** narrative.sequence seq_url = ${sequence_url}`);
+        console.log(`\n*** narrative.sequence sequence_url = ${sequence_url}`);
         //    if(sequence_url){
         //      import(sequence_url).then((seq) => {
         //        console.log(`****** narrative.sequence seq = ${seq}:`);

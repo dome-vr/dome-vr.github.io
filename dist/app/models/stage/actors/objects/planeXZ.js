@@ -17,6 +17,7 @@ export const PlaneXZ = class {
             });
             // blending
             // check: need gl.enable(gl.BLEND)
+            plane_m.blending = THREE.CustomBlending;
             plane_m.blendSrc = THREE.SrcAlphaFactor; // default
             plane_m.blendDst = THREE.OneMinusSrcAlphaFactor; //default
             //grid_m.depthTest = false;  //default

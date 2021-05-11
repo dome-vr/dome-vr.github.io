@@ -3,7 +3,7 @@ import { transform3d } from '../../../../services/transform3d.js';
 export const Rmquad = class {
     static create(options = {}) {
         // options
-        const opacity = options['opacity'] || 1.0, vsh = options['vsh'] || '../models/stage/shaders/webgl2/vertex/vsh_default.glsl.js', fsh = options['fsh'] || '../models/stage/shaders/webgl2/fragment/fsh_rm_texquad.glsl.js', texture = options['texture'], transform = options['transform'];
+        const opacity = options['opacity'] || 1.0, vsh = options['vsh'] || '../../shaders/webgl2/vertex/vsh_default.glsl.js', fsh = options['fsh'] || '../../shaders/webgl2/fragment/fsh_rm_texquad.glsl.js', texture = options['texture'], transform = options['transform'];
         return new Promise((resolve, reject) => {
             let plane_g, plane_m, vshader, fshader, uniforms, 
             //aspect:number = window.innerWidth/window.innerHeight, //aspect ratio
@@ -30,6 +30,7 @@ export const Rmquad = class {
                     side: THREE.DoubleSide,
                 });
                 // blending - check: need gl.enable(gl.BLEND)
+                plane_m.blending = THREE.CustomBlending;
                 plane_m.blendSrc = THREE.SrcAlphaFactor; // default
                 plane_m.blendDst = THREE.OneMinusSrcAlphaFactor; //default
                 //plane_m.depthTest = true;  //default is f
@@ -66,9 +67,13 @@ export const Rmquad = class {
                 plane['delta'] = (options = {}) => {
                     //console.log(`rmquad.delta: options = ${options}:`);
                     //console.dir(options); 
-                    const opacity = options['opacity'] || 0.0;
+                    const opacity = options['opacity'], transform = options['transform'];
                     if (opacity !== undefined) {
                         plane_m.opacity = opacity;
+                    }
+                    //transform
+                    if (transform && Object.keys(transform).length > 0) {
+                        transform3d.apply(transform, plane);
                     }
                 };
                 // test ONLY!!!

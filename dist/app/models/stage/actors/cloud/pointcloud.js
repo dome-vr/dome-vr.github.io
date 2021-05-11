@@ -15,6 +15,7 @@ export const Pointcloud = class {
         }), nvertices = pcloud_g.attributes.position.count, alphas = new Float32Array(nvertices * 1), psizes = new Float32Array(nvertices * 1);
         let color = options['color'] || 'red', transform = options['transform'];
         //blend
+        pcloud_m.blending = THREE.CustomBlending;
         pcloud_m.blendSrc = THREE.SrcAlphaFactor; // default
         pcloud_m.blendDst = THREE.OneMinusSrcAlphaFactor; //default
         //create pointcloud

@@ -107,7 +107,7 @@ const fsh = `
        vec3 eye = vec3(0.0, 0.0, 1.0);       // fov=pi/2 => z=1
 
        // map texture pixels to [-1,1]x[-1,1] near plane of fsh-eye fov=90
-       vec3 fwd = normalize(vec3(2.0*vuv.s-1.0, 2.0*vuv.t-1.0,-1.0));
+       vec3 fwd = normalize(vec3(2.0*vuv.s-1.0, 2.0*vuv.t-1.0, -1.0));
 
        // paint
        gl_FragColor = blend(color(march(eye,fwd), fwd));

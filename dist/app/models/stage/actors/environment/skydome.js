@@ -2,17 +2,17 @@ import { transform3d } from '../../../../services/transform3d.js';
 // class Skydome - Factory
 export const Skydome = class {
     static create(options = {}, narrative) {
-        const width = options['width'] || 5000, height = options['height'] || 10000, color = options['color'] || 'black', opacity = options['opacity'] || 1.0, url = options['texture'] || '', rotate = options['rotate'] || true, transform = (options['transform'] || {}), textureLoader = new THREE.TextureLoader();
+        const width = options['width'] || 5000, height = options['height'] || 10000, color = options['color'] || 'black', opacity = options['opacity'] || 1.0, url = options['texture'] || '', transparent = options['transparent'] || true, rotate = options['rotate'] || true, transform = (options['transform'] || {}), textureLoader = new THREE.TextureLoader();
         let dome_g, dome_m, dome;
         //diagnostics
-        console.log(`\n\n&&& Skydome.create():`);
-        console.log(`width = ${width}`);
-        console.log(`height = ${height}`);
-        console.log(`color = ${color}`);
-        console.log(`opacity = ${opacity}`);
-        console.log(`url = ${url}`);
-        console.log(`transform = ${transform}:`);
-        console.dir(transform);
+        //    console.log(`\n\n&&& Skydome.create():`);
+        //    console.log(`width = ${width}`);
+        //    console.log(`height = ${height}`);
+        //    console.log(`color = ${color}`);
+        //    console.log(`opacity = ${opacity}`);
+        //    console.log(`url = ${url}`);
+        //    console.log(`transform = ${transform}:`);
+        //    console.dir(transform);
         return new Promise((resolve, reject) => {
             try {
                 dome_g = new THREE.SphereBufferGeometry(1.0); // unit sphere
