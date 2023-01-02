@@ -30,8 +30,8 @@ const fsh = `
    
 
 
-     // distance - used by march
-     float distance(vec3 p, vec3 v, vec3 b){
+     // distance function _distance() - used by march
+     float _distance(vec3 p, vec3 v, vec3 b){
        vec3 p_v = p - v;
        //return length(max(abs(p_v)-b, 0.0));  // single-cube
 
@@ -44,7 +44,7 @@ const fsh = `
      }
 
 
-     // march(eye, fwd) - uses distance 
+     // march(eye, fwd) - uses distance f _distance() 
      float march(vec3 eye, vec3 fwd){
          float t=0.0;
          float s = uFovscale;
@@ -70,8 +70,8 @@ const fsh = `
              // distortion due to non-uniform aspect ratio 
              vec3 b = vec3(ssx*0.1, ssy*0.1, s*0.1);
 
-             // distance
-             float d = distance(p, v, b);  
+             // distance d 
+             float d = _distance(p, v, b);  
              t += d*0.5;
          }
          return t;
