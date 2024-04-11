@@ -9,7 +9,8 @@ export const Pointcloudlines = (_a = class {
     // create
     _a.create = (options = {}) => {
         // options
-        const maxParticleCount = 1000, particleCount = options['particleCount'] || 500, // no effect ?!
+        const maxParticleCount = 1000, //1000
+        particleCount = options['particleCount'] || 500, // no effect ?!
         showDots = options['showDots'] || true, // no effect ?!
         showLines = options['showLines'] || true, // no effect ?!
         maxConnections = options['maxConnections'] || 20, //1,  

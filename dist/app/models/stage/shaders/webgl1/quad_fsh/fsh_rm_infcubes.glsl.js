@@ -1,6 +1,7 @@
 // fsh_infcubes.glsl.ts
 // fragment shader
 // raymarch - infinite cubes - adapted from Roast
+import * as THREE from '../../../../../../../node_modules/three/build/three.module.js';
 const uniforms = {
     tDiffuse: { type: 't', value: null },
     uVertex: { type: 'v3', value: new THREE.Vector3() },

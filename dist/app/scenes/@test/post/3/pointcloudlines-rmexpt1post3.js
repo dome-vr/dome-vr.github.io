@@ -1,4 +1,4 @@
-// topology3/pointcloudlines-rmexpt1post3.ts
+// @test/post/3/pointcloudlines-rmexpt1post3.ts
 // webGL2, es300 three.js ==0.125.2
 const config = {
     // rendering topology
@@ -164,7 +164,8 @@ const state = {
                     url: '../models/stage/actors/raymarch/rmquad.js',
                     options: {
                         color: 'white',
-                        opacity: 0.5,
+                        transparent: true,
+                        opacity: 0.7,
                         //                      vsh:'../../../stage/shaders/webgl2/vertex/vsh_default.glsl.js',
                         //                      fsh:'../../../stage/shaders/webgl2/fragment/fsh_color.glsl.js',
                         vsh: '../../../stage/shaders/webgl1/quad_vsh/vsh_default.glsl.js',
@@ -177,11 +178,13 @@ const state = {
                     options: {
                         color: 'white',
                         transparent: true,
-                        opacity: 0.5,
+                        opacity: 0.6,
                         //texture:'./app/media/images/hexagonal_tr.png',
                         // test ONLY! - not for production use!
-                        scaleX: 1.001,
-                        scaleY: 1.001,
+                        scaleX: 1.0012,
+                        scaleY: 1.0012,
+                        //transform:{}
+                        transform: { t: [0.0, 0.0, 0.001] }
                     }
                 }
             } //actors

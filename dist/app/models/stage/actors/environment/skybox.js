@@ -2,17 +2,23 @@ import { transform3d } from '../../../../services/transform3d.js';
 // class Skybox - Factory
 export const Skybox = class {
     static create(options = {}) {
-        const size = options['size'] || 10000, color = options['color'] || 'black', opacity = options['opacity'] || 1.0, urls = options['textures'], transform = (options['transform'] || {}), 
+        const size = options['size'] || 10000, color = options['color'] || 'black', opacity = options['opacity'] || 1.0, urls = options['textures'], //string[6]
+        transform = (options['transform'] || {}), 
         //function to create single textured-material given url
         create_material = (url_) => {
             const loader = new THREE.TextureLoader();
             let material;
+            //**************
+            //console.log(`create_material:url_ = ${url_}`);
+            //**************
             return new Promise((resolve, reject) => {
                 try {
-                    if (url_ !== null) {
+                    if (url_ !== null) { //6 urls => texture the skybox
                         loader.load(url_, (texture) => {
+                            //***********
                             //console.log(`create_material((${url_}) texture = ${texture}:`);
                             //console.dir(texture);
+                            //***********
                             material = new THREE.MeshBasicMaterial({
                                 color: color,
                                 opacity: opacity,
@@ -24,10 +30,12 @@ export const Skybox = class {
                             material.blendSrc = THREE.SrcAlphaFactor; // default
                             material.blendDst = THREE.OneMinusSrcAlphaFactor; // default
                             material.blendEquation = THREE.AddEquation; // default
+                            material.map = texture;
+                            //material.needsUpdate = true;
                             resolve(material);
                         }); //load
                     }
-                    else { // url null
+                    else { // url null => no texture
                         material = new THREE.MeshBasicMaterial({
                             color: color,
                             opacity: opacity,
@@ -47,6 +55,12 @@ export const Skybox = class {
         //function to create materials[]
         create_materials = (urls_) => {
             try {
+                //**************
+                //console.log(`create_materials:urls_.length = ${urls_.length}`);
+                for (let i = 0; i < urls.length; i++) {
+                    //console.log(`urls_[${i}] = ${urls_[i]}`);
+                }
+                //**************
                 return Promise.all([
                     create_material(urls_[0]),
                     create_material(urls_[1]),
@@ -63,9 +77,15 @@ export const Skybox = class {
         };
         let cube_g, materials, cube;
         return new Promise((resolve, reject) => {
-            cube_g = new THREE.BoxBufferGeometry(size, size, size, 1, 1, 1);
+            cube_g = new THREE.BoxGeometry(size, size, size, 1, 1, 1);
             //urls must be 6 url-strings (or null) - but 6 array-elements
             try {
+                //**************
+                //console.log(`initial Promise:urls.length = ${urls.length}`);
+                for (let i = 0; i < urls.length; i++) {
+                    //console.log(`urls[${i}] = ${urls[i]}`);
+                }
+                //**************
                 create_materials(urls).then((materials_) => {
                     materials = materials_;
                     //console.log(`materials = ${materials}`);

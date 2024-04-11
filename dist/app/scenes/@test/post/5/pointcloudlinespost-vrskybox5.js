@@ -1,4 +1,4 @@
-// topology5/pointcloudlinespost-vrskybox5.ts
+// @test/post/5/pointcloudlinespost-vrskybox5.ts
 // webGL2, es300 three.js ==0.125.2
 const config = {
     // rendering topology
@@ -138,16 +138,16 @@ const state = {
                         scaleY: 1.01,
                     }
                 },
-                'unitcube': {
-                    factory: 'Unitcube',
-                    url: '../models/stage/actors/objects/unitcube.js',
-                    options: { wireframe: false,
-                        color: 'white',
-                        opacity: 0.7,
-                        map: './app/media/images/glad.png',
-                        transform: { t: [0, 0, -2], e: [0.0, 0.0, 0.0], s: [0.5, 1, 0.5] }
-                    }
-                },
+                //                'unitcube': {
+                //                    factory: 'Unitcube',
+                //                    url: '../models/stage/actors/objects/unitcube.js',
+                //                    options: { wireframe: false,
+                //                        color: 'white',
+                //                        opacity: 0.7,
+                //                        map: './app/media/images/glad.png',
+                //                        transform: { t: [0, 0, -2], e: [0.0, 0.0, 0.0], s: [0.5, 1, 0.5] }
+                //                    }
+                //                },
                 'sgpointcloudlines': {
                     factory: 'Pointcloudlines',
                     url: '../models/stage/actors/cloud/pointcloud-lines.js',
@@ -176,16 +176,16 @@ const state = {
                         //transform: { t: [0.0, 0.0, 0.0] }
                     }
                 },
-                'unitcube': {
-                    factory: 'Unitcube',
-                    url: '../models/stage/actors/objects/unitcube.js',
-                    options: { wireframe: false,
-                        color: 'white',
-                        opacity: 0.7,
-                        map: './app/media/images/glad.png',
-                        transform: { t: [0, 0, -2], e: [0.0, 0.0, 0.0], s: [0.5, 1, 0.5] }
-                    }
-                },
+                //                'unitcube': {
+                //                    factory: 'Unitcube',
+                //                    url: '../models/stage/actors/objects/unitcube.js',
+                //                    options: { wireframe: false,
+                //                        color: 'white',
+                //                        opacity: 0.7,
+                //                        map: './app/media/images/glad.png',
+                //                        transform: { t: [0, 0, -2], e: [0.0, 0.0, 0.0], s: [0.5, 1, 0.5] }
+                //                    }
+                //                },
                 'vrskybox': {
                     factory: 'Skybox',
                     url: '../models/stage/actors/environment/skybox.js',

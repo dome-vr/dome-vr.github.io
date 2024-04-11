@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>test_effect_cube_1to6.html</title>
+        <style>
+            body { margin: 0; }
+        </style>
+    </head>
+
+    <body>
+
+        <!--needed to import '* as THREE' but never used?! otherwise get error:
+          Uncaught TypeError: Failed to resolve module specifier "three". Relative references must start with either "/", "./", or "../". -->
+    	<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+    	<script type="importmap">
+    		{
+              	"imports": {
+    				"three": "../../node_modules/three/build/three.module.js",
+    				"three/addons/": "../../node_modules/three/examples/jsm/"
+        		}
+    		}
+        </script>
+
+
+        <script type='module'> 
+
+            //three.js
+            import * as THREE from "../../node_modules/three/build/three.module.js";
+
+            //utilities
+            import Stats from '../../node_modules/three/examples/jsm/libs/stats.module.js'; //default export
+    		import {GUI} from '../../node_modules/three/examples/jsm/libs/lil-gui.module.min.js';
+    		import {GLTFLoader} from '../../node_modules/three/examples/jsm/loaders/GLTFLoader.js';
+
+
+            //EffectComposer-passes
+            import {EffectComposer} from '../../node_modules/three/examples/jsm/postprocessing/EffectComposer.js'; //default export
+
+            //effects-passes
+    		import {DotScreenPass} from '../../node_modules/three/examples/jsm/postprocessing/DotScreenPass.js';
+    		import {AfterimagePass} from '../../node_modules/three/examples/jsm/postprocessing/AfterimagePass.js';
+    		import {FilmPass} from '../../node_modules/three/examples/jsm/postprocessing/FilmPass.js';
+    		import {RenderPass} from '../../node_modules/three/examples/jsm/postprocessing/RenderPass.js';
+
+
+            //VR
+            import {VRButton} from '../../node_modules/three/examples/jsm/webxr/VRButton.js';
+    		import {OrbitControls} from '../../dist/external/OrbitControls.js';
+
+            import {transform3d} from '../../dist/app/services/transform3d.js';
+
+
+            //shaders
+            import {vsh} from '../../dist/app/models/stage/shaders/template_shaders/vsh_template.glsl.js';
+            import {fsh} from '../../dist/app/models/stage/shaders/template_shaders/fsh_uPos_rmspheres.glsl.js';
+            import {uniforms} from '../../dist/app/models/stage/shaders/template_shaders/fsh_uPos_rmspheres.glsl.js';
+
+
+
+
+
+
+            //make THREE global
+            window['THREE'] = THREE;
+
+
+            //diagnostics
+            console.log(`test_effect_cube_1to6.html`);
+            //console.log(`EffectComposer = ${EffectComposer}`);
+            let frame = 0;
+
+
+            //BASICS
+            const clock = new THREE.Clock();
+            clock.start();
+
+            //renderer
+            const renderer = new THREE.WebGLRenderer();
+            renderer.setSize( window.innerWidth, window.innerHeight );
+            const canvas = renderer.domElement,
+                  context = canvas.getContext('webgl2', {antialias:true});
+            document.body.appendChild( renderer.domElement );
+            let aspect = window.innerWidth/window.innerHeight;
+
+            //used in animate()
+            let _rt = new THREE.WebGLRenderer();
+            _rt.setSize( window.innerWidth, window.innerHeight );
+
+
+
+
+
+            // SG ------------------------
+            //sg - sgscene,
+            const sgscene = new THREE.Scene();
+
+            //sglenspx,...,sglensnz
+            const sglenspz = new THREE.PerspectiveCamera(90, aspect, 0.1, 1000);
+            sglenspz.position.z = 10.;
+//            const sglensnx = new THREE.PerspectiveCamera(90, aspect, 0.1, 1000);
+//            sglenspx.position.x = -1.;
+//            const sglenspy = new THREE.PerspectiveCamera(90, aspect, 0.1, 1000);
+//            sglenspx.position.y = 1.;
+//            const sglensny = new THREE.PerspectiveCamera(90, aspect, 0.1, 1000);
+//            sglenspx.position.y = -1.;
+//            const sglenspz = new THREE.PerspectiveCamera(90, aspect, 0.1, 1000);
+//            sglenspx.position.z = 1.;
+//            const sglensnz = new THREE.PerspectiveCamera(90, aspect, 0.1, 1000);
+//            sglenspx.position.z = -1.;
+//
+//            //sglens[]
+//            const sglens=[
+//              sglenspx,
+//              sglensnx,
+//              sglenspy,
+//              sglensny,
+//              sglenspz,
+//              sglensnz
+//            ];
+
+
+            //sg-renderTargets rtpx,...,rtnz
+            const rtpz = new THREE.WebGLRenderTarget();
+//            const rtnx = new THREE.WebGLRenderTarget();
+//            const rtpy = new THREE.WebGLRenderTarget();
+//            const rtny = new THREE.WebGLRenderTarget();
+//            const rtpz = new THREE.WebGLRenderTarget();
+//            const rtnz = new THREE.WebGLRenderTarget();
+//
+//            //rt[]
+//            const rt = [
+//              rtpx,
+//              rtnx,
+//              rtpy,
+//              rtny,
+//              rtpz,
+//              rtnz
+//            ];
+
+//            for(let i=0; i<6; i++){
+//              rt[i].setSize( window.innerWidth, window.innerHeight );
+//            }
+            rtpz.setSize( window.innerWidth, window.innerHeight );
+
+
+            //effect composers
+            const composerpz = new EffectComposer(renderer, rtpz);
+//            const composernx = new EffectComposer(renderer, rtpx);
+//            const composerpy = new EffectComposer(renderer, rtpx);
+//            const composerny = new EffectComposer(renderer, rtpx);
+//            const composerpz = new EffectComposer(renderer, rtpx);
+//            const composernz = new EffectComposer(renderer, rtpx);
+//
+//            //composer[]
+//            const composer = [
+//              composerpx,
+//              composernx,
+//              composerpy,
+//              composerny,
+//              composerpz,
+//              composernz
+//            ];
+
+            //@@@ effects
+            //NOTE: order dependent!
+            //DotScreenPass() => use defaults in shader
+            const dotscreenpass = new DotScreenPass();
+            
+            //AfterImagePass => default .96
+            const afterimagepass2 = new AfterimagePass();
+
+            //needed but not applied!
+            //FilmPass(noise-intensity,scanline-int.,scanline-count,grayscale)
+            const filmpass = new FilmPass(.35, .025, 648, false);
+
+            //final pass
+            const renderpass = new RenderPass(sgscene, sglenspz);
+
+
+//            for(let i=0; i<6; i++){
+//              composer[i].addPass(dotscreenpass);
+//              composer[i].addPass(afterimagepass2);
+//    
+//              //!!! NOT rendered - need effect here or NO rendered effects !!!
+//              //    comment out => lose AfterImagePass, i.e. needed!
+//              composer[i].addPass(filmpass);
+//
+//              //executed
+//              composer[i].addPass(renderpass);
+//              composer[i].renderToScreen = false;
+//            }
+            composerpz.addPass(dotscreenpass);
+            composerpz.addPass(afterimagepass2);
+  
+            //!!! NOT rendered - need effect here or NO rendered effects !!!
+            //    comment out => lose AfterImagePass, px.e. needed!
+            composerpz.addPass(filmpass);
+
+            //executed
+            composerpz.addPass(renderpass);
+            composerpz.renderToScreen = false;
+
+
+            //sgscene:
+            //rotating sphereX (around X axis), sphereY (around Y axis)
+            //sphereX
+            const sphereX_g = new THREE.SphereGeometry(2),
+                  sphereX_m = new THREE.MeshBasicMaterial({
+                    visible:true,
+                    opacity:1.0,
+                    color: 0xff0000,
+                    side:THREE.DoubleSide,
+                  });
+
+            //sphereX blending - check: need gl.enable(gl.BLEND)
+            sphereX_m.blendSrc = THREE.SrcAlphaFactor; // default
+            sphereX_m.blendDst = THREE.OneMinusSrcAlphaFactor; //default
+    
+            // sphereX
+            const sphereX = new THREE.Mesh(sphereX_g, sphereX_m);
+            sphereX.position.x = 2.;
+            sphereX.position.z = 5.;
+            sgscene.add(sphereX);
+
+
+            const sphereY_g = new THREE.SphereGeometry(2),
+                  sphereY_m = new THREE.MeshBasicMaterial({
+                    visible:true,
+                    opacity:1.0,
+                    color: 0x00ff00,
+                    side:THREE.DoubleSide,
+                  });
+
+            //sphereY blending - check: need gl.enable(gl.BLEND)
+            sphereY_m.blendSrc = THREE.SrcAlphaFactor; // default
+            sphereY_m.blendDst = THREE.OneMinusSrcAlphaFactor; //default
+    
+            // sphereY
+            const sphereY = new THREE.Mesh(sphereY_g, sphereY_m);
+            sphereY.position.x = -2.;
+            sphereY.position.z = 5.;
+            sgscene.add(sphereY);
+
+
+
+
+            //VR ------------------------
+            //vr - vrscene, vrlens&vrorbit
+            const vrscene = new THREE.Scene();
+            const vrlens = new THREE.PerspectiveCamera(90,aspect, 0.1, 100000 );
+            vrlens.position.z = 10;
+            const vrorbit = new OrbitControls(vrlens, renderer.domElement);
+            vrorbit.update();
+            vrorbit.enableDamping = true;
+            vrorbit.dampingFactor = 0.25;
+            vrorbit.enableZoom = true;
+
+            //vraxes
+            const vraxes = new THREE.AxesHelper(10000);
+            vrscene.add(vraxes);
+
+            //vskybox materials[]
+            let vrskybox_ma = [];
+            for(let i=0; i<6; i++){
+              vrskybox_ma[i] = new THREE.MeshBasicMaterial({
+                    color:'white',
+                    visible:true,
+                    transparent:true,
+                    side:THREE.BackSide
+              });
+              vrskybox_ma[i].blendSrc = THREE.SrcAlphaFactor; // default
+              vrskybox_ma[i].blendDst = THREE.OneMinusSrcAlphaFactor; //default
+            }//vrskybox_ma
+
+
+            // vrskybox
+            const vrskybox_g = new THREE.BoxGeometry(10000,10000,10000),
+                  vrskybox = new THREE.Mesh(vrskybox_g, vrskybox_ma);
+
+            vrskybox.scale.x *= aspect;
+            vrscene.add(vrskybox);
+
+
+
+
+
+            // webxr
+            renderer.xr.enabled = true;
+            renderer.xr.setReferenceSpaceType('local');
+      
+            // webXR VRButton
+            document.body.append(VRButton.createButton(renderer));
+      
+            // stats - display fps performance
+            const stats = new Stats();
+            document.body.appendChild(stats.dom);
+            stats.dom.style.display = 'block';  // show
+  
+
+            //window re-size
+            function onWindowResize(){
+              let w = window.innerWidth,
+                  h = window.innerHeight;
+          
+              //adjust renderer size
+              canvas.width = w;
+              canvas.height = h;
+              renderer.setSize(w,h);
+              _rt.setSize(w,h);
+            }
+            window.addEventListener( 'resize', onWindowResize, false );
+
+
+
+
+
+            //render ***********************************************
+            const animate = function () {
+                frame+=1;
+
+                //update stats, vrorbit, et 
+                stats.update();
+                vrorbit.update();
+                let et = clock.getElapsedTime();
+
+
+                
+                //SG
+                //sphereX, sphereY - rotation
+                sphereX.position.y = 2.*Math.sin(20.*et);
+                sphereY.position.y = 2.*Math.cos(10.*et);
+
+                //EffectComposer
+                renderer.xr.enabled = false;
+
+//                //render to vrskybox face material.map
+//                for(let i=0; i<6; i++){
+//                  renderer.setRenderTarget(rt[i]);
+//                  renderer.render(sgscene, sglens[i]);
+//                  composer[i].render();
+//                  vrskybox_ma[i].map = composer[i].writeBuffer.texture;
+//                }
+
+
+//                renderer.setRenderTarget(rtpz);
+//                renderer.render(sgscene, sglenspz);
+//                vrskybox_ma.map = rtpz.texture;
+
+                composerpz.renderToScreen = false;
+                composerpz.render();
+                _rt = composerpz.writeBuffer;
+//                vrskybox_ma.map = _rt.texture; //works: 1 material f vrskybox
+
+                //try 1 material for ea. face of vrskybox
+                for(let i=0; i<6; i++){
+                  vrskybox_ma[i].map = _rt.texture
+                }
+
+
+                //VR
+                //render vrscene
+                //first turn back on xr.enabled so as to make a stereo image
+                renderer.xr.enabled = true;
+                renderer.setRenderTarget(null);
+                renderer.render(vrscene, vrlens)
+            };
+
+            //begin render-loop
+            renderer.setAnimationLoop(animate);
+
+        </script>
+    </body>
+</html>

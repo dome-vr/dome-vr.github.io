@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>test_mRTgts_6shmatcolors.html</title>
+        <style>
+            body { margin: 0; }
+        </style>
+    </head>
+
+    <body>
+        <script type='module'>
+            import * as THREE from '../../node_modules/three/build/three.module.js';
+            import {VRButton} from '../../node_modules/three/examples/jsm/webxr/VRButton.js';
+            import Stats from '../../node_modules/three/examples/jsm/libs/stats.module.js'; //default export
+            import {OrbitControls} from '../../dist/external/OrbitControls.js'; 
+
+            //shaders
+            import {vsh} from '../../dist/app/models/stage/shaders/mrtgts_shaders/vsh_default.glsl.js';
+            
+            import {fsh_nx} from '../../dist/app/models/stage/shaders/mrtgts_shaders/rm-6directions/fsh_uPos_eye-nx.glsl.js';
+            import {fsh_px} from '../../dist/app/models/stage/shaders/mrtgts_shaders/rm-6directions/fsh_uPos_eye-px.glsl.js';
+            import {fsh_ny} from '../../dist/app/models/stage/shaders/mrtgts_shaders/rm-6directions/fsh_uPos_eye-ny.glsl.js';
+            import {fsh_py} from '../../dist/app/models/stage/shaders/mrtgts_shaders/rm-6directions/fsh_uPos_eye-py.glsl.js';
+            import {fsh_nz} from '../../dist/app/models/stage/shaders/mrtgts_shaders/rm-6directions/fsh_uPos_eye-nz.glsl.js';
+            import {fsh_pz} from '../../dist/app/models/stage/shaders/mrtgts_shaders/rm-6directions/fsh_uPos_eye-pz.glsl.js';
+
+            import {uniforms_nx} from '../../dist/app/models/stage/shaders/mrtgts_shaders/rm-6directions/fsh_uPos_eye-nx.glsl.js';
+            import {uniforms_px} from '../../dist/app/models/stage/shaders/mrtgts_shaders/rm-6directions/fsh_uPos_eye-px.glsl.js';
+            import {uniforms_ny} from '../../dist/app/models/stage/shaders/mrtgts_shaders/rm-6directions/fsh_uPos_eye-ny.glsl.js';
+            import {uniforms_py} from '../../dist/app/models/stage/shaders/mrtgts_shaders/rm-6directions/fsh_uPos_eye-py.glsl.js';
+            import {uniforms_nz} from '../../dist/app/models/stage/shaders/mrtgts_shaders/rm-6directions/fsh_uPos_eye-nz.glsl.js';
+            import {uniforms_pz} from '../../dist/app/models/stage/shaders/mrtgts_shaders/rm-6directions/fsh_uPos_eye-pz.glsl.js';
+
+
+            //make THREE global
+            window['THREE'] = THREE;
+
+
+
+            //diagnostics
+            console.log(`test_mRtgts_6rshmatcolors.html...`);
+
+            //clock
+            const clock = new THREE.Clock();
+
+            //renderer
+            const renderer = new THREE.WebGLRenderer();
+            renderer.setSize( window.innerWidth, window.innerHeight );
+
+            //canvas
+            const canvas = renderer.domElement;
+            document.body.appendChild( renderer.domElement );
+            let aspect = window.innerWidth/window.innerHeight;
+
+
+
+            // RM ------------------------
+            //plane with ShaderMaterial using fsh which generates one of six
+            //views in the six coordinate axes directions forward and backward.
+            //The RenderTarget textures hold dynamic views of the implicitly
+            //defined raymarch space.
+            //rmscenes - one per coordinate direction
+            const rmscene_nx = new THREE.Scene(),
+                  rmscene_px = new THREE.Scene(),
+                  rmscene_py = new THREE.Scene(),
+                  rmscene_ny = new THREE.Scene(),
+                  rmscene_pz = new THREE.Scene(),
+                  rmscene_nz = new THREE.Scene();
+
+            //rmlens
+            const rmlens = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 0.1, 10000 );
+            rmlens.position.z = 1;
+
+            //RenderTargets - one per rmscene
+            //rmscene_X renders to rt_X
+            const rt_nx = new THREE.WebGLRenderTarget(2,2),
+                  rt_px = new THREE.WebGLRenderTarget(2,2),
+                  rt_py = new THREE.WebGLRenderTarget(2,2),
+                  rt_ny = new THREE.WebGLRenderTarget(2,2),
+                  rt_pz = new THREE.WebGLRenderTarget(2,2),
+                  rt_nz = new THREE.WebGLRenderTarget(2,2);
+
+
+            //plane geometry
+            //raymarch near-plane intersected with view frustrum 
+            const rmplane_g = new THREE.PlaneGeometry(2,2,1);
+
+            //plane materials - one per cube-vrskybox side
+            //NOTE: each face material has a unique directional raymarch fsh
+            const rmplane_mnx = new THREE.ShaderMaterial({
+              vertexShader: vsh,
+              uniforms: uniforms_nx, 
+              fragmentShader: fsh_nx,
+              side:THREE.DoubleSide,  //default - need DoubleSide?
+            }),
+            rmplane_mpx = new THREE.ShaderMaterial({
+              vertexShader: vsh,
+              uniforms: uniforms_px, 
+              fragmentShader: fsh_px,
+              side:THREE.DoubleSide,  //default - need DoubleSide?
+            }),
+            rmplane_mpy = new THREE.ShaderMaterial({
+              vertexShader: vsh,
+              uniforms: uniforms_py, 
+              fragmentShader: fsh_py,
+              side:THREE.DoubleSide,  //default - need DoubleSide?
+            }),
+            rmplane_mny = new THREE.ShaderMaterial({
+              vertexShader: vsh,
+              uniforms: uniforms_ny, 
+              fragmentShader: fsh_ny,
+              side:THREE.DoubleSide,  //default - need DoubleSide?
+            }),
+            rmplane_mpz = new THREE.ShaderMaterial({
+              vertexShader: vsh,
+              uniforms: uniforms_pz, 
+              fragmentShader: fsh_pz,
+              side:THREE.DoubleSide,  //default - need DoubleSide?
+            }),
+            rmplane_mnz = new THREE.ShaderMaterial({
+              vertexShader: vsh,
+              uniforms: uniforms_nz, 
+              fragmentShader: fsh_nz,
+              side:THREE.DoubleSide,  //default - need DoubleSide?
+            });
+
+            //rmplanes - one per rmscene - locus of raymarch view of space,
+            //in each of 6 directions of the coordinate axes and negatives.
+            const rmplane_nx = new THREE.Mesh(rmplane_g, rmplane_mnx),
+                  rmplane_px = new THREE.Mesh(rmplane_g, rmplane_mpx),
+                  rmplane_py = new THREE.Mesh(rmplane_g, rmplane_mpy),
+                  rmplane_ny = new THREE.Mesh(rmplane_g, rmplane_mny),
+                  rmplane_pz = new THREE.Mesh(rmplane_g, rmplane_mpz),
+                  rmplane_nz = new THREE.Mesh(rmplane_g, rmplane_mnz);
+
+            //add rmplanes to corresponding rmscenes
+            rmscene_nx.add(rmplane_nx);
+            rmscene_px.add(rmplane_px);
+            rmscene_py.add(rmplane_py);
+            rmscene_ny.add(rmplane_ny);
+            rmscene_pz.add(rmplane_pz);
+            rmscene_nz.add(rmplane_nz);
+
+            //form array rmplane_m for convenient iterations
+            const rmplane_m = [
+              rmplane_mpx,
+              rmplane_mnx,
+              rmplane_mpy,
+              rmplane_mny,
+              rmplane_mpz,
+              rmplane_mnz
+            ];
+
+
+
+
+            //VR ------------------------
+            //vr - vrscene, vrlens&vrorbit
+            const vrscene = new THREE.Scene();
+            const vrlens = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 0.1, 10000 );
+            vrlens.position.z = 10;
+            vrlens.lookAt(0.,0.,0.);
+            const vrorbit = new OrbitControls(vrlens, renderer.domElement);
+            vrorbit.update();
+            vrorbit.enableDamping = true;
+            vrorbit.dampingFactor = 0.25;
+            vrorbit.enableZoom = true;
+
+
+            //vraxes
+            const vraxes = new THREE.AxesHelper(10000);
+            vrscene.add(vraxes);
+
+            //vrskybox
+            //NOTE:BoxGeometry is buffered
+            const vrskybox_g = new THREE.BoxGeometry(10000,10000,10000),
+                  vrskybox_ma = [
+                    new THREE.MeshBasicMaterial({side:THREE.BackSide}),
+                    new THREE.MeshBasicMaterial({side:THREE.BackSide}),
+                    new THREE.MeshBasicMaterial({side:THREE.BackSide}),
+                    new THREE.MeshBasicMaterial({side:THREE.BackSide}),
+                    new THREE.MeshBasicMaterial({side:THREE.BackSide}),
+                    new THREE.MeshBasicMaterial({side:THREE.BackSide}),
+                  ];
+
+            //textured mRtgts_vrskybox
+            const vrskybox = new THREE.Mesh(vrskybox_g, vrskybox_ma);
+
+            //adjust box for aspect ratio
+            vrskybox.scale.x *= aspect;
+
+            //flip texture map for viewing correctly on inside of cube vrskybox
+            vrskybox.scale.x = -1;
+
+            //add vrskybox to scene
+            vrscene.add(vrskybox);
+
+
+      
+            // webXR VRButton
+            document.body.append(VRButton.createButton(renderer));
+      
+            // stats - display fps performance
+            const stats = new Stats();
+            document.body.appendChild(stats.dom);
+            stats.dom.style.display = 'block';  // show
+   
+
+            //set uAspect
+            for(let i=0; i<6; i++){
+              if(rmplane_m[i].uniforms && rmplane_m[i].uniforms['uAspect']){
+                rmplane_m[i].uniforms.uAspect.value = window.innerWidth/window.innerHeight;  
+                rmplane_m[i].uniforms.uAspect.needsUpdate = true;
+             }
+            }
+
+
+
+            //window re-size
+            function onWindowResize(){
+              let w = window.innerWidth,
+                  h = window.innerHeight;
+          
+              //adjust renderer size
+              canvas.width = w;
+              canvas.height = h;
+              renderer.setSize(w,h);
+
+              //adjust rm
+              for(let i=0; i<6; i++){
+                if(rmplane_m[i].uniforms && rmplane_m[i].uniforms['uAspect']){
+                  rmplane_m[i].uniforms.uAspect.value = w/h;  //secs
+                  rmplane_m[i].uniforms.uAspect.needsUpdate = true;
+                }
+              }
+            }
+            window.addEventListener( 'resize', onWindowResize, false );
+
+
+
+
+
+            //render-animate() *************************************
+            const animate = function () {
+                //stats
+                stats.update();
+
+                //update time, uTime uniform
+                let et = clock.getElapsedTime();  //secs
+                for(let i=0; i<6; i++){
+                  if(rmplane_m[i].uniforms && rmplane_m[i].uniforms['uTime']){
+                    rmplane_m[i].uniforms.uTime.value = et;  //secs
+                    rmplane_m[i].uniforms.uTime.needsUpdate = true;
+                  }
+                }//update uTime
+
+
+                //update uPositions uniform for each face-fsh
+                //NOTE:template_shaders/fsh_uPos_rmspheres has rm-objs at z=-2
+                for(let i=0; i<6; i++){
+                  if(rmplane_m[i].uniforms && rmplane_m[i].uniforms['uPositions']){
+                    //linear animations
+  //                  rmplane_m[i].uniforms.uPositions.value[0].x+=0.0125*Math.sin(et);  
+  //                  rmplane_m[i].uniforms.uPositions.value[0].y+=0.0025*Math.sin(et);  
+  //                  rmplane_m[i].uniforms.uPositions.value[1].y+=0.0115*Math.sin(et);  
+  //                  rmplane_m[i].uniforms.uPositions.value[1].z+=0.0015*Math.sin(et);  
+  //                  rmplane_m[i].uniforms.uPositions.value[2].z+=0.006*Math.sin(et); 
+  //                  rmplane_m[i].uniforms.uPositions.value[2].x+=0.008*Math.sin(et); 
+  
+                    //rotational animations
+                    //exp: 2*Math.sin/cos rotates around origin at radius=2
+                    rmplane_m[i].uniforms.uPositions.value[0].x = 2.*Math.sin(et);  
+                    rmplane_m[i].uniforms.uPositions.value[0].z = 2.*Math.cos(et);  
+                    rmplane_m[i].uniforms.uPositions.value[1].x = 2.*Math.sin(et);  
+                    rmplane_m[i].uniforms.uPositions.value[1].z = 2.*Math.cos(et);  
+                    rmplane_m[i].uniforms.uPositions.value[2].x = 2*Math.sin(et);  
+                    rmplane_m[i].uniforms.uPositions.value[2].z = 2.*Math.cos(et);  
+                    rmplane_m[i].uniforms.uTime.needsUpdate = true;
+                  }//6
+                }//update uPositions               
+
+
+                //render rmscene_X
+                //webxr - set renderer.xr.enabled false so produce 2D image
+                renderer.xr.enabled = false;
+                renderer.xr.setReferenceSpaceType('local');
+                renderer.setRenderTarget(rt_nx);
+                renderer.render(rmscene_nx, rmlens)
+                renderer.setRenderTarget(rt_px);
+                renderer.render(rmscene_px, rmlens)
+                renderer.setRenderTarget(rt_py);
+                renderer.render(rmscene_py, rmlens)
+                renderer.setRenderTarget(rt_ny);
+                renderer.render(rmscene_ny, rmlens)
+                renderer.setRenderTarget(rt_pz);
+                renderer.render(rmscene_pz, rmlens)
+                renderer.setRenderTarget(rt_nz);
+                renderer.render(rmscene_nz, rmlens)
+
+                //update textures in vskybox_ma
+                vrskybox_ma[0].map = rt_nx.texture;
+                vrskybox_ma[1].map = rt_px.texture;
+                vrskybox_ma[2].map = rt_py.texture;
+                vrskybox_ma[3].map = rt_ny.texture;
+                vrskybox_ma[4].map = rt_pz.texture;
+                vrskybox_ma[5].map = rt_nz.texture;
+
+                //render vrscene
+                //webxr- set renderer.xr.enabled true so produce 3D-VR
+                renderer.xr.enabled = true;
+                renderer.xr.setReferenceSpaceType('local');
+                renderer.setRenderTarget(null);
+                renderer.render(vrscene, vrlens);
+            };
+
+            //begin render-loop
+            renderer.setAnimationLoop(animate);
+
+        </script>
+    </body>
+</html>

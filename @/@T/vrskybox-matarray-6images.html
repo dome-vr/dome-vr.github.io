@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>vrskybox-matarray-6skyimgs.html</title>
+		<style>
+			body { margin: 0; }
+		</style>
+	</head>
+
+	<body>
+        <script type='module'>
+            import * as THREE from '../../node_modules/three/build/three.module.js';
+            import {VRButton} from '../../node_modules/three/examples/jsm/webxr/VRButton.js';
+            import Stats from '../../node_modules/three/examples/jsm/libs/stats.module.js'; //default export
+            import {OrbitControls} from '../../dist/external/OrbitControls.js'; 
+
+            //shaders
+            import {vsh} from '../../dist/app/models/stage/shaders/fshskybox_shaders/vsh_shskybox.glsl.js';
+            import {fsh} from '../../dist/app/models/stage/shaders/fshskybox_shaders/fsh_shskybox.glsl.js';
+            import {uniforms} from '../../dist/app/models/stage/shaders/fshskybox_shaders/fsh_shskybox.glsl.js';
+
+
+
+            //make THREE global
+            window['THREE'] = THREE;
+
+
+            //diagnostics
+            console.log(`vrskybox-matarray-6skyimgs.html...`);
+
+
+            //renderer
+            const renderer = new THREE.WebGLRenderer({antialias:true});
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.setPixelRatio(window.devicePixelRatio);
+
+            //canvas
+            const canvas = renderer.domElement;
+			document.body.appendChild( renderer.domElement );
+            let aspect = window.innerWidth/window.innerHeight;
+
+
+
+            //VR ------------------------
+            //vr - vrscene, vrlens&vrorbit
+            const vrscene = new THREE.Scene();
+			const vrlens = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 0.1, 10000 );
+            vrlens.position.z = 1.0;
+            const vrorbit = new OrbitControls(vrlens, renderer.domElement);
+            vrorbit.update();
+            vrorbit.enableDamping = true;
+            vrorbit.dampingFactor = 0.25;
+            vrorbit.enableZoom = true;
+
+            //vraxes
+            const vraxes = new THREE.AxesHelper(10000);
+            vrscene.add(vraxes);
+
+
+            //NOTE:use chess_texture in earliest phase of development
+            //before beging to use fsh->renderTarget.texture->vrskybox map
+            const texture_loader = new THREE.TextureLoader();
+//            const px = texture_loader.load('../../dist/app/media/images/chess.png');
+//            const nx = texture_loader.load('../../dist/app/media/images/escher.jpg');
+//            const py = texture_loader.load('../../dist/app/media/images/glad.png');
+//            const ny = texture_loader.load('../../dist/app/media/images/mglory.png');
+//            const pz = texture_loader.load('../../dist/app/media/images/moon_tr.png');
+//            const nz = texture_loader.load('../../dist/app/media/images/pinkLotus.png');
+           const px = texture_loader.load('../../dist/app/media/images/skybox/Park3Med/px.jpg');
+            const nx = texture_loader.load('../../dist/app/media/images/skybox/Park3Med/nx.jpg');
+            const py = texture_loader.load('../../dist/app/media/images/skybox/Park3Med/py.jpg');
+            const ny = texture_loader.load('../../dist/app/media/images/skybox/Park3Med/ny.jpg');
+            const pz = texture_loader.load('../../dist/app/media/images/skybox/Park3Med/pz.jpg');
+            const nz = texture_loader.load('../../dist/app/media/images/skybox/Park3Med/nz.jpg');
+
+
+            //vrskybox
+            //NOTE:BoxGeometry is buffered
+            const vrskyboxg = new THREE.BoxGeometry(10000,10000,10000);
+            const vrskyboxma = [
+              new THREE.MeshBasicMaterial( { color: 0xffffff, map:px, side:THREE.DoubleSide } ),
+              new THREE.MeshBasicMaterial( { color: 0xffffff, map:nx, side:THREE.DoubleSide } ),
+              new THREE.MeshBasicMaterial( { color: 0xffffff, map:py, side:THREE.DoubleSide } ),
+              new THREE.MeshBasicMaterial( { color: 0xffffff, map:ny, side:THREE.DoubleSide } ),
+              new THREE.MeshBasicMaterial( { color: 0xffffff, map:pz, side:THREE.DoubleSide } ),
+              new THREE.MeshBasicMaterial( { color: 0xffffff, map:nz, side:THREE.DoubleSide } )
+            ]; 
+
+
+            //textured vrskybox
+            //const vrskybox = new THREE.Mesh(vrskyboxg, vrskyboxm);
+            const vrskybox = new THREE.Mesh(vrskyboxg, vrskyboxma);
+
+
+            //adjust box for aspect ratio
+            vrskybox.scale.x *= aspect;
+
+            //flip texture map for viewing correctly on inside of cube vrskybox
+            vrskybox.scale.x = -1;
+
+            //add vrskybox to scene
+			vrscene.add(vrskybox);
+
+
+      
+            // webXR VRButton
+            document.body.append(VRButton.createButton(renderer));
+      
+            // stats - display fps performance
+            const stats = new Stats();
+            document.body.appendChild(stats.dom);
+            stats.dom.style.display = 'block';  // show
+   
+
+
+            //window re-size
+            function onWindowResize(){
+              const width_ = window.innerWidth,
+                    height_ = window.innerHeight;
+          
+              canvas.width = width_;
+              canvas.height = height_;
+              renderer.setSize(width_, height_);
+            }
+            window.addEventListener( 'resize', onWindowResize, false );
+
+
+
+            //render
+			const animate = function () {
+                //stats
+                stats.update();
+
+                //render vrscene
+                //webxr- set renderer.xr.enabled true so produce 3D-VR
+                renderer.xr.enabled = true;
+                renderer.xr.setReferenceSpaceType('local');
+                renderer.setRenderTarget(null);
+                renderer.render(vrscene, vrlens);
+			};
+
+            //begin render-loop
+            renderer.setAnimationLoop(animate);
+
+		</script>
+	</body>
+</html>

@@ -1,10 +1,13 @@
-// topology2/capri-rmcantor-vrskybox7.ts
+// topology7/capri-rmcantor-vrskybox7.ts
 // webGL2, es300 three.js ==0.125.2
 const config = {
     // rendering topology
     topology: {
         // webxr?
         _webxr: true,
+        // test-assert
+        _test: false,
+        // topology type
         topology: 7,
         // displayed_scene = 'sg|rm|vr'
         displayed_scene: 'vr',

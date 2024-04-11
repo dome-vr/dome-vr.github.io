@@ -9,7 +9,7 @@ export const Pointaudio = class {
             // d at which attenuation begins (?)  0.0 => no sound!
             refd = options['refd'] || 0.0, 
             // d at which audibility ends
-            maxd = options['maxd'] || 1000., playbackRate = options['playbackRate'] || 1.0, volume = options['volume'] || 1.0, loop = options['loop'] || false, play = false, pause = false, stop = true, audioLoader = new THREE.AudioLoader(), sound = new THREE.PositionalAudio(narrative['audioListener']), actor = narrative.findActor(actorname);
+            maxd = options['maxd'] || 1000.0, playbackRate = options['playbackRate'] || 1.0, volume = options['volume'] || 1.0, loop = options['loop'] || false, play = false, pause = false, stop = true, audioLoader = new THREE.AudioLoader(), sound = new THREE.PositionalAudio(narrative['audioListener']), actor = narrative.findActor(actorname);
             console.log(`\n\n&&& pointaudio: sound=${sound} refd=${refd} maxd=${maxd}`);
             console.dir(sound);
             sound.setRefDistance(refd);

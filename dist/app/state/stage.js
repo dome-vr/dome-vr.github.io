@@ -18,7 +18,7 @@ class Stage {
     // [1] _actors can be t or f or undefined 
     // t/f => create/remove actor(s)
     // undefined => modify actor(s) via actor.delta(options), a method
-    // [2] actors = Record<string,unknown>[] = [{name:Actor},...]
+    // [2] actors = object[] = [{name:Actor},...]
     async scene(scene_name, state, narrative) {
         // break-resolve if state[scene_name] (exp state['sgscene']) is undefined
         // or if state[scene_name] = {}
@@ -48,8 +48,9 @@ class Stage {
                 switch (_actors) {
                     case true: // _actor=t => create actor
                         if (url) {
-                            //console.log(`creating actor ${url}`);
+                            console.log(`\nstage.scene() creating actor ${url}`);
                             try {
+                                //console.log(`attempting to import module at ${url}`);
                                 m = await import(url);
                                 //console.log(`m:`);
                                 //console.dir(m);
@@ -62,6 +63,7 @@ class Stage {
                                         options['lens'] = narrative[scene_name]['lens'];
                                     }
                                     actor = await m[factory].create(options, narrative);
+                                    //console.log(`actor resolved from factory is ${actor}`);
                                     // Panorama is *special case*
                                     //if(factory === 'Panorama')
                                     if (actor['layers'] && actor['layers'].length > 0) {
@@ -73,13 +75,13 @@ class Stage {
                                         }
                                     }
                                     else {
-                                        //console.log(`stage.scene ${scene_name} - narrative.addActor(${name})`);
+                                        //console.log(`\nstage.scene (line 107) ${scene_name}scene - narrative.addActor(${name})`);
                                         //console.log(`add actor = ${actor}`);
                                         narrative.addActor(scene, name, actor);
                                     }
                                 }
                                 catch (e) {
-                                    console.log(`factory.create(${options}) error:${e}`);
+                                    //console.log(`factory.create(${options}) error:${e}`);
                                 }
                             }
                             catch (e) {

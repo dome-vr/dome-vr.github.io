@@ -14,7 +14,7 @@ class Audio {
         audio = this;
         //console.log(`listener = ${listener}`);
     } //ctor
-    // initialization
+    // initialization  
     initialize(lens) {
         lens.add(listener);
     }

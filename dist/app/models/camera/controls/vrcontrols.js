@@ -15,8 +15,8 @@ class Vrcontrols {
     // a good speed is 0.1 - larger numbers will increse the rotation per mouse
     // move, and smaller numbers will decrease the rotation amount per move
     start(controlTarget, domElement, speed = 0.1) {
-        console.log(`\n\n&&&&&&&&&& vrcontrols`);
-        console.log(`domElement = ${domElement}`);
+        //console.log(`\n\n&&&&&&&&&& vrcontrols`);
+        //console.log(`domElement = ${domElement}`);
         domElement.addEventListener('mousedown', (e) => {
             isDragging = true;
         });

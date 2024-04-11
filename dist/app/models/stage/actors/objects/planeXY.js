@@ -8,7 +8,7 @@ export const PlaneXY = class {
         //console.log(`\n&&&&&&&&&&&&& PlaneXY w=${width} h=${height}; options:`);
         //console.dir(options);
         return new Promise((resolve, reject) => {
-            const plane_g = new THREE.PlaneBufferGeometry(width, height, 1, 1), plane_m = new THREE.MeshBasicMaterial({
+            const plane_g = new THREE.PlaneGeometry(width, height, 1, 1), plane_m = new THREE.MeshBasicMaterial({
                 wireframe: wireframe,
                 color: color,
                 transparent: true,

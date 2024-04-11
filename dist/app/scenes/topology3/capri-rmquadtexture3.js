@@ -17,7 +17,7 @@ const config = {
         //use frame n-1 sgTarget.tex ('sg') 
         _sgpost: false,
         // rmstage or vrstage actors 
-        sgTargetNames: ['rmquad', 'rmhud'],
+        sgTargetNames: ['rmquad', 'rmhud', 'rmplane'],
         // render rmscene to display, or to rmTarget offscreen for texturing 
         // in vrscene - either skybox/skydome/etc. or actors
         // NOTE! true=>must define rmquad and rmTargetName(s)
@@ -186,11 +186,12 @@ const state = {
                     url: '../models/stage/actors/objects/planeXY.js',
                     options: {
                         wireframe: false,
-                        color: 'red',
+                        color: 'white',
                         opacity: 1.0,
                         width: 2,
                         height: 2,
-                        transform: { t: [0, 0, .1], s: [.1, .5, .1] }
+                        //map:'./app/media/images/pinkLotus.png',
+                        transform: { t: [0, 0, .1], s: [.2, .5, .2] }
                         //neg z-values ruin transparency  ?!!
                     }
                 }

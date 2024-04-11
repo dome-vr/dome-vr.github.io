@@ -37,10 +37,10 @@ export const Multishader = class {
                 let e;
                 switch (geometry) {
                     case 'quad':
-                        multimat_g = new THREE.PlaneBufferGeometry(width, height, quad_widthSegments, quad_heightSegments);
+                        multimat_g = new THREE.PlaneGeometry(width, height, quad_widthSegments, quad_heightSegments);
                         break;
                     case 'sphere':
-                        multimat_g = new THREE.SphereBufferGeometry(radius, sphere_widthSegments, sphere_heightSegments);
+                        multimat_g = new THREE.SphereGeometry(radius, sphere_widthSegments, sphere_heightSegments);
                         break;
                     default:
                         e = `unrecognized geometry = ${geometry}`;
@@ -64,7 +64,7 @@ export const Multishader = class {
                         //            console.dir(fsh[i]['uniforms']);
                         //            console.log(`maps[${i}] = ${maps[i]}:`);
                         //            console.dir(maps[i]);
-                        // add layer to BufferGeometry multimat_g
+                        // add layer to Geometry multimat_g
                         multimat_g.addGroup(0, 5192, i);
                         // create and add ShaderMaterial OR MeshBasicMaterial
                         //console.log(`multishader: &&& material[${i}] = ${material[i]}:`);

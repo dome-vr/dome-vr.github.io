@@ -3,7 +3,7 @@ import { transform3d } from '../../../../services/transform3d.js';
 export const Rmquad = class {
     static create(options = {}) {
         // options
-        const opacity = options['opacity'] || 1.0, vsh = options['vsh'] || '../../shaders/webgl2/vertex/vsh_default.glsl.js', fsh = options['fsh'] || '../../shaders/webgl2/fragment/fsh_rm_texquad.glsl.js', texture = options['texture'], transform = options['transform'];
+        const opacity = options['opacity'] || 1.0, fog = options['fog'] || true, glslVersion = options['glslVersion'] || THREE.GLSL1, vsh = options['vsh'] || '../../shaders/webgl2/vertex/vsh_default.glsl.js', fsh = options['fsh'] || '../../shaders/webgl2/fragment/fsh_rm_texquad.glsl.js', texture = options['texture'], transform = options['transform'];
         return new Promise((resolve, reject) => {
             let plane_g, plane_m, vshader, fshader, uniforms, 
             //aspect:number = window.innerWidth/window.innerHeight, //aspect ratio
@@ -20,13 +20,15 @@ export const Rmquad = class {
                 vshader = a[0].vsh;
                 fshader = a[1].fsh;
                 uniforms = a[1].uniforms;
-                plane_g = new THREE.PlaneBufferGeometry(2, 2);
+                plane_g = new THREE.PlaneGeometry(2, 2);
                 plane_m = new THREE.ShaderMaterial({
+                    transparent: true,
                     opacity: opacity,
+                    fog: fog,
+                    glslVersion: glslVersion,
                     vertexShader: vshader,
                     uniforms: uniforms,
                     fragmentShader: fshader,
-                    transparent: true,
                     side: THREE.DoubleSide,
                 });
                 // blending - check: need gl.enable(gl.BLEND)
@@ -48,7 +50,7 @@ export const Rmquad = class {
                 }
                 plane['animate'] = function (et) {
                     if (plane_m.uniforms && plane_m.uniforms['uTime']) {
-                        plane_m.uniforms.uTime.value = et / 1000.;
+                        plane_m.uniforms.uTime.value = et / 1000.0;
                         plane_m.uniforms.uTime.needsUpdate = true;
                     }
                     //          aspect = window.innerWidth/window.innerHeight;

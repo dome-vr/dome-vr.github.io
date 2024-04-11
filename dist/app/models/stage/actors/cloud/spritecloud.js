@@ -87,7 +87,7 @@ export const Spritecloud = class {
                             //console.log(`spritecloud positions i=${i} j=${j}`);
                         }
                         if (loaded === N) {
-                            console.log(`cld texture loading complete - ${loaded} images`);
+                            //console.log(`cld texture loading complete: ${loaded} images`);
                             //console.log(`textures complete - objs.l = ${objects.length}`);
                             // if state_positions = [] or undefined generate morph positions
                             if (state_positions.length === 0) {

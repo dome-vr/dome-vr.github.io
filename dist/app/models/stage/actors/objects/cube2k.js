@@ -9,7 +9,7 @@ export const Cube2k = class {
         //console.log(`&&& Cube2k options:`);
         //console.dir(option);
         return new Promise((resolve, reject) => {
-            const cube_g = new THREE.BoxBufferGeometry(2000.0, 2000.0, 2000.0);
+            const cube_g = new THREE.BoxGeometry(2000.0, 2000.0, 2000.0);
             cube_m = (material === 'basic') ?
                 new THREE.MeshBasicMaterial({
                     wireframe: wireframe,

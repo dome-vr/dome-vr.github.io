@@ -1,6 +1,6 @@
 // mediator.ts 
 // socket.io.js
-import * as io from '../../../external/socket.io/socket.io.js';
+import * as io from '../../../../node_modules/socket.io-client/dist/socket.io.js';
 import { queue } from './queue.js';
 // singleton instance - exported
 let mediator, config;
@@ -17,11 +17,11 @@ export class Mediator {
         //console.log(`services/actions/mediator initializing`);
         config = _config;
         if (config.server.server_connect) {
-            console.log(`*** mediator: connecting to server`);
+            console.log(`\n*** mediator: connecting to server`);
             mediator.connect();
         }
         else {
-            console.log(`*** mediator: running without server`);
+            console.log(`\n*** mediator: running without server`);
         }
     }
     // connect to index.js server = config.server_host 

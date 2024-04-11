@@ -1,3 +1,7 @@
+// director.ts 
+//look (peek) at queue
+//keep module actionsTargets
+//exec actions
 import { queue } from './queue.js';
 // singleton closure-instance variable
 let director, actionsTargets, narrative; // needed to fetch actors
@@ -57,7 +61,7 @@ class Director {
     // NOTE: if a.t does not exist in actionsTargets, then we can assume a.t is an
     // actor name and fetch the actor using narrative.findActor(name:string)
     exec(a) {
-        console.log(`\ndirector.exec: a.t=${a.t} a.f=${a.f} a.a=${a.a} a.o=${a.o} ${a.ms}`);
+        //console.log(`\ndirector.exec: a.t=${a.t} a.f=${a.f} a.a=${a.a} a.o=${a.o} ${a.ms}`);
         // set target
         const names = a.t.split('.'), //possibly multiple exp:'a.b.c'
         name = names[0];

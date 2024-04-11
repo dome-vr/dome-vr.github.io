@@ -1,4 +1,4 @@
-// topology3/pointcloudlinespost-rmexpt13.ts
+// @test/post/3/pointcloudlinespost-rmexpt13.ts
 // webGL2, es300 three.js ==0.125.2
 const config = {
     // rendering topology

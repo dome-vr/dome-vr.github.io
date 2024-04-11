@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>test_sgcubemap_vrfshskybox.html</title>
+    <style>
+      body { margin: 0; }
+    </style>
+  </head>
+
+  <body>
+
+    <script type='module'>
+      import * as THREE from '../../node_modules/three/build/three.module.js';
+      import {VRButton} from '../../node_modules/three/examples/jsm/webxr/VRButton.js';
+      import Stats from '../../node_modules/three/examples/jsm/libs/stats.module.js'; //default export
+      import {OrbitControls} from '../../dist/external/OrbitControls.js'; 
+
+      //shaders
+      import {vsh} from '../../dist/app/models/stage/shaders/fshskybox_shaders/vsh_shskybox.glsl.js';
+      import {fsh} from '../../dist/app/models/stage/shaders/fshskybox_shaders/fsh_shskybox.glsl.js';
+      import {uniforms} from '../../dist/app/models/stage/shaders/fshskybox_shaders/fsh_shskybox.glsl.js';
+
+
+      //make THREE global
+      window['THREE'] = THREE;
+
+
+      //diagnostics
+      console.log('test_sgcubemap_vrfshskybox.html');
+
+
+      //renderer
+      const renderer = new THREE.WebGLRenderer({antialias:true});
+      renderer.setSize( window.innerWidth, window.innerHeight );
+      renderer.setPixelRatio(window.devicePixelRatio);
+      renderer.xr.setReferenceSpaceType('local');
+
+      //canvas
+      const canvas = renderer.domElement;
+      document.body.appendChild( renderer.domElement );
+      let aspect = window.innerWidth/window.innerHeight;
+
+      //texture loader
+      const texture_loader = new THREE.TextureLoader();
+
+
+
+      //SG ------------------------
+      const sgscene = new THREE.Scene(),
+            //cubeRenderTarget = new THREE.WebGLCubeRenderTarget(512, {generateMipMaps:false, minFilter:THREE.LinearMipMapLinearFilter}),
+            cubeRenderTarget = new THREE.WebGLCubeRenderTarget(512),
+            cubecam = new THREE.CubeCamera(.1, 10000, cubeRenderTarget);
+
+      sgscene.add(cubecam);
+      cubecam.update(renderer, sgscene);
+
+      //sgaxes
+      const sgaxes = new THREE.AxesHelper(10000);
+      sgscene.add(sgaxes);
+
+
+
+      //sgskybox
+      //NOTE:use 6 textures {px,nx,py,ny,pz,nz} for corresp. sides of skybox
+      //CubeTextureLoader, CubeTexture
+      const cubetex_loader = new THREE.CubeTextureLoader();
+
+
+
+
+      //FAILS to display!- AND no rotating sphereY!
+//      const t = texture_loader.load('../../dist/app/media/images/chess.png');
+//      //NOTE:BoxGeometry is buffered
+//      const sgskyboxg = new THREE.BoxGeometry(10000,10000,10000),
+//            sgskyboxm = new THREE.MeshBasicMaterial( { color: 0xffffff, map:t, side:THREE.DoubleSide}),
+//            sgskybox = new THREE.Mesh(sgskyboxg, sgskyboxm);
+
+
+      //FAILS to display!- AND no rotating sphereY!
+//      const sgpx = texture_loader.load('../../dist/app/media/images/skybox/Park3Med/px.jpg');
+//      const sgnx = texture_loader.load('../../dist/app/media/images/skybox/Park3Med/nx.jpg');
+//      const sgpy = texture_loader.load('../../dist/app/media/images/skybox/Park3Med/py.jpg');
+//      const sgny = texture_loader.load('../../dist/app/media/images/skybox/Park3Med/ny.jpg');
+//      const sgpz = texture_loader.load('../../dist/app/media/images/skybox/Park3Med/pz.jpg');
+//      const sgnz = texture_loader.load('../../dist/app/media/images/skybox/Park3Med/nz.jpg');
+//
+//      //NOTE:BoxGeometry is buffered
+//      const sgskyboxg = new THREE.BoxGeometry(10000,10000,10000),
+//            sgskyboxma = [
+//              new THREE.MeshBasicMaterial( { color: 0xffffff, map:sgpx, side:THREE.DoubleSide}),
+//              new THREE.MeshBasicMaterial( { color: 0xffffff, map:sgnx, side:THREE.DoubleSide}),
+//              new THREE.MeshBasicMaterial( { color: 0xffffff, map:sgpy, side:THREE.DoubleSide}),
+//              new THREE.MeshBasicMaterial( { color: 0xffffff, map:sgny, side:THREE.DoubleSide}),
+//              new THREE.MeshBasicMaterial( { color: 0xffffff, map:sgpz, side:THREE.DoubleSide}),
+//              new THREE.MeshBasicMaterial( { color: 0xffffff, map:sgnz, side:THREE.DoubleSide})
+//            ]; 
+//
+//      //sgskyboxm blending - check: need gl.enable(gl.BLEND)
+//      for(let i=0; i<6; i++){
+//        sgskyboxma[i].blendSrc = THREE.SrcAlphaFactor; // default
+//        sgskyboxma[i].blendDst = THREE.OneMinusSrcAlphaFactor; //default
+//      }
+//
+//      //textured sgskybox
+//      const sgskybox = new THREE.Mesh(sgskyboxg, sgskyboxma);
+
+
+
+      //DISPLAYS - but no rotating sphereY!
+      //NOTE:BoxGeometry is buffered
+//      const sgskyboxg = new THREE.BoxGeometry(10000,10000,10000),
+//            sgskyboxm = new THREE.ShaderMaterial({
+//              uniforms: {
+//                skybox:sgcubetex
+//              },
+//              vertexShader: vsh,
+//              fragmentShader: fsh,
+//              opacity:1.0,
+//              side:THREE.BackSide
+//            });
+//      sgskyboxm.uniforms.skybox.value = sgcubetex;
+//      sgskyboxm.uniforms.skybox.needsUpdate = true;
+//      //console.log(`sgskyboxm.uniforms.skybox.value = ${sgskyboxm.uniforms.skybox.value}`);
+//
+//      //textured sgskybox
+//      const sgskybox = new THREE.Mesh(sgskyboxg, sgskyboxm);
+//
+//
+//
+//
+//      //adjust box for aspect ratio
+//      sgskybox.scale.x *= aspect;
+//
+//      //flip texture map for viewing correctly on inside of cube sgskybox
+//      sgskybox.scale.x = -1;
+//
+//      //add sgskybox to scene
+//      sgscene.add(sgskybox);
+
+
+
+
+
+      //DISPLAYS - but no rotating sphereY!
+      cubetex_loader.setPath('../../dist/app/media/images/skybox/sky2/');
+      let sgcubetex = cubetex_loader.load(['px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg']);
+      sgscene.background = sgcubetex;
+
+
+      //sgactor(s)
+      //const sphereY_g = new THREE.BoxGeometry(10,10,10),
+      const sphereY_g = new THREE.SphereGeometry(10),
+//            sphereY_m = new THREE.MeshBasicMaterial({
+//              visible:true,
+//              color: 0xff0000,
+//              side:THREE.DoubleSide
+//            });
+            sphereY_m = new THREE.MeshStandardMaterial({
+              visible:true,
+              roughness:0.1,
+              metalness:0,
+              color: 0xff0000,
+              side:THREE.DoubleSide
+            });
+
+      //sphereY blending - check: need gl.enable(gl.BLEND)
+      //sphereY_m.blendSrc = THREE.SrcAlphaFactor; // default
+      //sphereY_m.blendDst = THREE.OneMinusSrcAlphaFactor; //default
+    
+      // sphereY
+      const sphereY = new THREE.Mesh(sphereY_g, sphereY_m);
+      sphereY.position.z = -15.;
+      sgscene.add(sphereY);
+
+
+      //centerY - point at origin, parent of sphereY, to define rotation 
+      const centerYg = new THREE.BufferGeometry(),
+            verticesY = new Float32Array([0, 0, 0]),
+            centerYm = new THREE.PointsMaterial( { size: 1, sizeAttenuation: false, visible:true } );
+      centerYg.setAttribute('position', new THREE.BufferAttribute( verticesY, 3 ) );
+      const centerY = new THREE.Points(centerYg, centerYm);
+      sgscene.add(centerY);
+      centerY.add(sphereY);
+
+
+
+
+
+
+
+      //VR ------------------------
+      //vr - vrscene, vrlens&vrorbit
+      const vrscene = new THREE.Scene();
+      const vrlens = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 0.1, 10000 );
+      vrlens.position.z = 10.;
+      vrlens.lookAt(0,0,0);  
+      const vrorbit = new OrbitControls(vrlens, renderer.domElement);
+      vrorbit.update();
+      vrorbit.enableDamping = true;
+      vrorbit.dampingFactor = 0.25;
+      vrorbit.enableZoom = true;
+
+      //vraxes
+      const vraxes = new THREE.AxesHelper(10000);
+      vrscene.add(vraxes);
+
+
+      //vractors - exp:spritecloud
+
+
+      //vrskybox-inner - texture maps - possibly panoramic
+      //NOTE:use 6 textures {px,nx,py,ny,pz,nz} for corresp. sides of skybox
+      //CubeTextureLoader, CubeTexture
+      //defined for possible vrskybox and/or vrskybox2 cases
+      const px = texture_loader.load('../../dist/app/media/images/chess.png');
+      const nx = texture_loader.load('../../dist/app/media/images/escher.jpg');
+      const py = texture_loader.load('../../dist/app/media/images/glad.png');
+      const ny = texture_loader.load('../../dist/app/media/images/mglory.png');
+      const pz = texture_loader.load('../../dist/app/media/images/moon_tr.png');
+      const nz = texture_loader.load('../../dist/app/media/images/pinkLotus.png');
+
+//      const px = texture_loader.load('../../dist/app/media/images/sprites/sprite_redlight.png');
+//      const nx = texture_loader.load('../../dist/app/media/images/sprites/sprite_redlight.png');
+//      const py = texture_loader.load('../../dist/app/media/images/sprites/sprite_redlight.png');
+//      const ny = texture_loader.load('../../dist/app/media/images/sprites/sprite_redlight.png');
+//      const pz = texture_loader.load('../../dist/app/media/images/sprites/sprite_redlight.png');
+//      const nz = texture_loader.load('../../dist/app/media/images/sprites/sprite_redlight.png');
+
+      //vrskybox-inner - texture maps - possibly panoramic
+      //const vrskyboxg = new THREE.BoxGeometry(10000,10000,10000),
+      //NOTE:BoxGeometry is buffered
+      const vrskyboxg = new THREE.BoxGeometry(8000,8000,8000),
+            vrskyboxma = [
+              new THREE.MeshBasicMaterial( { color: 0xffffff, map:px, side:THREE.DoubleSide, transparent:true, opacity:0.3 }),
+              new THREE.MeshBasicMaterial( { color: 0xffffff, map:nx, side:THREE.DoubleSide, transparent:true, opacity:0.3 }),
+              new THREE.MeshBasicMaterial( { color: 0xffffff, map:py, side:THREE.DoubleSide , transparent:true, opacity:0.3}),
+              new THREE.MeshBasicMaterial( { color: 0xffffff, map:ny, side:THREE.DoubleSide , transparent:true, opacity:0.3}),
+              new THREE.MeshBasicMaterial( { color: 0xffffff, map:pz, side:THREE.DoubleSide , transparent:true, opacity:0.3}),
+              new THREE.MeshBasicMaterial( { color: 0xffffff, map:nz, side:THREE.DoubleSide , transparent:true, opacity:0.3})
+            ], 
+            vrskybox = new THREE.Mesh(vrskyboxg, vrskyboxma);
+
+      //vrskyboxm blending - check: need gl.enable(gl.BLEND)
+      for(let i=0; i<6; i++){
+        vrskyboxma[i].blendSrc = THREE.SrcAlphaFactor; // default
+        vrskyboxma[i].blendDst = THREE.OneMinusSrcAlphaFactor; //default
+      }
+
+      //adjust box for aspect ratio
+      vrskybox.scale.x *= aspect;
+
+      //flip texture map for viewing correctly on inside of cube vrskybox
+      vrskybox.scale.x = -1;
+
+      //add vrskybox to vscene
+      vrscene.add(vrskybox);
+
+
+
+      //vr2skybox-outer - cubeRenderTarget.texture
+      //NOTE:use 6 textures {px,nx,py,ny,pz,nz} for corresp. sides of skybox
+      //CubeTextureLoader, CubeTexture
+      //cubetex_loader.setPath('../../dist/app/media/images/skybox/greendaisies/');
+      //let vr2cubetex = cubetex_loader.load(['px.png', 'nx.png', 'py.png', 'ny.png', 'pz.png', 'nz.png']);
+
+      //NOTE:BoxGeometry is buffered
+      //const vr2skyboxg = new THREE.BoxGeometry(8000,8000,8000),
+      const vr2skyboxg = new THREE.BoxGeometry(10000,10000,10000),
+            vr2skyboxm = new THREE.ShaderMaterial({
+              uniforms: {
+                skybox:cubeRenderTarget.texture
+              },
+              vertexShader: vsh,
+              fragmentShader: fsh,
+              opacity:0.5,
+              side:THREE.BackSide
+            });
+      vr2skyboxm.uniforms.skybox.value = cubeRenderTarget.texture;
+      vr2skyboxm.uniforms.skybox.needsUpdate = true;
+      //console.log(`vr2skyboxm.uniforms.skybox.value = ${vr2skyboxm.uniforms.skybox.value}`);
+
+      //vr2skyboxm blending - check: need gl.enable(gl.BLEND)
+      vr2skyboxm.blendSrc = THREE.SrcAlphaFactor; // default
+      vr2skyboxm.blendDst = THREE.OneMinusSrcAlphaFactor; //default
+
+      //textured vr2skybox
+      const vr2skybox = new THREE.Mesh(vr2skyboxg, vr2skyboxm);
+
+      //adjust box for aspect ratio
+      vr2skybox.scale.x *= aspect;
+
+      //flip texture map for viewing correctly on inside of cube vr2skybox
+      vr2skybox.scale.x = -1;
+
+      //add vr2skybox to vrscene
+      vrscene.add(vr2skybox);
+
+
+
+      // webXR VRButton
+      document.body.append(VRButton.createButton(renderer));
+
+      // stats - display fps performance
+      const stats = new Stats();
+      document.body.appendChild(stats.dom);
+      stats.dom.style.display = 'block';  // show
+   
+
+
+      //window re-size
+      function onWindowResize(){
+        const width_ = window.innerWidth,
+              height_ = window.innerHeight;
+    
+        canvas.width = width_;
+        canvas.height = height_;
+        renderer.setSize(width_, height_);
+      }
+      window.addEventListener( 'resize', onWindowResize, false );
+
+
+
+
+
+      //render
+      const animate = function () {
+        //stats
+        stats.update();
+
+        //orbit-controls
+        vrorbit.update();
+
+
+
+        //cube-camera
+        //renderer.xr.enabled = false;
+        //renderer.setRenderTarget(cubeRenderTarget);
+        cubecam.update(renderer, sgscene);
+
+        //sgactors-animate
+        centerY.rotateY(.1);
+
+
+
+        //vractors-animate
+
+        //render vrscene
+        //webxr- set renderer.xr.enabled true so produce 3D-VR
+        renderer.xr.enabled = true;
+        renderer.setRenderTarget(null);
+        renderer.render(vrscene, vrlens)
+        
+      };
+
+      //begin render-loop
+      renderer.setAnimationLoop(animate);
+
+    </script>
+  </body>
+</html>

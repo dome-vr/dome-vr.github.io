@@ -1,0 +1,105 @@
+.:
+total 61K
+-rw-r--r-- 1 mark_ 197609   42 Feb  5 14:22 #files_wo_index_are_htmlONLY.txt
+drwxr-xr-x 1 mark_ 197609    0 Feb 17 12:28 1/
+drwxr-xr-x 1 mark_ 197609    0 Mar 23 15:08 4/
+drwxr-xr-x 1 mark_ 197609    0 Mar 23 15:27 5/
+drwxr-xr-x 1 mark_ 197609    0 Mar 23 15:51 6/
+drwxr-xr-x 1 mark_ 197609    0 Mar 23 15:51 7/
+-rw-r--r-- 1 mark_ 197609    0 Mar 23 16:40 @P.scenes
+-rw-r--r-- 1 mark_ 197609 7.5K Feb 17 12:28 grimnight_panorama_skybox.html
+drwxr-xr-x 1 mark_ 197609    0 Mar 22 20:26 post/
+drwxr-xr-x 1 mark_ 197609    0 Mar 22 20:28 rmanim/
+-rw-r--r-- 1 mark_ 197609 5.0K Feb 17 12:28 test_cubetex_6images.html
+-rw-r--r-- 1 mark_ 197609 9.8K Feb 17 12:28 test_fsh.html
+-rw-r--r-- 1 mark_ 197609 6.6K Feb 17 12:28 test_sRTgt_1fsh&tex.html
+-rw-r--r-- 1 mark_ 197609 4.5K Feb 17 12:28 test_sRTgt_1fsh_nobg7.html
+-rw-r--r-- 1 mark_ 197609 4.5K Feb 17 12:28 test_sRTgt_shader_templates_nobg7.html
+drwxr-xr-x 1 mark_ 197609    0 Mar 23 15:33 video/
+
+./1:
+total 8.0K
+-rw-r--r-- 1 mark_ 197609 4.5K Feb 17 12:28 pointcloudlines1.html
+
+./4:
+total 8.0K
+-rw-r--r-- 1 mark_ 197609 4.5K Feb 17 12:28 sparkling-spherepointcloud4.html
+
+./5:
+total 8.0K
+-rw-r--r-- 1 mark_ 197609 4.5K Feb 17 12:28 sgcloudmoon-vrskybox5.html
+
+./6:
+total 20K
+-rw-r--r-- 1 mark_ 197609 4.5K Feb 17 12:28 rmcantor_vrskyboxcloud6.html
+-rw-r--r-- 1 mark_ 197609 4.6K Feb 17 12:28 rmexpt1post-vrskybox6.html
+-rw-r--r-- 1 mark_ 197609 3.8K Feb 17 12:28 rmquad_vrskyboxcontrols6.html
+
+./7:
+total 80K
+-rw-r--r-- 1 mark_ 197609 4.6K Feb 17 12:28 grimnight_rmexpt1_vrskybox7.html
+-rw-r--r-- 1 mark_ 197609 4.6K Feb 17 12:28 pointcloudlinespost-rmexpt1-vrskybox7.html
+-rw-r--r-- 1 mark_ 197609 4.6K Feb 17 12:28 pointcloudlinespost-rmexpt1post-vrskybox7.html
+-rw-r--r-- 1 mark_ 197609 4.6K Feb 17 12:28 sgcloud-rmcantormoon-vrskybox7.html
+-rw-r--r-- 1 mark_ 197609 4.6K Feb 17 12:28 sgcloud-rmexpt1post-vrskybox7.html
+-rw-r--r-- 1 mark_ 197609 4.6K Feb 17 12:28 sgcloudmoonpost-fshtDiffuse-vrskybox7.html
+-rw-r--r-- 1 mark_ 197609 4.6K Feb 17 12:28 sgcloudpost-rmexpt1-vrskybox7.html
+-rw-r--r-- 1 mark_ 197609 4.6K Feb 17 12:28 sgcloudpost-rmexpt1post-vrskybox7.html
+-rw-r--r-- 1 mark_ 197609 4.6K Feb 17 12:28 vranim7.html
+-rw-r--r-- 1 mark_ 197609 4.5K Feb 17 12:28 vranim_effects7.html
+
+./post:
+total 4.0K
+drwxr-xr-x 1 mark_ 197609 0 Mar 22 20:26 3/
+drwxr-xr-x 1 mark_ 197609 0 Mar 23 15:56 5/
+drwxr-xr-x 1 mark_ 197609 0 Mar 22 20:26 6/
+drwxr-xr-x 1 mark_ 197609 0 Mar 23 16:08 7/
+
+./post/3:
+total 16K
+-rw-r--r-- 1 mark_ 197609 4.6K Feb 17 12:28 pointcloudlinespost-rmexpt1post3.html
+-rw-r--r-- 1 mark_ 197609 4.5K Feb 17 12:28 post3_2.html
+
+./post/5:
+total 32K
+-rw-r--r-- 1 mark_ 197609 4.5K Feb 17 12:28 sgcloudmoon-vrskybox5.html
+-rw-r--r-- 1 mark_ 197609 4.6K Feb 17 12:28 sgcloudpost-vrskybox5.html
+-rw-r--r-- 1 mark_ 197609 4.6K Feb 17 12:28 sgcloudpostb-vrskybox5.html
+-rw-r--r-- 1 mark_ 197609 4.5K Feb 17 12:28 sgpointcloudlinespost-vrskybox5.html
+
+./post/6:
+total 16K
+-rw-r--r-- 1 mark_ 197609 4.5K Feb 17 12:28 post6_3_2.html
+-rw-r--r-- 1 mark_ 197609 4.6K Feb 17 12:28 rmexpt1post-vrskybox6.html
+
+./post/7:
+total 72K
+-rw-r--r-- 1 mark_ 197609 4.6K Feb 17 12:28 pointcloudlinespost-rmexpt1-vrskybox7.html
+-rw-r--r-- 1 mark_ 197609 4.6K Feb 17 12:28 pointcloudlinespost-rmexpt1post-vrskybox7.html
+-rw-r--r-- 1 mark_ 197609 4.5K Feb 17 12:28 post7_1&2.html
+-rw-r--r-- 1 mark_ 197609 4.5K Feb 17 12:28 post7_1.html
+-rw-r--r-- 1 mark_ 197609 4.5K Feb 17 12:28 post7_2.html
+-rw-r--r-- 1 mark_ 197609 4.5K Feb 17 12:28 post7_3_2.html
+-rw-r--r-- 1 mark_ 197609 4.6K Feb 17 12:28 sgcloud-rmexpt1post-vrskybox7.html
+-rw-r--r-- 1 mark_ 197609 4.6K Feb 17 12:28 sgcloudpost-rmexpt1-vrskybox7.html
+-rw-r--r-- 1 mark_ 197609 4.6K Feb 17 12:28 sgcloudpost-rmexpt1post-vrskybox7.html
+
+./rmanim:
+total 4.0K
+drwxr-xr-x 1 mark_ 197609 0 Mar 23 16:14 7/
+
+./rmanim/7:
+total 48K
+-rw-r--r-- 1 mark_ 197609 4.6K Mar 20 17:30 capri-rmexpt2anim-vrskybox7.html
+-rw-r--r-- 1 mark_ 197609 4.6K Mar 20 08:46 grimnight-rmexpt1anim-vrskybox7.html
+-rw-r--r-- 1 mark_ 197609 4.5K Mar 22 22:21 post7_1&2.html
+-rw-r--r-- 1 mark_ 197609 4.5K Mar 22 22:12 post7_1.html
+-rw-r--r-- 1 mark_ 197609 4.5K Mar 22 22:20 post7_2.html
+-rw-r--r-- 1 mark_ 197609 4.6K Mar 17 18:09 sgcloud-rmanimkeymapcantor-vrskybox7.html
+
+./video:
+total 32K
+-rw-r--r-- 1 mark_ 197609 4.6K Feb 17 12:28 pointcloudlinespost-rmexpt1post3.html
+-rw-r--r-- 1 mark_ 197609 4.6K Feb 17 12:28 sgcloudpost-vrskybox5.html
+-rw-r--r-- 1 mark_ 197609 4.6K Feb 17 12:28 sgcloudpostb-vrskybox5.html
+-rw-r--r-- 1 mark_ 197609 4.5K Feb 17 12:28 sgpointcloudlinespost-vrskybox5.html

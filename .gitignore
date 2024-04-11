@@ -1,12 +1,43 @@
-#dome-vr.com .gitignore
+# dome-vr5 .gitignore
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-# saves all directories incl node_modules (dependencies) and dist (js-files)
-# also saves root level config files, etc.
-# Thus saves all except files with the following extentions:
 
+
+# dependencies
+node_modules/
+
+# production
+#/dist - need js-files and dist/external modules
+#external copy three_0.147.0 - makes CubeCamera-CubeMap work - no real value!
+#NOTE: roughly >0.134.0 => many! problems with texture re-size for mult objs
+dist/external/three/
+
+# various notes and dcoumentation
+&docs/
+
+# tsc logs, console diagnostics
+&logs/
+
+# music, shader exps, technique exps, dev-tests
+&examples/
+
+# shader dev-tests 
+# domeshaders.html; domeshaders-skybox.html
+**/domeshaders/
+
+#inessential archives (mainly failing or less efficient code versions)
+**/archive*/
+
+
+# https cedrtificates and https.conf.js
+ca.crt
+ca.key
+cert.crt
+cert.key
+https.conf.js
 
 # Vim swp-files
 *.swp
+*.swo
 
 # npm-debug
 npm-debug.log*
@@ -15,12 +46,7 @@ npm-debug.log*
 *.txt
 
 
-# misc
-.DS_Store
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-yarn-debug.log*
-yarn-error.log*
+# don't ignore .md
+!*.md
+
 

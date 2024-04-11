@@ -3,8 +3,7 @@
 // Fragment shader program 
 const uniforms = {
     tDiffuse: { type: 't', value: null },
-    uTime: { type: 'f', value: 0.0 },
-    uResolution: { type: 'v2', value: new THREE.Vector2(960, 1080) }
+    uTime: { type: 'f', value: 0.0 }
 };
 const fsh = `//#version 300 es     //written in by three.js compiler 
 

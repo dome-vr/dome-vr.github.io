@@ -1,4 +1,4 @@
-// topology2/capri-rmcantor-vrskybox7.ts
+// topology7/capri-rmcantor-vrskybox7.ts
 // webGL2, es300 three.js ==0.125.2
 const config = {
     // rendering topology

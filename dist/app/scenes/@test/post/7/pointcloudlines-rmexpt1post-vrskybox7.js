@@ -1,4 +1,4 @@
-// topology7/pointcloudlines-rmexpt1post-vrskybox7.ts
+// @test/7/pointcloudlines-rmexpt1post-vrskybox7.ts
 // webGL2, es300 three.js ==0.125.2
 const config = {
     // rendering topology
@@ -111,14 +111,14 @@ const state = {
         sgscene: {
             _actors: true,
             actors: {
-                'sgaxes': {
-                    factory: 'Axes',
-                    url: '../models/stage/actors/objects/axes.js',
-                    options: {
-                        length: 10000,
-                        transform: { t: [0.0, 0.0, 0.0] }
-                    }
-                },
+                //                'sgaxes': {
+                //                    factory: 'Axes',
+                //                    url: '../models/stage/actors/objects/axes.js',
+                //                    options: {
+                //                        length: 10000,
+                //                        transform: { t: [0.0, 0.0, 0.0] }
+                //                    }
+                //                },
                 'sghud': {
                     factory: 'Hud',
                     url: '../models/stage/actors/post/hud.js',
@@ -131,16 +131,16 @@ const state = {
                         scaleY: 1.01,
                     }
                 },
-                'sgunitcube': {
-                    factory: 'Unitcube',
-                    url: '../models/stage/actors/objects/unitcube.js',
-                    options: { wireframe: false,
-                        color: 'white',
-                        opacity: 0.7,
-                        map: './app/media/images/glad.png',
-                        transform: { t: [0, 0, -2], e: [0.0, 0.0, 0.0], s: [0.5, 1, 0.5] }
-                    }
-                },
+                //                'sgunitcube': {
+                //                    factory: 'Unitcube',
+                //                    url: '../models/stage/actors/objects/unitcube.js',
+                //                    options: { wireframe: false,
+                //                        color: 'white',
+                //                        opacity: 0.7,
+                //                        map: './app/media/images/glad.png',
+                //                        transform: { t: [0, 0, -2], e: [0.0, 0.0, 0.0], s: [0.5, 1, 0.5] }
+                //                    }
+                //                },
                 'sgpointcloudlines': {
                     factory: 'Pointcloudlines',
                     url: '../models/stage/actors/cloud/pointcloud-lines.js',
@@ -170,7 +170,7 @@ const state = {
                     options: {
                         color: 'white',
                         transparent: true,
-                        opacity: 0.6,
+                        opacity: 0.5,
                         vsh: '../../../stage/shaders/webgl1/quad_vsh/vsh_default.glsl.js',
                         fsh: '../../../stage/shaders/webgl1/quad_fsh/fsh_rm_expt1.glsl.js',
                     }
@@ -181,56 +181,38 @@ const state = {
                     options: {
                         color: 'white',
                         transparent: true,
-                        opacity: 0.99,
+                        opacity: 0.9,
                         //texture:'./app/media/images/hexagonal_tr.png',
                         // test ONLY! - not for production use!
                         scaleX: 1.01,
                         scaleY: 1.01,
                         //transform:{}
-                        transform: { t: [0.0, 0.0, -0.001] }
+                        transform: { t: [0.0, 0.0, -0.001] } //rmhud must be behind rmquad ?!!
                     }
                 }
-                //                'rmhud': {
-                //                    factory: 'Rmquad',
-                //                    //factory: 'Hud',
-                //                    url: '../models/stage/actors/raymarch/rmquad.js',
-                //                    //url: '../models/stage/actors/post/hud.js',
-                //                    options: {
-                //                      color:'white',
-                //                      opacity:.99, // 0.5
-                //                      scaleX:1.001, //1.0015,  //1.01, //default=1
-                //                      scaleY:1.001,  //1.03, //default=1
-                //                      vsh:'../../../stage/shaders/webgl2/vertex/vsh_default.glsl.js',
-                //                      fsh:'../../../stage/shaders/webgl2/fragment/fsh_rm_texquad.glsl.js',
-                ////                      vsh:'../../../stage/shaders/webgl1/quad_vsh/vsh_default.glsl.js',
-                ////                      fsh:'../../../stage/shaders/webgl1/quad_fsh/fsh_tDiffuse.glsl.js',
-                //                      //texture:'./app/media/images/glad.png',
-                //                      transform:{t:[0.0,0.0,0.001]}
-                //                    }
-                //                }
             } //actors
         },
         vrscene: {
             _actors: true,
             actors: {
-                'vraxes': {
-                    factory: 'Axes',
-                    url: '../models/stage/actors/objects/axes.js',
-                    options: {
-                        length: 10000,
-                        transform: { t: [0.0, 0.0, 0.0] }
-                    }
-                },
-                'vrunitcube': {
-                    factory: 'Unitcube',
-                    url: '../models/stage/actors/objects/unitcube.js',
-                    options: { wireframe: false,
-                        color: 'white',
-                        opacity: 0.7,
-                        map: './app/media/images/glad.png',
-                        transform: { t: [0, 0, -2], e: [0.0, 0.0, 0.0], s: [0.5, 1, 0.5] }
-                    }
-                },
+                //                'vraxes': {
+                //                    factory: 'Axes',
+                //                    url: '../models/stage/actors/objects/axes.js',
+                //                    options: {
+                //                        length: 10000,
+                //                        transform: { t: [0.0, 0.0, 0.0] }
+                //                    }
+                //                },
+                //                'vrunitcube': {
+                //                    factory: 'Unitcube',
+                //                    url: '../models/stage/actors/objects/unitcube.js',
+                //                    options: { wireframe: false,
+                //                        color: 'white',
+                //                        opacity: 0.7,
+                //                        map: './app/media/images/glad.png',
+                //                        transform: { t: [0, 0, -2], e: [0.0, 0.0, 0.0], s: [0.5, 1, 0.5] }
+                //                    }
+                //                },
                 //                'ground':{ 
                 //                  factory:'GridXZ',
                 //                  url:'../models/stage/actors/environment/gridXZ.js',

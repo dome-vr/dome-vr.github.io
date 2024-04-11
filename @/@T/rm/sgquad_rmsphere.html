@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <base href="/dist/"> <!-- all urls relative to base href='./dist/'> -->
+    <title>
+     sgquad-rmsphere:three0.125.02-webGL2-es300:base-href-dist
+    </title>
+    <style>
+      body { margin: 0;
+             padding: 0;
+             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 
+               'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 
+               'Droid Sans', 'Helvetica Neue', sans-serif;
+               -webkit-font-smoothing: antialiased;
+               -moz-osx-font-smoothing: grayscale;
+      }
+    </style>
+  </head>
+
+
+
+  <body>
+    <!-- NOTE:canvas is styled exactly as Singularity.css -->
+    <canvas id='webgl' style='width:100vw; height:100vh; background-color:black; position:absolute; left:0px; top:0px;'/>
+
+
+    <script type='module'> 
+
+// Three.js
+ import * as THREE from '../node_modules/three/build/three.module.js';
+//import {VRButton} from './external/three/examples/jsm/webxr/VRButton.js';
+import Stats from '../node_modules/three/examples/jsm/libs/stats.module.js'; //default export
+import {OrbitControls} from './external/OrbitControls.js';
+
+//gsap
+//import {gsap} from './external/gsap/all.js';
+
+// tween.js
+//import TWEEN from './external/tween.js/tween.esm.js';
+
+
+
+//shaders
+import {vsh} from './app/models/stage/shaders/webgl1/test_vsh/vsh_point.glsl.js';
+import {fsh} from './app/models/stage/shaders/webgl1/test_fsh/fsh_rm_spheres.glsl.js';
+import {uniforms} from './app/models/stage/shaders/webgl1/test_fsh/fsh_rm_spheres.glsl.js';
+
+
+
+console.log(`\n*** src/@test/genshaders/*.html starting`);
+console.log(`*** NOTE: <base href='/dist/'> so src/*.html imports ./dist/**/*.js\n\n`);
+
+let   stats,
+      clock,
+      rmscene,
+      rmlens,
+      controls,
+      w,
+      h,
+      aspect,
+      canvas,
+      context,
+      renderer,
+      create_renderer = () => {
+        renderer = new THREE.WebGLRenderer({
+          canvas:canvas,
+          context:context,
+          antialias:true,
+          alpha:true
+        });
+        let dpr = window.devicePixelRatio;
+        renderer.setPixelRatio(dpr);  // critically important for post!!
+        renderer.setClearColor(new THREE.Color('white'), 1.0);
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        return renderer;
+      },
+      escher,
+      moon,
+      lotus,
+      glad,
+      texture,
+      opacity,
+      tloader,
+      rmquad_g,
+      rmquad_m,
+      rmquad,
+      cube_g,
+      cube_m,
+      cube,
+      onWindowResize = () => {
+        const w_ = window.innerWidth,
+              h_ = window.innerHeight;
+
+        //canvas
+        canvas.width = w_;
+        canvas.height = h_;
+
+        //camera
+        aspect = w_/h_;
+        if(rmlens){
+          rmlens.aspect = aspect;
+          rmlens.updateProjectionMatrix();
+        }
+
+        //rmquad aspect ratio
+        //rmquad.material.uniforms.uResolution.value = new THREE.Vector2(w_,h_);
+        //rmquad.material.uniforms.uResolution.needsUpdate = true;
+        rmquad.material.uniforms.uAspect.value = aspect;
+        rmquad.material.uniforms.uAspect.needsUpdate = true;
+        //console.log(`\nresize: aspect = ${aspect}`);
+        //console.log(`uAspect = ${rmquad.material.uniforms.uAspect.value}`);
+
+        //adjust quad size by aspect ratio
+        //rmquad.scale.set(aspect,1.0,1.0);
+
+        //renderer
+        renderer.setSize(w_, h_);
+      };
+
+
+
+const init = () => {
+
+  //time
+  stats = new Stats();
+  document.body.appendChild(stats.dom);
+  stats.dom.style.display = 'block';  // show
+  clock = new THREE.Clock();
+  clock.start();
+
+  //gsap
+  //tl.play();    
+  // set timer to report time passage - t, dt, frames
+  //gsap.ticker.add(timer);
+
+  //scene
+  canvas = document.getElementById('webgl');
+  context = canvas.getContext('webgl2', {antialias:true});
+  rmscene = new THREE.Scene();
+  w = window.innerWidth;
+  h = window.innerHeight;
+  aspect = w/h;
+  rmlens = new THREE.PerspectiveCamera(90., aspect, .01, 1000);
+  rmlens.position.z = 1.0;
+  controls = new OrbitControls(rmlens, canvas);
+  renderer = create_renderer();
+
+
+  // test-textures
+  tloader = new THREE.TextureLoader(),
+  escher = tloader.load('./app/media/images/escher.jpg'),
+  glad = tloader.load('./app/media/images/glad.png'),
+  lotus = tloader.load('./app/media/images/lotus_64.png'),
+  moon = tloader.load('./app/media/images/moon_tr.png'),
+
+  //texture?
+  //texture = glad;
+  opacity = 0.5;
+
+  //actors
+  rmquad_g = new THREE.PlaneGeometry(2,2);
+  rmquad_m = new THREE.ShaderMaterial({
+                vertexShader: vsh,
+                uniforms: uniforms, 
+                fragmentShader: fsh,
+                opacity:opacity,
+                transparent:true,
+                side:THREE.DoubleSide
+  });
+
+  // blending - check: need gl.enable(gl.BLEND)
+  rmquad_m.blending = THREE.CustomBlending;
+  rmquad_m.blendSrc = THREE.SrcAlphaFactor; // default
+  rmquad_m.blendDst = THREE.OneMinusSrcAlphaFactor; //default
+  //rmquad_m.depthTest = true;  //default is t
+
+  // rmquad
+  rmquad = new THREE.Mesh(rmquad_g, rmquad_m);
+
+  //texture-map - mainly test
+  if(texture){
+    rmquad_m.uniforms.tDiffuse.value = texture;
+    rmquad_m.uniforms.tDiffuse.needsUpdate = true;
+  }
+
+  //adjust quad size by aspect ratio
+  //rmquad.scale.set(aspect,1.0,1.0);
+
+  //set resolution (not used!) and aspect ratio
+  //rmquad.material.uniforms.uResolution.value = new THREE.Vector2(w,h);
+  //rmquad.material.uniforms.uResolution.needsUpdate = true;
+  rmquad.material.uniforms.uAspect.value = aspect;
+  rmquad.material.uniforms.uAspect.needsUpdate = true;
+
+  //add rmquad to scene
+  rmscene.add(rmquad)
+
+
+  //add cube to scene
+  cube_g = new THREE.BoxGeometry(1.0, 1.0, 0.05);
+  cube_m = new THREE.MeshBasicMaterial({
+       wireframe: false,
+       color:new THREE.Color('red'),            
+       transparent: true,
+       opacity:0.3,
+       side:THREE.DoubleSide
+  });
+  cube = new THREE.Mesh(cube_g, cube_m);
+  cube.position.x = 0.0;
+  cube.position.z = 0.0;
+  rmscene.add(cube);
+
+  //add axes
+  const axes = new THREE.AxesHelper(10000);
+  rmscene.add(axes);
+
+  //for resize
+  window.addEventListener( 'resize', onWindowResize, false );
+
+  //start animation-loop
+  renderer.setAnimationLoop(animate);
+
+}//init
+
+
+
+const animate = () => {
+
+  // time-ms
+  let et = 1000.*clock.getElapsedTime();
+//  if(rmquad && rmquad.material.uniforms.uTime){
+//    rmquad.material.uniforms.uTime.value = et;
+//    rmquad.material.uniforms.uTime.needsUpdate = true;
+//  }
+
+  // fps
+  stats.update();
+
+  //orbitcontrols
+  controls.update();
+
+  //clouds - use TWEEN
+//  if(sgcloud || vrcloud){
+//    TWEEN.update();
+//  }
+
+  renderer.render(rmscene, rmlens);
+}
+
+
+init();
+animate();
+    
+    </script>
+
+  </body>
+</html>

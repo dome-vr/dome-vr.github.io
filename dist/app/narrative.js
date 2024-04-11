@@ -1,23 +1,47 @@
 // narrative.ts
-// bootstrap controller-application
+// bootstrap controller-rendering application
+// NOTE: The html-file corresponding to a particular scene specifies
+// 1) the scene relative-url and
+// 2) the bootstrap controller-renderer file - exp. narrative.js
+// Thus each scene has a distict composition and differing scenes may specify
+// the use of distinct controller-renderer modules. 
 // RECALL: src/app/narrative.ts is transpiled to dist/app/narrative.js
 // and index.html <base href='/dist/'>  
 // so all js-files referenced in narrative.ts are loaded relative to 
-// dome-vr4/dist/app
-// RECALL: external-lib is at dome-vr4/dist/external, 
-// so the path to the external-lib relative to dist/app/narrative is ../external
-// exp: import {VRButton} from '../external/three/examples/jsm/webxr/VRButton.js
-// modules exterior to dome-vr4
+// dome-vr5/dist/app
+// Thus src/app/**/*.ts are transpiled to dist/app/**/*.js and j.map
+// modules exterior to dome-vr5
 // Three.js
-import * as THREE from '../external/three/build/three.module.js';
-import { VRButton } from '../external/three/examples/jsm/webxr/VRButton.js';
-import Stats from '../external/three/examples/jsm/libs/stats/stats.module.js'; //default export
-import { OrbitControls } from '../external/three/examples/jsm/controls/OrbitControls.js';
+import * as THREE from '../../node_modules/three/build/three.module.js';
+//import * as THREE from '../external/three/build/three.module.js';
+import { VRButton } from '../../node_modules/three/examples/jsm/webxr/VRButton.js';
+//import {VRButton} from '../external/three/examples/jsm/webxr/VRButton.js';
+import Stats from '../../node_modules/three/examples/jsm/libs/stats.module.js'; //default export
+//import Stats from '../external/three/examples/jsm/libs/stats.module.js'; //default export
+//import {OrbitControls} from '../../node_modules/three/examples/jsm/controls/OrbitControls.js'; //FAILS-Failed to resolve module specifier "node_modules/three/examples/jsm/controls/OrbitControls.js". Relative references must start with either "/", "./", or "../".
+//import {OrbitControls, MapControls} from './node_modules/three/examples/jsm/controls/OrbitControls.js'; //FAILS-404 
+//import {OrbitControls, MapControls} from 'three/examples/jsm/controls/OrbitControls.js'; //FAILS-unexpected identifier THREE not found in test.html:78 - this is the dynamic import of narrative.js importing OrbitControls 
+//import {OrbitControls, MapControls} from 'node_modules/three/examples/jsm/controls/OrbitControls.js'; //FAILS-Relative references must start with either "/", "./", or "../".
+import { OrbitControls } from '../external/OrbitControls.js'; //GOOD
+//EffectComposer 
+import { EffectComposer } from '../../node_modules/three/examples/jsm/postprocessing/EffectComposer.js'; //default export
+//displayed effects-passes
+import { DotScreenPass } from '../../node_modules/three/examples/jsm/postprocessing/DotScreenPass.js';
+import { HalftonePass } from '../../node_modules/three/examples/jsm/postprocessing/HalftonePass.js';
+import { AfterimagePass } from '../../node_modules/three/examples/jsm/postprocessing/AfterimagePass.js';
+import { BloomPass } from '../../node_modules/three/examples/jsm/postprocessing/BloomPass.js';
+import { FilmPass } from '../../node_modules/three/examples/jsm/postprocessing/FilmPass.js';
+//final non-displayed (but necessary) pair of passes
+//The first is a non-displayed film2 pass and the 2nd-executed is rendering
+//It seems te final film2-pass is in the upcoming buffer but not displayed.
+import { RenderPass } from '../../node_modules/three/examples/jsm/postprocessing/RenderPass.js';
 // gsap
-import { gsap } from '../external/gsap/all.js';
+// NEED gsap@3.6.0 NOT current >=gsap@3.11.0 !!
+//import {gsap} from '../external/gsap/all.js';
+import { gsap } from '../../node_modules/gsap/all.js';
 // tween.js
-import TWEEN from '../external/tween.js/tween.esm.js';
-// make exterior modules available globally 
+//import TWEEN from '../external/tween.js/tween.esm.js'; //dome-vr5 v0.9.0
+import TWEEN from '../../node_modules/@tweenjs/tween.js/dist/tween.esm.js';
 window['THREE'] = THREE;
 window['TWEEN'] = TWEEN;
 // at compile time tsc is smart enough to load <module>.ts even though the 
@@ -36,68 +60,23 @@ import { stage } from './state/stage.js';
 import { camera } from './state/camera.js';
 import { actions } from './state/actions.js';
 // singleton closure variables
-// const but uninitialized
-let narrative, config, 
-// canvas DOM-singularity, and webgl2-context
-canvas, context, 
-// topology type and corresponding flags
-// see function calculate_topology(sg:boolen,rm:boolean,vr:boolean):number
-topology, _sg, _rm, _vr, _sgpost = false, _rmpost = false, renderer, // NOTE:renderer.render(sgscene,lens)
-displayed_scene, 
-// sg - camera components, renderTarget, actors
-sgscene, sglens, // from state/camera
-// NOTE:TBD 'csphere' is whole apparatus - lens, lights etc
-sgorbit, sgTargetNames, 
-//_sgpost
-sghud, sghud_tDiffuse, 
-//bg
-sgskybox, sgskybox_materials, sgskydome, sgskydome_map, 
-//spritecloud
-sgcloud, 
-// rm - lens, renderTarget, actors
-rmscene, rmlens, // separate camera for rendering rmscene
-rmTargetNames, rmquad, rmquad_tDiffuse, rmhud, rmhud_tDiffuse, 
-// test-quad
-rmplane, 
-// vr - camera components, renderTarget, actors
-vrscene, vrlens, // separate camera for rendering vrscene,
-vrorbit, 
-//bg
-vrskybox, vrskybox_materials, vrskydome, vrskydome_map, 
-//spritecloud
-vrcloud, 
-// variable actor in narrative.render()
-actor, 
-// fps-performance meter
-stats;
-// const - initialized
-const initial_width = window.innerWidth, initial_height = window.innerHeight, dpr = window.devicePixelRatio, tVector = new THREE.Vector2(), 
-// dictionary of all actors.
-cast = {}, 
-//state/stage creates name-actor entries & registers them in cast 
-//via narrative.addActor(scene, name, actor) 
-// dictionary of targets of actions 
-actionsTargets = {}, 
+// const 
+const initial_width = window.innerWidth, initial_height = window.innerHeight, dpr = window.devicePixelRatio, 
 // 'startAudio' - enable audio button
 startAudio = document.getElementById('startAudio'), 
 // AudioListener - needed to create audio actors 
 audioListener = new THREE.AudioListener(), 
-// renderTargets
-sgTarget = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight), 
-//causes three.module.js:24784 WebGL: INVALID_OPERATION: readPixels: no PIXEL_PACK buffer bound
-//sgTarget = new THREE.WebGLRenderTarget(window.innerWidth*dpr, window.innerHeight*dpr),
-rmTarget = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight), 
-// test-textures
+//test-textures
 tloader = new THREE.TextureLoader(), escher = tloader.load('./app/media/images/escher.jpg'), glad = tloader.load('./app/media/images/glad.png'), lotus = tloader.load('./app/media/images/lotus_64.png'), moon = tloader.load('./app/media/images/moon_tr.png'), 
 // time
-tl = gsap.timeline({ paused: true }), clock = new THREE.Clock(), // uses perfomance.now() - fine grain
+clock = new THREE.Clock(), // uses perfomance.now() - fine grain
 devclock = new THREE.Clock(), // uses perfomance.now() - fine grain
 timer = (t, dt, fr) => {
     // sync frame and gsap-frame => no need to increment frame in render()
     frame = fr;
-    //        if(fr % 1000 === 0){
-    //          console.log(`timer:frame=${frame} et=${et} fr=${fr} t=${t}`);
-    //        }
+    //      if(fr % 1000 === 0){
+    //        console.log(`timer:frame=${frame} et=${et} fr=${fr} t=${t}`);
+    //      }
 }, 
 // renderers
 create_renderer = () => {
@@ -112,7 +91,64 @@ create_renderer = () => {
     return renderer;
 };
 //dynamic
-let tw = window.innerWidth * dpr, th = window.innerHeight * dpr, tData = new Uint8Array(tw * th * 4), //RGBA => 4  NOTE- dpr scale NEEDED
+let narrative, config, 
+// canvas DOM-singularity, and webgl2-context
+canvas, context, 
+// topology type and corresponding flags
+// see function calculate_topology(sg:boolen,rm:boolean,vr:boolean):number
+topology, _sg, _rm, _vr, _sgpost = false, _rmpost = false, renderer, // NOTE:renderer.render(sgscene,lens)
+displayed_scene, 
+// sg - camera components
+sgscene, sglens, // from state/camera
+// NOTE:TBD 'csphere' is whole apparatus - lens, lights etc
+sgorbit, 
+//rm a/o vr actors receiving renderTarget.texture mapping 
+sgTargetNames, 
+//_sgpost
+sghud, sghud_tDiffuse, 
+//bg
+sgskybox, sgskybox_materials, sgskydome, sgskydome_map, 
+//spritecloud
+sgcloud, 
+// rm - lens
+rmscene, rmlens, // separate camera for rendering rmscene
+//vr actors receiving renderTarget.texture mapping 
+rmTargetNames, rmquad, //rm
+rmquad_tDiffuse, rmhud, //_rmpost 
+rmhud_tDiffuse, 
+// test-quad
+rmplane, 
+// vr - camera components
+//NOTE: also can use worldControls and keyboardMap for navigation
+vrscene, vrlens, // separate camera for rendering vrscene,
+vrorbit, 
+//bg
+vrskybox, vrskybox_materials, vrskydome, vrskydome_map, 
+//spritecloud
+vrcloud, 
+// variable actor in narrative.render()
+actor, 
+// dictionary of all actors.
+cast = {}, 
+//state/stage creates name-actor entries & registers them in cast 
+//via narrative.addActor(scene, name, actor) 
+// fps-performance meter
+stats, 
+// animation
+tl = gsap.timeline({ paused: true }), 
+// renderTargets
+sgTarget = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight), 
+//causes three.module.js:24784 WebGL: INVALID_OPERATION: readPixels: no PIXEL_PACK buffer bound
+//sgTarget = new THREE.WebGLRenderTarget(window.innerWidth*dpr, window.innerHeight*dpr),
+rmTarget = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight), 
+//effects
+_sgeffect = false, sgeffects = [], sgcomposer = null, _rmeffect = false, rmeffects = [], rmcomposer = null, 
+//Vector2 of texture coords   
+tVector = new THREE.Vector2(), 
+//dictionary of module-targets of actions (Command pattern method calls) 
+actionsTargets = {}, 
+//window
+tw = window.innerWidth * dpr, th = window.innerHeight * dpr, tData = new Uint8Array(tw * th * 4), //RGBA => 4  NOTE- dpr scale NEEDED
 //since creating from Framebuffer
 dTexture = new THREE.DataTexture(tData, tw, th, THREE.RGBAFormat), iData = new Uint8Array(tw * th * 4), //RGBA => 4 NOTE-dpr scale not needed
 //since creating from sgTarget.texture
@@ -134,10 +170,13 @@ class Narrative {
         return narrative;
     }
     foo() {
-        console.log(`narrative.foo()`);
+        //console.log(`narrative.foo()`);
         //diagnostics
         for (const [name, actor] of Object.entries(cast)) {
-            console.log(`cast has actor  ${name}`);
+            //console.log(`cast has actor  ${name}`);
+            if (vrscene && vrscene['children']) {
+                //console.log(`vrscene contains ${name} is ${vrscene.children.includes(actor)}`);
+            }
             //console.dir(actor);
         }
         //narrative.reportActors(true);
@@ -148,9 +187,9 @@ class Narrative {
         return 'foo';
     }
     // set up rendering framework and initialize services and state 
-    //bootstrap(_config:Config, state:State){
     bootstrap(_config, state) {
         //console.log(`\n@@@ narrative.bootstrap:`);
+        console.log(`*** three.js version = ${THREE.REVISION}`); //three.js version
         devclock.start();
         // initialize config
         config = _config;
@@ -160,6 +199,19 @@ class Narrative {
         //NOTE: config is not needed as arg since it is a closure var of narrative
         narrative.initialize();
         narrative['config'] = config;
+        //effects
+        _sgeffect = config['topology']['_sgeffect'];
+        if (_sgeffect) {
+            sgcomposer = new EffectComposer(renderer, sgTarget);
+            sgcomposer.renderToScreen = false;
+            sgeffects = config['topology']['sgeffects']; //object[]
+        }
+        _rmeffect = config['topology']['_rmeffect'];
+        if (_rmeffect) {
+            rmcomposer = new EffectComposer(renderer, rmTarget);
+            rmcomposer.renderToScreen = false;
+            rmeffects = config['topology']['rmeffects']; //object[]
+        }
         // initialize actionsTargets
         // initialize modules with set of possible actions targets {t:'target',...}
         // and with ref to narrative (contained in 'actionsTargets')
@@ -197,7 +249,7 @@ class Narrative {
         }
         // initialize state 
         narrative.changeState(state);
-    }
+    } //bootstrap
     // initialize needed narrative closure variables and copy references
     // to narrative instance object for use in state modules camera, stage
     // audio and actions.
@@ -214,6 +266,7 @@ class Narrative {
         _rmpost = config.topology._rmpost;
         topology = config.topology.topology; //topology=_sg + _rm*2 + _vr*4
         //console.log(`rendering topology type = ${topology}`);
+        //console.log(`!!! config.top._sgpost = ${config.topology._sgpost}`);
         // canvas needed in camera.delta for vrcontrols and possibly others
         narrative['canvas'] = canvas;
         // displayed_scene needed in state/camera to add audioListener to 
@@ -268,8 +321,7 @@ class Narrative {
         }
         // returns to bootstrap()
     } //initialize()
-    // for actions (usually from server)
-    // change state of framework states
+    // change state of scene
     changeState(state) {
         //console.log(`\n@@@ narrative.changeState:`);
         (async () => {
@@ -323,7 +375,7 @@ class Narrative {
                         animating = true;
                         renderer.setAnimationLoop(narrative.render);
                         narrative.render();
-                    }
+                    } //if(!animating)
                 }); //n.prerender()
             }
             catch (e) {
@@ -333,7 +385,7 @@ class Narrative {
     } //changeState
     // prepare actors and components for render()
     prerender(state) {
-        //console.log(`\n@@@ narrative.prerender()`);
+        //console.log(`\n@@@ narrative.prerender() _sgpost = ${_sgpost}`);
         return new Promise((resolve, reject) => {
             if (sgscene) {
                 //console.log(`prerender(): sgscene is defined!`);
@@ -371,10 +423,47 @@ class Narrative {
                 }
                 sgskydome = narrative.findActor('sgskydome');
                 if (sgskydome) {
-                    console.log(`sgskydome actor found`);
+                    //console.log(`sgskydome actor found`);
                     sgskydome_map = sgskydome.material.map;
                 }
                 sgcloud = narrative.findActor('sgcloud');
+                //_sgeffect
+                if (_sgeffect === true && sgeffects && sgeffects.length > 0) {
+                    for (const o of sgeffects) {
+                        const key = Object.keys(o)[0], //objects o have ex. 1 key:value
+                        valarr = o[key];
+                        console.log(`\n######### key = ${key}`);
+                        console.log(`######### valarr = ${valarr}`);
+                        console.dir(o);
+                        if (key === 'dotscreen') {
+                            //no-args
+                            sgcomposer.addPass(new DotScreenPass());
+                        }
+                        if (key === 'halftone') {
+                            // w,h,params - {} => use defaults
+                            sgcomposer.addPass(new HalftonePass(window.innerWidth, window.innerHeight, {}));
+                        }
+                        if (key === 'afterimage') {
+                            //damp=.96 default
+                            sgcomposer.addPass(new AfterimagePass(...valarr));
+                        }
+                        if (key === 'bloom') {
+                            //defaults: strength=1,kernelSize=25,sigma=4
+                            sgcomposer.addPass(new BloomPass(...valarr));
+                        }
+                        if (key === 'film') {
+                            //ctor(noiseIntensity,scanlinesIntensity,scanlinesCnt,grayscale)
+                            //typical value => FilmPass(.35, .025, 648, false)
+                            sgcomposer.addPass(new FilmPass(...valarr));
+                        }
+                    } //add displayed passes
+                    //final 2 passes
+                    //2nd-to-last MUST be FilmPass (why?!) but NECESSARY for display
+                    //filmpass2 is NOT displayed so params are irrelevant
+                    //last is obviously RenderPass - params are fixed: sgscene&sglens
+                    sgcomposer.addPass(new FilmPass(.35, .025, 648, false)); //'filmpass2'
+                    sgcomposer.addPass(new RenderPass(sgscene, sglens));
+                } //_sgeffect
             } //if(sgscene)
             if (rmscene) {
                 //console.log(`prerender(): rmscene is defined!`);
@@ -399,14 +488,51 @@ class Narrative {
                     _rm = false;
                     _rmpost = false;
                 }
+                //_rmeffect
+                if (_rmeffect === true && rmeffects && rmeffects.length > 0) {
+                    for (const o of rmeffects) {
+                        const key = Object.keys(o)[0], //objects o have ex. 1 key:value
+                        valarr = o[key];
+                        console.log(`\n######### key = ${key}`);
+                        console.log(`######### valarr = ${valarr}`);
+                        console.dir(o);
+                        if (key === 'dotscreen') {
+                            //no-args
+                            rmcomposer.addPass(new DotScreenPass());
+                        }
+                        if (key === 'halftone') {
+                            // w,h,params - {} => use defaults
+                            rmcomposer.addPass(new HalftonePass(window.innerWidth, window.innerHeight, {}));
+                        }
+                        if (key === 'afterimage') {
+                            //damp=.96 default
+                            rmcomposer.addPass(new AfterimagePass(...valarr));
+                        }
+                        if (key === 'bloom') {
+                            //defaults: strength=1,kernelSize=25,sigma=4
+                            rmcomposer.addPass(new BloomPass(...valarr));
+                        }
+                        if (key === 'film') {
+                            //ctor(noiseIntensity,scanlinesIntensity,scanlinesCnt,grayscale)
+                            //typical value => FilmPass(.35, .025, 648, false)
+                            rmcomposer.addPass(new FilmPass(...valarr));
+                        }
+                    } //add displayed passes
+                    //final 2 passes
+                    //2nd-to-last MUST be FilmPass (why?!) but NECESSARY for display
+                    //filmpass2 is NOT displayed so params are irrelevant
+                    //last is obviously RenderPass - params are fixed: rmscene&rmlens
+                    rmcomposer.addPass(new FilmPass(.35, .025, 648, false)); //'filmpass2'
+                    rmcomposer.addPass(new RenderPass(rmscene, rmlens));
+                } //_rmeffect
                 //TEMP - test
                 rmplane = narrative.findActor('rmplane');
             }
             if (vrscene) {
                 //console.log(`prerender(): vrscene is defined!`);
                 vrlens = narrative['vr']['lens'];
-                if (state['camera']['vr']['lens'] && state['camera']['vr']['lens']['_orbit']) {
-                    console.log(`*** enabling orbit controls for vrlens:`);
+                if (state['camera']['vr'] && state['camera']['vr']['lens'] && state['camera']['vr']['lens']['_orbit']) {
+                    console.log(`\n*** enabling orbit controls for vrlens:`);
                     vrorbit = new OrbitControls(vrlens, renderer.domElement);
                     vrorbit.update();
                     vrorbit.enableDamping = true;
@@ -438,7 +564,7 @@ class Narrative {
                 }
                 vrcloud = narrative.findActor('vrcloud');
             } //if(vrscene)
-            resolve(devclock.getElapsedTime());
+            resolve(devclock.getElapsedTime()); //secs
         }); //return new Promise
     } //prerender()
     // render current frame - frame holds current frame number
@@ -466,35 +592,46 @@ class Narrative {
         ////      const vp = renderer.xr.getCamera(sglens).getWorldPosition(wvp);
         ////      console.log(`wvp = ${wvp.x}  ${wvp.y}  ${wvp.z}`);
         //    }
-        // time-ms, check msgs
-        et = 1000. * clock.getElapsedTime();
-        //    if(rmquad && rmquad.material.uniforms.uTime){
-        //      rmquad.material.uniforms.uTime.value = et;
-        //      rmquad.material.uniforms.uTime.needsUpdate = true;
-        //    }
+        //TIME - scheduled actions
+        //elapsed time-ms
+        et = 1000.0 * clock.getElapsedTime(); //ms
+        //fsh uniform float uTime - other possible instances of uTime?
+        if (rmquad && rmquad.material.uniforms.uTime) {
+            //console.log(`uTime refreshed!`);
+            rmquad.material.uniforms.uTime.value = et;
+            rmquad.material.uniforms.uTime.needsUpdate = true;
+        }
+        //queue.peek
         if (frame % 10 === 0) { //check for pending msgs - period is approx 160ms 
             director.look(et);
         }
-        // fps
+        //stats-fps
         if (_stats) {
             stats.update();
         }
-        //clouds - use TWEEN
+        //spriteclouds - use TWEEN
         if (sgcloud || vrcloud) {
             TWEEN.update();
         }
-        // animate actors with special sub-renders - exps sgcloud/vrcloud
+        // animate actors with special sub-renders - expected action in actor is:
+        // vrscene.position.[xyz] += f() or scene.rotation.[xy(z)] += f()
+        // exp:actors/mrtgts/mrtgts_skybox['animation'] = (et, scene){}
         for (const [name, actor] of Object.entries(cast)) {
+            //console.log(`narrative.render: renderer = ${renderer}`);
+            //console.log(`narrative.render: ${name}['animate'] = ${actor['animate']}`);
+            //
             if (actor['animate']) {
-                actor['animate'](et);
+                actor['animate'](et, renderer, vrscene);
             }
         }
+        //TOPOLOGY - one of {1,...,7}
         // render config-defined topology using defined rendering functions
         switch (topology) {
             case 7: // sg-rm-vr
                 renderer.xr.enabled = false; //5f
                 renderer.setRenderTarget(sgTarget);
                 renderer.render(sgscene, sglens);
+                //_sgpost false unless set true by config
                 if (_sgpost) {
                     //if(frame%600===0){console.log(`_sgpost:rtTexture to sghud`);}
                     image = sgTarget.texture.image;
@@ -505,6 +642,11 @@ class Narrative {
                     sghud_tDiffuse['value'] = rtTexture;
                     sghud_tDiffuse['needsUpdate'] = true;
                 }
+                //_sgeffect
+                if (_sgeffect === true && sgeffects && sgeffects.length > 0) {
+                    sgcomposer.render(sgscene, sglens);
+                    sgTarget = sgcomposer.writeBuffer;
+                } //_sgeffect
                 //sgTargetNames - 'rmquad' a/o 'rmhud'
                 for (const actorname of sgTargetNames) {
                     if (actorname === 'rmquad') {
@@ -524,6 +666,7 @@ class Narrative {
                 }
                 renderer.setRenderTarget(rmTarget);
                 renderer.render(rmscene, rmlens);
+                //_rmpost false unless set true by config
                 if (_rmpost) {
                     //if(frame%600===0){console.log(`_rmpost:rtTexture to rmhud`);}
                     image = rmTarget.texture.image;
@@ -531,9 +674,20 @@ class Narrative {
                     iData = new Uint8Array(w * h * 4);
                     renderer.readRenderTargetPixels(rmTarget, 0, 0, w, h, iData);
                     rtTexture = new THREE.DataTexture(iData, w, h, THREE.RGBAFormat);
-                    rmhud_tDiffuse['value'] = rtTexture;
-                    rmhud_tDiffuse['needsUpdate'] = true;
+                    if (rmhud_tDiffuse) {
+                        rmhud_tDiffuse['value'] = rtTexture;
+                        rmhud_tDiffuse['needsUpdate'] = true;
+                    }
+                    //          if(rmquad_tDiffuse){ //do not overwrite sgTarget.texture on rmquad
+                    //            rmquad_tDiffuse['value'] = rtTexture;
+                    //            rmquad_tDiffuse['needsUpdate'] = true;
+                    //          }
                 } //if(_rmpost)
+                //_rmeffect
+                if (_rmeffect === true && rmeffects && Object.keys(rmeffects).length > 0) {
+                    rmcomposer.render(rmscene, rmlens);
+                    rmTarget = rmcomposer.writeBuffer;
+                } //_rmeffect
                 for (const actorname of rmTargetNames) {
                     if (actorname === 'vrskybox') {
                         //if(frame%600===0){console.log(`rmTarget.tex to vrskybox`);}
@@ -599,9 +753,20 @@ class Narrative {
                     iData = new Uint8Array(w * h * 4);
                     renderer.readRenderTargetPixels(rmTarget, 0, 0, w, h, iData);
                     rtTexture = new THREE.DataTexture(iData, w, h, THREE.RGBAFormat);
-                    rmhud_tDiffuse['value'] = rtTexture;
-                    rmhud_tDiffuse['needsUpdate'] = true;
+                    if (rmhud_tDiffuse) {
+                        rmhud_tDiffuse['value'] = rtTexture;
+                        rmhud_tDiffuse['needsUpdate'] = true;
+                    }
+                    if (rmquad_tDiffuse) {
+                        rmquad_tDiffuse['value'] = rtTexture;
+                        rmquad_tDiffuse['needsUpdate'] = true;
+                    }
                 } //if(_rmpost)
+                //_rmeffect
+                if (_rmeffect === true && rmeffects && Object.keys(rmeffects).length > 0) {
+                    rmcomposer.render(rmscene, rmlens);
+                    rmTarget = rmcomposer.writeBuffer;
+                } //_rmeffect
                 for (const actorname of rmTargetNames) {
                     if (actorname === 'vrskybox') {
                         const faces = config.topology.rmvrSkyboxFaces;
@@ -669,6 +834,11 @@ class Narrative {
                     sghud_tDiffuse['value'] = rtTexture;
                     sghud_tDiffuse['needsUpdate'] = true;
                 }
+                //_sgeffect
+                if (_sgeffect === true && sgeffects && sgeffects.length > 0) {
+                    sgcomposer.render(sgscene, sglens);
+                    sgTarget = sgcomposer.writeBuffer;
+                } //_sgeffect
                 //possibly map (post) sgTarget.texture to vrskybox
                 for (const actorname of sgTargetNames) {
                     if (actorname === 'vrskybox') {
@@ -722,18 +892,26 @@ class Narrative {
                 //if(frame%600===0){console.log(`\nrendered to sgTarget`);}
                 //_sgpost=f => only fsh-rmquad as rmscene
                 if (_sgpost) {
-                    image = sgTarget.texture.image;
-                    const w = image.width, h = image.height;
-                    iData = new Uint8Array(w * h * 4);
-                    renderer.readRenderTargetPixels(sgTarget, 0, 0, w, h, iData);
-                    rtTexture = new THREE.DataTexture(iData, w, h, THREE.RGBAFormat);
-                    sghud_tDiffuse['value'] = rtTexture;
-                    sghud_tDiffuse['needsUpdate'] = true;
+                    if (sghud_tDiffuse) {
+                        image = sgTarget.texture.image;
+                        const w = image.width, h = image.height;
+                        iData = new Uint8Array(w * h * 4);
+                        renderer.readRenderTargetPixels(sgTarget, 0, 0, w, h, iData);
+                        rtTexture = new THREE.DataTexture(iData, w, h, THREE.RGBAFormat);
+                        sghud_tDiffuse['value'] = rtTexture;
+                        sghud_tDiffuse['needsUpdate'] = true;
+                    }
                 }
                 //if(frame%600===0){console.log(`wrote rtTexture to sghud`);}
+                //_sgeffect
+                if (_sgeffect === true && sgeffects && sgeffects.length > 0) {
+                    sgcomposer.render(sgscene, sglens);
+                    sgTarget = sgcomposer.writeBuffer;
+                } //_sgeffect
                 //texture map rmquad a/o rmhud with sgTarget.texture
                 //if(frame%600===0){console.log(`sgTNames.l=${sgTargetNames.length}`);}
                 for (const actorname of sgTargetNames) {
+                    //if(frame%600===0){console.log(`sgTNames=${sgTargetNames}`);}
                     if (actorname === 'rmquad') {
                         if (rmquad_tDiffuse) {
                             rmquad_tDiffuse['value'] = sgTarget.texture; // both WORK!
@@ -756,8 +934,14 @@ class Narrative {
                 //if(frame%600===0){console.log(`rendered rmscene to framebuffer`);}
                 if (_rmpost) {
                     renderer.copyFramebufferToTexture(tVector, dTexture);
-                    rmhud_tDiffuse['value'] = dTexture;
-                    rmhud_tDiffuse['needsUpdate'] = true;
+                    if (rmhud_tDiffuse) {
+                        rmhud_tDiffuse['value'] = dTexture;
+                        rmhud_tDiffuse['needsUpdate'] = true;
+                    }
+                    //          if(rmquad_tDiffuse){ //do not overwrite sgTarget.texture on rmquad
+                    //            rmquad_tDiffuse['value'] = dTexture;
+                    //            rmquad_tDiffuse['needsUpdate'] = true;
+                    //          }
                 } //if(_rmpost)
                 //if(frame%600===0){console.log(`wrote dTexture to rmhud`);}
                 break;
@@ -782,8 +966,14 @@ class Narrative {
                 renderer.render(rmscene, rmlens);
                 if (_rmpost) {
                     renderer.copyFramebufferToTexture(tVector, dTexture);
-                    rmhud_tDiffuse['value'] = dTexture;
-                    rmhud_tDiffuse['needsUpdate'] = true;
+                    if (rmhud_tDiffuse) {
+                        rmhud_tDiffuse['value'] = dTexture;
+                        rmhud_tDiffuse['needsUpdate'] = true;
+                    }
+                    if (rmquad_tDiffuse) {
+                        rmquad_tDiffuse['value'] = dTexture;
+                        rmquad_tDiffuse['needsUpdate'] = true;
+                    }
                 } //if(_rmpost)
                 break;
             //if _sgpost then _webxr:false - sghud is on near plane - flat and mono
@@ -793,9 +983,11 @@ class Narrative {
             case 1: // sg
                 renderer.render(sgscene, sglens);
                 if (_sgpost) {
-                    renderer.copyFramebufferToTexture(tVector, dTexture);
-                    sghud_tDiffuse['value'] = dTexture;
-                    sghud_tDiffuse['needsUpdate'] = true;
+                    if (sghud_tDiffuse) {
+                        renderer.copyFramebufferToTexture(tVector, dTexture);
+                        sghud_tDiffuse['value'] = dTexture;
+                        sghud_tDiffuse['needsUpdate'] = true;
+                    }
                 } //if(_sgpost)
                 break;
             default: // error

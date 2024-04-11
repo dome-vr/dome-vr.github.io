@@ -1,4 +1,4 @@
-// topology2/rmexpt1post2.ts
+// @test/post/2/rmexpt1post2.ts
 // webGL2, es300 three.js ==0.125.2
 const config = {
     // rendering topology
@@ -127,14 +127,13 @@ const state = {
                     url: '../models/stage/actors/post/hud.js',
                     options: {
                         color: 'white',
-                        transparent: true,
-                        opacity: 0.99,
+                        opacity: 0.7,
                         //texture:'./app/media/images/hexagonal_tr.png',
                         // test ONLY! - not for production use!
-                        scaleX: 1.01,
-                        scaleY: 1.01,
+                        scaleX: 1.005,
+                        scaleY: 1.005,
                         //transform:{}
-                        transform: { t: [0.0, 0.0, -0.001] }
+                        transform: { t: [0.0, 0.0, 0.001] }
                     }
                 }
             } //actors

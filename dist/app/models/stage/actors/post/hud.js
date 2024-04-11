@@ -3,7 +3,7 @@ import { transform3d } from '../../../../services/transform3d.js';
 export const Hud = class {
     static create(options = {}) {
         // options
-        const color = options['color'] || 'white', opacity = options['opacity'] || 0.5, vsh = options['vsh'] || '../../shaders/webgl1/quad_vsh/vsh_default.glsl.js', fsh = options['fsh'] || '../../shaders/webgl1/quad_fsh/fsh_default.glsl.js', texture = options['texture'], scaleX = options['scaleX'] || 1.0, scaleY = options['scaleY'] || 1.0, transform = options['transform'];
+        const opacity = options['opacity'] || 0.5, fog = options['fog'] || true, glslVersion = options['glslVersion'] || THREE.GLSL1, vsh = options['vsh'] || '../../shaders/webgl1/quad_vsh/vsh_default.glsl.js', fsh = options['fsh'] || '../../shaders/webgl1/quad_fsh/fsh_default.glsl.js', texture = options['texture'], scaleX = options['scaleX'] || 1.0, scaleY = options['scaleY'] || 1.0, transform = options['transform'];
         return new Promise((resolve, reject) => {
             let hud_g, hud_m, vshader, fshader, uniforms, hud;
             const loader = new THREE.TextureLoader();
@@ -17,13 +17,15 @@ export const Hud = class {
                 vshader = a[0].vsh;
                 fshader = a[1].fsh;
                 uniforms = a[1].uniforms;
-                hud_g = new THREE.PlaneBufferGeometry(w, h, 1, 1);
+                hud_g = new THREE.PlaneGeometry(w, h, 1, 1);
                 hud_m = new THREE.ShaderMaterial({
                     vertexShader: vshader,
                     uniforms: uniforms,
                     fragmentShader: fshader,
-                    opacity: opacity,
                     transparent: true,
+                    opacity: opacity,
+                    fog: fog,
+                    glslVersion: glslVersion,
                     side: THREE.DoubleSide,
                 });
                 // blending
@@ -56,10 +58,7 @@ export const Hud = class {
                 hud['delta'] = (options = {}) => {
                     //console.log(`hud.delta: options = ${options}:`);
                     //console.dir(options);
-                    const color = options['color'], opacity = options['opacity'], transform = options['transform'];
-                    if (color !== undefined) {
-                        hud_m.color = color;
-                    }
+                    const opacity = options['opacity'], transform = options['transform'];
                     if (opacity !== undefined) {
                         hud_m.opacity = opacity;
                     }

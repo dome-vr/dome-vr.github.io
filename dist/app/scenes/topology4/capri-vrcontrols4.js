@@ -100,9 +100,10 @@ const state = {
                 far: 300 //default:100
             },
             controls: {
+                //controlTarget:'vrscene',  //default
                 _controls: true,
                 controls_speed: 0.1,
-                _keymap: true,
+                _keymap: 'vr',
                 keymap_speed: 0.01 //default 0.01
             },
             csphere: {

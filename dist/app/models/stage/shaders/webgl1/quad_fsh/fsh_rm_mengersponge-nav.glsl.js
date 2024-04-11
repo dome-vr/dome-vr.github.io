@@ -1,6 +1,7 @@
 // fsh_mengersponge-nav.glsl.ts
 // fragment shader
 // raymarch - expt3-infinite mengersponge - adapted from Roast
+import * as THREE from '../../../../../../../node_modules/three/build/three.module.js';
 const uniforms = {
     tDiffuse: { type: 't', value: null },
     uVertex: { type: 'v3', value: new THREE.Vector3() },
@@ -231,9 +232,21 @@ vec4 colormarch(vec3 ro, vec3 rd) {
 
      // main uses march, color and blend
      void main() {
+
        // eye and fwd
        //vec3 eye = vec3(0.0, 0.0, 1.0);       // fov=pi/2 => z=1
-       vec3 eye = cameraPosition;
+       //vec3 eye = cameraPosition;
+       
+       //feb18_2024 expt
+       vec3 eye = vec3(0,0,5000);
+
+
+       //rmanim
+       //eye.x += 1000.*sin(.001*uTime);
+       //eye.y += 1000.*sin(.001*uTime);
+       eye.z -= 100.*sin(.001*uTime);
+
+
 
        // map texture pixels to [-1,1]x[-1,1] near plane of fsh-eye fov=90
        vec3 fwd = normalize(vec3(2.0*vuv.s-1.0, 2.0*vuv.t-1.0,-1.0));

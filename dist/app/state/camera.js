@@ -1,9 +1,8 @@
 // camera.ts 
 import { transform3d } from '../services/transform3d.js';
-//import {sgcontrols} from '../models/camera/controls/sgcontrols.js';
-//import {sgkeymap} from '../models/camera/keymaps/sgkeymap.js';
 import { vrcontrols } from '../models/camera/controls/vrcontrols.js';
 import { vrkeymap } from '../models/camera/keymaps/vrkeymap.js';
+import { rmkeymap } from '../models/camera/keymaps/rmkeymap.js';
 // singleton closure-instance variable
 let camera, sglens, vrlens, sgcsphere, vrcsphere;
 class Camera {
@@ -66,7 +65,7 @@ class Camera {
     } //create_lens
     // l = state['sg'|'vr']['fog']  - no return
     create_fog(f, scene) {
-        console.log(`camera.create_fog(f,scene) camera component`);
+        //console.log(`camera.create_fog(f,scene) camera component`);
         if (f && Object.keys(f).length > 0) {
             const _fog = f['_fog']; //_fog is boolean - inferred 
             if (_fog) { //t=>create
@@ -95,7 +94,7 @@ class Camera {
         } //f
     } //create_fog
     create_csphere(ss, scene, narrative, scenename) {
-        console.log('camera.create_csphere(ss,scene,csphere) camera component');
+        //console.log('camera.create_csphere(ss,scene,csphere) camera component');
         let lens_, key = ss['key'] || {}, fill = ss['fill'] || {}, back = ss['back'] || {};
         if (scenename === 'vr') {
             lens_ = vrlens;
@@ -124,7 +123,7 @@ class Camera {
             const p = lens_['position'];
             radius = Math.sqrt(p.x * p.x + p.y * p.y + p.z * p.z);
         }
-        console.log(`radius of csphere is ${radius}`);
+        //console.log(`radius of csphere is ${radius}`);
         // avoid radius=0
         if (radius < .1) {
             radius = 10.0;
@@ -146,14 +145,14 @@ class Camera {
                 l.position.fromArray(pos_a); // default lens 'headlight'
             return l;
         });
-        //add to scene
+        //add components to csphere to create camera apparatus
+        csphere.add(lens_);
         csphere.add(key);
         csphere.add(fill);
         csphere.add(back);
-        scene.add(csphere);
-        console.log(`csphere = ${csphere}:`);
-        console.dir(csphere);
-        //add actors with canonical names
+        //console.log(`csphere = ${csphere}:`);
+        //console.dir(csphere);
+        //add actors with canonical names - they are also added to scene
         narrative.addActor(scene, `${scenename}csphere`, csphere);
         narrative.addActor(scene, `${scenename}key`, key);
         narrative.addActor(scene, `${scenename}fill`, fill);
@@ -161,46 +160,59 @@ class Camera {
         //write
         if (scenename === 'vr') {
             vrcsphere = csphere;
-            console.log(`camera.create_csphere: vrcsphere = ${vrcsphere}:`);
-            console.dir(vrcsphere);
+            //console.log(`camera.create_csphere: vrcsphere = ${vrcsphere}:`);
+            //console.dir(vrcsphere);
         }
         else {
             sgcsphere = csphere;
-            console.log(`camera.create_csphere: sgcsphere = ${sgcsphere}:`);
-            console.dir(sgcsphere);
+            //console.log(`camera.create_csphere: sgcsphere = ${sgcsphere}:`);
+            //console.dir(sgcsphere);
         }
     } //create_csphere
     create_controls(cs, scene, narrative, scenename) {
-        console.log('camera.create_controls(cs,scene,controls,scenename) ');
-        console.log(`scenename = ${scenename}`);
-        if (scenename === 'sg') {
-            console.log(`implememtation of sgcontrols.ts/sgkeymap.ts NOT complete`);
+        console.log('camera.create_controls(cs,scene,narrative,scenename) ');
+        //console.log(`scenename = ${scenename}`);
+        //console.log(`scene = ${scene}`);
+        let controlTarget = scene; //vrscene - default
+        //NOTE:controls/keymap used only in output scene (given by scenename)
+        //     exp. vrscene
+        if (scenename === 'vr') {
+            if (cs['controlTarget'] === 'vrcsphere') {
+                controlTarget = vrcsphere;
+            }
+            else {
+                cs['controlTarget'] = 'vrscene';
+                controlTarget = scene; //redundant
+            }
             if (cs['_controls']) {
+                //remove vrlens from vrcsphere if  _controls is true and ctgt='vrscene'
+                //vrcontrols and vkeymap move vrscene to animate vrlens 'relatively'
+                if (cs['controlTarget'] === 'vrscene') {
+                    if (vrcsphere) {
+                        vrcsphere.remove(vrlens);
+                        //console.log('^^^^^^^^^^^^^^^ removing vrlens from vrcsphere');
+                    }
+                }
                 const controls_speed = cs['controls_speed'] || 0.1;
                 const canvas = narrative['canvas'];
-                //sgcontrols.start(sglens, sgcsphere, controls_speed);
+                vrcontrols.start(controlTarget, canvas, controls_speed);
             }
             if (cs['_keymap']) {
-                const keymap_speed = cs['keymap_speed'] || 0.01;
-                const canvas = narrative['canvas'];
-                //sgkeymap.start(sglens, sgcsphere, keymap_speed);
-            }
-        }
-        else {
-            if (cs['_controls']) {
-                const controls_speed = cs['controls_speed'] || 0.1;
-                const canvas = narrative['canvas'];
-                vrcontrols.start(scene, canvas, controls_speed);
-            }
-            if (cs['_keymap']) {
-                const keymap_speed = cs['keymap_speed'] || 0.01;
-                const canvas = narrative['canvas'];
-                vrkeymap.start(scene, vrcsphere, keymap_speed);
+                if (cs['_keymap'] === 'rm') {
+                    const keymap_speed = cs['keymap_speed'] || 0.1;
+                    //console.log(`\n\n!!!! _keymap='rm' speed=${keymap_speed} !!!!\n\n`);
+                    rmkeymap.start(narrative, keymap_speed);
+                }
+                if (cs['_keymap'] === 'vr') {
+                    const keymap_speed = cs['keymap_speed'] || 0.1;
+                    const canvas = narrative['canvas'];
+                    vrkeymap.start(controlTarget, keymap_speed);
+                }
             }
         }
     } //create_controls
     // create objects specified in arg camera-state === state['camera']
-    // returns new Promise<Record<string,unknown>>((resolve, reject) => {});
+    // returns new Promise<object>((resolve, reject) => {});
     delta(state, narrative) {
         //console.log(`@@ camera.delta(state, scenes) state:`);
         //console.dir(state);
@@ -231,14 +243,6 @@ class Camera {
                 }
                 else {
                     //console.log(`state['sg']['csphere'] is undefined or empty`);
-                }
-                // controls
-                const sgc = (state_sg['controls']);
-                if (sgc && Object.keys(sgc).length > 0) {
-                    camera.create_controls(sgc, scene, narrative, 'sg');
-                }
-                else {
-                    //console.log(`state['sg']['controls'] is undefined or empty`);
                 }
             }
             else {

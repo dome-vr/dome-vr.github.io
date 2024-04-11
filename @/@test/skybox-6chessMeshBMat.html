@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+        <title>test_6chessMeshBMat.html</title>
+		<style>
+			body { margin: 0; }
+		</style>
+	</head>
+
+	<body>
+        <script type='module'>
+            import * as THREE from '../../node_modules/three/build/three.module.js';
+            import {VRButton} from '../../node_modules/three/examples/jsm/webxr/VRButton.js';
+            import Stats from '../../node_modules/three/examples/jsm/libs/stats.module.js'; //default export
+            import {OrbitControls} from '../../dist/external/OrbitControls.js'; 
+
+            //shaders
+            //NOTE!!!!
+            //Later substitute correct six direction-specific raymarch fshs
+            //NOTE!!!!
+            import {vsh} from './default_shaders/vsh_default.glsl.js';
+            //{fsh} is TEMP!!!!!
+            import {fsh} from './default_shaders/fsh_default.glsl.js';
+            import {uniforms} from './default_shaders/fsh_default.glsl.js';
+
+
+
+            //make THREE global
+            window['THREE'] = THREE;
+
+
+            //diagnostics
+            console.log(`test_mRtgts.html...`);
+
+
+            //renderer
+			const renderer = new THREE.WebGLRenderer();
+			renderer.setSize( window.innerWidth, window.innerHeight );
+
+            //canvas
+            const canvas = renderer.domElement;
+			document.body.appendChild( renderer.domElement );
+            let aspect = window.innerWidth/window.innerHeight;
+
+
+
+            //VR ------------------------
+            //vr - vrscene, vrlens&vrorbit
+            const vrscene = new THREE.Scene();
+			const vrlens = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 0.1, 10000 );
+            vrlens.position.z = 10;
+            const vrorbit = new OrbitControls(vrlens, renderer.domElement);
+            vrorbit.update();
+            vrorbit.enableDamping = true;
+            vrorbit.dampingFactor = 0.25;
+            vrorbit.enableZoom = true;
+
+
+            //NOTE:use chess_texture in earliest phase of development
+            //before beging to use fsh->renderTarget.texture->vrskybox map
+            const texture_loader = new THREE.TextureLoader();
+            const chess_texture = texture_loader.load('../../dist/app/media/images/chess.png');
+
+            //vraxes
+            const vraxes = new THREE.AxesHelper(10000);
+            vrscene.add(vraxes);
+
+            //vrskybox
+            //NOTE!!!!
+            //early dev => use 6 chess_textures instead of rtfront.texture,...
+            //NOTE!!!!
+            //NOTE:BoxGeometry is buffered
+            const vrskybox_g = new THREE.BoxGeometry(10000,10000,10000),
+                  vrskybox_ma = [
+                    new THREE.MeshBasicMaterial({side:THREE.BackSide, map:chess_texture }),
+                    new THREE.MeshBasicMaterial({side:THREE.BackSide, map:chess_texture }),
+                    new THREE.MeshBasicMaterial({side:THREE.BackSide, map:chess_texture }),
+                    new THREE.MeshBasicMaterial({side:THREE.BackSide, map:chess_texture }),
+                    new THREE.MeshBasicMaterial({side:THREE.BackSide, map:chess_texture }),
+                    new THREE.MeshBasicMaterial({side:THREE.BackSide, map:chess_texture })
+                  ],
+                  //NOTE!!!
+                  //later dev use renderTarget.textures
+                  //NOTE!!!
+//                  vrskybox_ma = [
+//                    new THREE.MeshBasicMaterial({side:THREE.BackSide, map:rtfront.texture }),
+//                    new THREE.MeshBasicMaterial({side:THREE.BackSide, map:rtback.texture }),
+//                    new THREE.MeshBasicMaterial({side:THREE.BackSide, map:rtright.texture }),
+//                    new THREE.MeshBasicMaterial({side:THREE.BackSide, map:rtleft.texture }),
+//                    new THREE.MeshBasicMaterial({side:THREE.BackSide, map:rtground.texture }),
+//                    new THREE.MeshBasicMaterial({side:THREE.BackSide, map:rtsky.texture })
+//                  ],
+
+                  //textured mRtgts_vrskybox
+                  vrskybox = new THREE.Mesh(vrskybox_g, vrskybox_ma);
+
+            //adjust box for aspect ratio
+            vrskybox.scale.x *= aspect;
+
+            //flip texture map for viewing correctly on inside of cube vrskybox
+            vrskybox.scale.x = -1;
+
+            //add vrskybox to scene
+			vrscene.add(vrskybox);
+
+
+      
+            // webXR VRButton
+            document.body.append(VRButton.createButton(renderer));
+      
+            // stats - display fps performance
+            const stats = new Stats();
+            document.body.appendChild(stats.dom);
+            stats.dom.style.display = 'block';  // show
+   
+
+
+            //window re-size
+            function onWindowResize(){
+              const width_ = window.innerWidth,
+                    height_ = window.innerHeight;
+          
+              canvas.width = width_;
+              canvas.height = height_;
+              renderer.setSize(width_, height_);
+            }
+            window.addEventListener( 'resize', onWindowResize, false );
+
+
+
+            //render
+			const animate = function () {
+                //stats
+                stats.update();
+
+                //NOTE!!!
+                //later dev render to renderTargets rtfront,...,rtsky
+                //NOTE!!!
+//                //render rmscene_X
+//                //webxr - set renderer.xr.enabled false so produce 2D image
+//                renderer.xr.enabled = false;
+//                renderer.xr.setReferenceSpaceType('local');
+//                renderer.setRenderTarget(rtfront);
+//                renderer.render(rmscene_front, rmlens)
+//                renderer.setRenderTarget(rtback);
+//                renderer.render(rmscene_back, rmlens)
+//                renderer.setRenderTarget(rtright);
+//                renderer.render(rmscene_right, rmlens)
+//                renderer.setRenderTarget(rtleft);
+//                renderer.render(rmscene_left, rmlens)
+//                renderer.setRenderTarget(rtground);
+//                renderer.render(rmscene_ground, rmlens)
+//                renderer.setRenderTarget(rtsky);
+//                renderer.render(rmscene_sky, rmlens)
+
+                //render vrscene
+                //webxr- set renderer.xr.enabled true so produce 3D-VR
+                renderer.xr.enabled = true;
+                renderer.xr.setReferenceSpaceType('local');
+                renderer.setRenderTarget(null);
+                renderer.render(vrscene, vrlens);
+			};
+
+            //begin render-loop
+            renderer.setAnimationLoop(animate);
+
+		</script>
+	</body>
+</html>

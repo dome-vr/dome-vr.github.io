@@ -3,7 +3,7 @@ import { transform3d } from '../../../../services/transform3d.js';
 export const Quad = class {
     static create(options = {}) {
         // const options
-        const width = options['width'] || 2, height = options['height'] || 2, color = options['color'] || 'white', opacity = options['opacity'] || 1.0, vsh_url = options['vsh'], fsh_url = options['fsh'], texture = options['texture'], transform = options['transform'];
+        const width = options['width'] || 2, height = options['height'] || 2, opacity = options['opacity'] || 1.0, fog = options['fog'] || true, glslVersion = options['glslVersion'] || THREE.GLSL1, vsh_url = options['vsh'], fsh_url = options['fsh'], texture = options['texture'], transform = options['transform'];
         // const but unassigned
         let vsh, fsh, uniforms, shaders;
         //diagnostics
@@ -27,11 +27,14 @@ export const Quad = class {
             });
         }
         return new Promise((resolve, reject) => {
-            const plane_g = new THREE.PlaneBufferGeometry(width, height, 1, 1), plane_m = new THREE.ShaderMaterial({
+            const plane_g = new THREE.PlaneGeometry(width, height, 1, 1), plane_m = new THREE.ShaderMaterial({
                 vertexShader: vsh,
                 fragmentShader: fsh,
                 uniforms: uniforms,
                 transparent: true,
+                opacity: opacity,
+                fog: fog,
+                glslVersion: glslVersion,
                 side: THREE.DoubleSide,
             });
             //plane:THREE.Mesh;

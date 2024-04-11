@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>test_fsh.html</title>
+        <style>
+            body { margin: 0; }
+        </style>
+    </head>
+
+    <body>
+        <script type='module'>
+            import * as THREE from '../../node_modules/three/build/three.module.js';
+            import {VRButton} from '../../node_modules/three/examples/jsm/webxr/VRButton.js';
+            import Stats from '../../node_modules/three/examples/jsm/libs/stats.module.js'; //default export
+            import {OrbitControls} from '../../dist/external/OrbitControls.js'; 
+            import {transform3d} from '../../dist/app/services/transform3d.js';
+
+
+
+            import {vsh} from '../../dist/app/models/stage/shaders/webgl1/quad_vsh/vsh_default.glsl.js';
+            import {fsh} from '../../dist/app/models/stage/shaders/webgl1/quad_fsh/fsh_rm&anim_expt1.glsl.js';
+            import {uniforms} from '../../dist/app/models/stage/shaders/webgl1/quad_fsh/fsh_rm&anim_expt1.glsl.js';
+
+
+
+            //import {vsh} from '../../dist/app/models/stage/shaders/template_shaders/vsh_template.glsl.js';
+            //import {vsh} from '../../dist/app/models/stage/shaders/webgl2/vertex/vsh_default.glsl.js';
+
+
+//             import {fsh} from '../../dist/app/models/stage/shaders/template_shaders/fsh_rmsphere.glsl.js';
+//            import {uniforms} from '../../dist/app/models/stage/shaders/template_shaders/fsh_rmsphere.glsl.js';
+
+//            import {fsh} from '../../dist/app/models/stage/shaders/template_shaders/fsh_inf_rmsphere.glsl.js';
+//            import {uniforms} from '../../dist/app/models/stage/shaders/template_shaders/fsh_inf_rmsphere.glsl.js';
+
+//             import {fsh} from '../../dist/app/models/stage/shaders/template_shaders/fsh_rm_template_expt1.glsl.js';
+//            import {uniforms} from '../../dist/app/models/stage/shaders/template_shaders/fsh_rm_template_expt1.glsl.js';
+
+
+            //import {fsh} from '../../dist/app/models/stage/shaders/template_shaders/fsh_uPos_rmspheres.glsl.js';
+            //import {uniforms} from '../../dist/app/models/stage/shaders/template_shaders/fsh_uPos_rmspheres.glsl.js';
+
+
+
+
+
+
+
+            //make THREE global
+            window['THREE'] = THREE;
+
+
+            //diagnostics
+            console.log(`test_fsh.html`);
+            let frame = 0;
+
+
+            //BASICS
+            const clock = new THREE.Clock();
+            clock.start();
+
+            //renderer
+            const renderer = new THREE.WebGLRenderer();
+            renderer.setSize( window.innerWidth, window.innerHeight );
+            const canvas = renderer.domElement,
+                  context = canvas.getContext('webgl2', {antialias:true});
+            document.body.appendChild( renderer.domElement );
+            let aspect = window.innerWidth/window.innerHeight;
+
+
+
+            // RM ------------------------
+            //rm - rmscene, rmlens&rmorbit
+            const rmscene = new THREE.Scene();
+            const rmlens = new THREE.PerspectiveCamera( 90, aspect, 0.1, 1000);
+            rmlens.position.z = 1;
+
+            //plane
+            const plane_g = new THREE.PlaneGeometry(2,2,1),
+                  plane_m = new THREE.ShaderMaterial({
+                    opacity:1.0,
+                    vertexShader: vsh,
+                    uniforms: uniforms, 
+                    fragmentShader: fsh,
+                    transparent:true,
+                    side:THREE.DoubleSide,
+                  });
+
+            //texture
+            const rmloader = new THREE.TextureLoader();
+            const rmtexture = rmloader.load('../../dist/app/media/images/glad.png');
+            if(plane_m.uniforms && plane_m.uniforms.tDiffuse){
+              plane_m.uniforms.tDiffuse.value = rmtexture;
+              plane_m.uniforms.tDiffuse.needsUpdate = true;
+            }
+    
+            // blending - check: need gl.enable(gl.BLEND)
+            plane_m.blendSrc = THREE.SrcAlphaFactor; // default
+            plane_m.blendDst = THREE.OneMinusSrcAlphaFactor; //default
+            //plane_m.depthTest = true;  //default is f
+    
+            // plane
+            const plane = new THREE.Mesh(plane_g, plane_m);
+            rmscene.add(plane);
+
+
+            //rmrenderTarget
+            const rmrenderTarget = new THREE.WebGLRenderTarget();
+            rmrenderTarget.setSize( window.innerWidth, window.innerHeight );
+
+
+
+            //VR ------------------------
+            //vr - vrscene, vrlens&vrorbit
+            const vrscene = new THREE.Scene();
+            const vrlens = new THREE.PerspectiveCamera( 90, aspect, 0.1, 100000 );
+            vrlens.position.z = 10;
+            const vrorbit = new OrbitControls(vrlens, renderer.domElement);
+            vrorbit.update();
+            vrorbit.enableDamping = true;
+            vrorbit.dampingFactor = 0.25;
+            vrorbit.enableZoom = true;
+
+            //vraxes
+            const vraxes = new THREE.AxesHelper(10000);
+            vrscene.add(vraxes);
+
+            // vrskybox
+            const vrskybox_g = new THREE.BoxGeometry(10000,10000,10000),
+                  vrskybox_m = new THREE.MeshBasicMaterial({
+                    color:'white',
+                    visible:true,
+                    transparent:true,
+                    side:THREE.BackSide
+                  }),
+                  vrskybox = new THREE.Mesh(vrskybox_g, vrskybox_m);
+            // blending - check: need gl.enable(gl.BLEND)
+            vrskybox_m.blendSrc = THREE.SrcAlphaFactor; // default
+            vrskybox_m.blendDst = THREE.OneMinusSrcAlphaFactor; //default
+            vrskybox.scale.x *= aspect;
+            vrscene.add(vrskybox);
+
+
+
+            // webxr
+            renderer.xr.enabled = true;
+            renderer.xr.setReferenceSpaceType('local');
+      
+            // webXR VRButton
+            document.body.append(VRButton.createButton(renderer));
+      
+            // stats - display fps performance
+            const stats = new Stats();
+            document.body.appendChild(stats.dom);
+            stats.dom.style.display = 'block';  // show
+   
+
+
+            //set uAspect
+            if(plane_m.uniforms && plane_m.uniforms['uAspect']){
+              plane_m.uniforms.uAspect.value = window.innerWidth/window.innerHeight;  
+              plane_m.uniforms.uAspect.needsUpdate = true;
+            }
+
+
+
+
+            //window re-size
+            function onWindowResize(){
+              let w = window.innerWidth,
+                  h = window.innerHeight;
+          
+              //adjust renderer size
+              canvas.width = w;
+              canvas.height = h;
+              renderer.setSize(w,h);
+
+              //adjust rm
+              if(plane_m.uniforms && plane_m.uniforms['uAspect']){
+                plane_m.uniforms.uAspect.value = w/h;  //secs
+                plane_m.uniforms.uAspect.needsUpdate = true;
+              }
+            }
+            window.addEventListener( 'resize', onWindowResize, false );
+
+
+
+
+
+            //render ***********************************************
+            const animate = function () {
+                frame+=1;
+
+                //update stats, uTime, uPositions
+                stats.update();
+                let et = clock.getElapsedTime();
+                if(plane_m.uniforms && plane_m.uniforms['uTime']){
+                  plane_m.uniforms.uTime.value = et;  //secs
+                  plane_m.uniforms.uTime.needsUpdate = true;
+                }
+                if(plane_m.uniforms && plane_m.uniforms['uPositions']){
+                  //uPos_rmspheres - no effect
+                  //plane_m.uniforms.uPositions.value[0].x+=0.125*Math.sin(et);  
+                  //inf_rmsphere - linear
+//                  plane_m.uniforms.uPositions.value[0].x+=0.0125*Math.sin(et);  
+//                  plane_m.uniforms.uPositions.value[0].y+=0.0025*Math.sin(et);  
+//                  plane_m.uniforms.uPositions.value[1].y+=0.0115*Math.sin(et);  
+//                  plane_m.uniforms.uPositions.value[1].z+=0.0015*Math.sin(et);  
+//                  plane_m.uniforms.uPositions.value[2].z+=0.006*Math.sin(et);  
+//                  plane_m.uniforms.uPositions.value[2].x+=0.008*Math.sin(et);  
+
+                  //inf_rmsphere - rotation
+                  //NOTE:template_shaders/fsh_uPos_rmspheres has rm-objs at z=-2
+                  //     so 2*Math.sin/cos rotates around origin at radius=2
+                  plane_m.uniforms.uPositions.value[0].x = 2.*Math.sin(et);  
+                  plane_m.uniforms.uPositions.value[0].z = 2.*Math.cos(et);  
+                  plane_m.uniforms.uPositions.value[1].x = 4.*Math.sin(2*et);  
+                  plane_m.uniforms.uPositions.value[1].z = 4.*Math.cos(2*et);  
+                  plane_m.uniforms.uPositions.value[2].x = 8.*Math.sin(4*et);  
+                  plane_m.uniforms.uPositions.value[2].z = 8.*Math.cos(4*et);  
+                  plane_m.uniforms.uTime.needsUpdate = true;
+                }
+
+
+                //render rmscene to rmrenderTarget
+                //first turn off xr.enabled so as to make a mono image
+                renderer.xr.enabled = false;
+                renderer.setRenderTarget(rmrenderTarget);
+                renderer.render(rmscene, rmlens);
+
+                //texture skybox
+                vrskybox.material.map = rmrenderTarget.texture;
+                //vrskybox.material.needsUpdate = true;
+
+                //render vrscene
+                //first turn back on xr.enabled so as to make a stereo image
+                renderer.xr.enabled = true;
+                renderer.setRenderTarget(null);
+                renderer.render(vrscene, vrlens)
+            };
+
+            //begin render-loop
+            renderer.setAnimationLoop(animate);
+
+        </script>
+    </body>
+</html>

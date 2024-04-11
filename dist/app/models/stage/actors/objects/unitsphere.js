@@ -8,7 +8,7 @@ export const Unitsphere = class {
         //console.log(`&&& Unitsphere options:`);
         //console.dir(options);
         return new Promise((resolve, reject) => {
-            const sphere_g = new THREE.SphereBufferGeometry(radius, widthSegments, heightSegments), sphere_m = (material === 'basic') ? new THREE.MeshBasicMaterial({
+            const sphere_g = new THREE.SphereGeometry(radius, widthSegments, heightSegments), sphere_m = (material === 'basic') ? new THREE.MeshBasicMaterial({
                 wireframe: wireframe,
                 color: color,
                 transparent: true,

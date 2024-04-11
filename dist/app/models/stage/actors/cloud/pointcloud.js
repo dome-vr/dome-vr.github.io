@@ -7,7 +7,7 @@ let pcloud;
 export const Pointcloud = class {
     static create(options = {}) {
         //console.log(`\n\n$$$ pointcloud: o['radius'] = ${options['radius']}`);
-        const pointsize = options['pointsize'] || 2.0, radius = options['radius'] || 100, rotation_speed = options['rotation_speed'] || .005, pcloud_g = new THREE.SphereBufferGeometry(radius, 160, 80), pcloud_m = new THREE.ShaderMaterial({
+        const pointsize = options['pointsize'] || 2.0, radius = options['radius'] || 100, rotation_speed = options['rotation_speed'] || .005, pcloud_g = new THREE.SphereGeometry(radius, 160, 80), pcloud_m = new THREE.ShaderMaterial({
             uniforms: uniforms,
             vertexShader: vsh,
             fragmentShader: fsh,

@@ -1,6 +1,7 @@
 // fsh_rm_expt1b.glsl.ts
 // fragment shader
 // raymarch - expt1-fogcubes
+import * as THREE from '../../../../../../../node_modules/three/build/three.module.js';
 const uniforms = {
     tDiffuse: { type: 't', value: null },
     uVertex: { type: 'v3', value: new THREE.Vector3() },
@@ -11,7 +12,6 @@ const uniforms = {
     uCam_right: { type: 'v3', value: new THREE.Vector3(1, 0, 0) },
     uRed: { type: 'f', value: 0.0 },
     uTime: { type: 'f', value: 0.0 },
-    uResolution: { type: 'v2', value: new THREE.Vector2(960, 1080) }
 };
 const fsh = `
      #ifdef GL_ES

@@ -1,6 +1,7 @@
 // fsh_rm_cubes.glsl.ts
 // fragment shader
 // raymarch - cubes
+import * as THREE from '../../../../../../../node_modules/three/build/three.module.js';
 const uniforms = {
     tDiffuse: { type: 't', value: null },
     uVertex: { type: 'v3', value: new THREE.Vector3() },

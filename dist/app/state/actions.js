@@ -18,7 +18,7 @@ class Actions {
             actions = new Actions();
         }
     }
-    // new Promise<Record<string,unknown>>((resolve, reject) => {});
+    // new Promise<object>((resolve, reject) => {});
     // state['_actions']: t=>q.load; f=>empty queue; undefined=>append to queue
     delta(state = {}, narrative) {
         //console.log(`\n state/actions.delta state:`);
@@ -32,7 +32,7 @@ class Actions {
                 const _actions = state['_actions'], sequence_url = state['sequence_url'];
                 //diagnostics
                 //console.log(`actions: _actions=${_actions}:`);
-                console.log(`actions sequence_url=${sequence_url}`);
+                console.log(`\nactions sequence_url=${sequence_url}`);
                 if (_actions === false) { // _actions:f => load []
                     queue.load([]);
                     result['_actions'] = false;

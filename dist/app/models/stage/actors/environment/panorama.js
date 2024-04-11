@@ -75,4 +75,4 @@ export const Panorama = class {
         }); //return Promise<Actor>
     } //create
 }; //class Panorama
-//# sourceMappingURL=Panorama.js.map
+//# sourceMappingURL=panorama.js.map

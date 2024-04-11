@@ -1,6 +1,7 @@
 // fsh_rm_expt1.glsl.ts
 // fragment shader
 // raymarch - expt1-fogcubes
+import * as THREE from '../../../../../../../node_modules/three/build/three.module.js';
 const uniforms = {
     tDiffuse: { type: 't', value: null },
     uVertex: { type: 'v3', value: new THREE.Vector3() },
@@ -105,6 +106,10 @@ const fsh = `
      void main() {
        // eye and fwd
        vec3 eye = vec3(0.0, 0.0, 1.0);       // fov=pi/2 => z=1
+
+       //TEST!!!!
+       eye.z -= .05;
+       //TEST!!!!
 
        // map texture pixels to [-1,1]x[-1,1] near plane of fsh-eye fov=90
        vec3 fwd = normalize(vec3(2.0*vuv.s-1.0, 2.0*vuv.t-1.0, -1.0));

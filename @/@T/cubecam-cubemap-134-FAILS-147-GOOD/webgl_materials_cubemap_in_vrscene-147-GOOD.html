@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>wmcd:webgl_materials_cubemap_dynamic</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <style>
+        body { margin:0 }
+    </style>
+  </head>
+
+  <body>
+    <div id="info"><a href="https://threejs.org" target="_blank" rel="noopener"></a></div> 
+        <!-- Import maps polyfill -->
+        <!-- Remove this when import maps will be widely supported -->
+        <!--
+        <script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+        <script type="importmap">
+            {
+                "imports": {
+                    "three": "../build/three.module.js",
+                    "three/addons/": "./jsm/"
+                }
+            }
+        </script>
+        -->
+
+    <script type="module">
+
+// 0.134.0 => FAILS!
+//            import * as THREE from '../../node_modules/three/build/three.module.js';
+//            import {VRButton} from '../../node_modules/three/examples/jsm/webxr/VRButton.js';
+//            import Stats from '../../node_modules/three/examples/jsm/libs/stats.module.js'; //default export
+//            import {OrbitControls} from '../../dist/external/OrbitControls.js'; 
+
+
+// 0.147.0 => GOOD!
+      import * as THREE from '../../dist/external/three/build/three.module.js';
+      import {VRButton} from '../../dist/external/three/examples/jsm/webxr/VRButton.js';
+      import Stats from '../../dist/external/three/examples/jsm/libs/stats.module.js'; //default export
+      //uses three_0.134.0 - no problem except warning appears
+      import {OrbitControls} from '../../dist/external/OrbitControls.js'; 
+      //for pure three_0.147.0 need to change import of three in OrbitControls
+      //import {OrbitControls} from '../../dist/external/three/examples/jsm/controls/OrbitControls.js'; 
+
+      //shaders
+//      import {vsh} from '../../dist/app/models/stage/shaders/fshskybox_shaders/vsh_shskybox.glsl.js';
+//      import {fsh} from '../../dist/app/models/stage/shaders/fshskybox_shaders/fsh_shskybox.glsl.js';
+//      import {uniforms} from '../../dist/app/models/stage/shaders/fshskybox_shaders/fsh_shskybox.glsl.js';
+
+
+      //make THREE global
+      window['THREE'] = THREE;
+
+
+      //diagnostics
+      console.log('bsed on webgl_materials_cubemap_dynamic.html');
+
+
+
+      let camera, sgscene, vrscene, renderer, stats;
+      let cube, centerY, vrskydome, torus;
+      let cubeCamera, cubeRenderTarget;
+      let controls;
+
+
+      function init() {
+          renderer = new THREE.WebGLRenderer( { antialias: true } );
+          renderer.setPixelRatio( window.devicePixelRatio );
+          renderer.setSize( window.innerWidth, window.innerHeight );
+          renderer.outputEncoding = THREE.sRGBEncoding;
+          renderer.toneMapping = THREE.ACESFilmicToneMapping;
+          document.body.appendChild( renderer.domElement );
+          stats = new Stats();
+          document.body.appendChild( stats.dom );
+          window.addEventListener( 'resize', onWindowResized );
+
+
+          camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
+          camera.position.z = 75;
+
+
+          sgscene = new THREE.Scene();
+          //sgscene.rotation.y = 0.5; // avoid flying objects occluding the sun
+          vrscene = new THREE.Scene();
+
+          //cubeCamera
+          cubeRenderTarget = new THREE.WebGLCubeRenderTarget( 256 );
+          //cubeRenderTarget.texture.type = THREE.HalfFloatType;
+          cubeCamera = new THREE.CubeCamera( 1, 1000, cubeRenderTarget );
+
+          //sgscene.background
+          const cubetex_loader = new THREE.CubeTextureLoader();
+          //cubetex_loader.setPath( 'textures/cube/Park3Med/' );
+          cubetex_loader.setPath( '../../dist/app/media/images/skybox/Park3Med/' );
+          const sgcubetex = cubetex_loader.load(['px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg']);
+          sgscene.background = sgcubetex;
+
+
+          //vrskydome
+          const vrmaterial = new THREE.MeshStandardMaterial( {
+              envMap: cubeRenderTarget.texture,
+              roughness: 0.05,
+              metalness: 1,
+              color:0xffffff,
+              transparent:true,
+              opacity:0.7,
+              side:THREE.DoubleSide
+          } );
+//          const vrmaterial = new THREE.MeshBasicMaterial( {
+//              envMap: cubeRenderTarget.texture,
+//          } );
+          const vrskydomeg = new THREE.SphereGeometry(9000,32,16);
+          //const vrskydomeg = new THREE.Mesh( new THREE.IcosahedronGeometry(15, 8 ), vrmaterial );
+          vrskydome = new THREE.Mesh(vrskydomeg, vrmaterial );
+   
+
+          //flip texture cubemap view to display correctly (right-side up)
+          //on inside of cube sgskydome
+          cubeCamera.rotation.z = Math.PI;
+          vrscene.add( vrskydome );
+
+          //NOTE: ALL below FAILED to change display ?!
+          //camera.rotateZ(Math.PI);
+          //sgscene.scale.x *= -1;
+          //vrscene.scale.x *= -1;
+          // Flip every 3d object in the scene.
+          //sgscene.traverse(function (object) { //also vrscene
+          //  object.scale.x *= -1;
+          //});
+          //camera.rotation.z = Math.PI;
+
+
+          //cube
+          const sgmaterial = new THREE.MeshBasicMaterial( {
+              color:0xff0000,
+              side: THREE.FrontSide
+          } );
+          cube = new THREE.Mesh( new THREE.BoxGeometry( 5, 5, 5 ), sgmaterial );
+          cube.position.z = 50.;
+          sgscene.add( cube );
+
+          //centerY - point at origin, parent of sphereY, to define rotation 
+          const centerYg = new THREE.BufferGeometry(),
+                verticesY = new Float32Array([0, 0, 0]),
+                centerYm = new THREE.PointsMaterial( { size: 1, sizeAttenuation: false, visible:true } );
+          centerYg.setAttribute('position', new THREE.BufferAttribute( verticesY, 3 ) );
+          centerY = new THREE.Points(centerYg, centerYm);
+          sgscene.add(centerY);
+          centerY.add(cube);
+
+
+          //controls
+          controls = new OrbitControls( camera, renderer.domElement );
+          controls.autoRotate = true;
+      }//init
+
+
+      function onWindowResized() {
+          renderer.setSize( window.innerWidth, window.innerHeight );
+          camera.aspect = window.innerWidth / window.innerHeight;
+          camera.updateProjectionMatrix();
+      }
+
+
+      function animate(msTime ) {
+          const time = msTime / 1000;
+          controls.update();
+          stats.update();
+
+          //sg cube
+          cube.position.x = Math.cos( time ) * 15;
+          cube.position.y = Math.sin( time ) * 15;
+//          cube.position.z = Math.sin( time ) * 10;
+          cube.rotation.x += 0.02;
+          cube.rotation.y += 0.03;
+          centerY.rotation.y += 0.0035;
+
+          //sgscene
+          cubeCamera.update( renderer, sgscene );
+
+          //vrscene
+          renderer.render( vrscene, camera );
+      }
+
+
+      init();
+
+      //begin render-loop
+      renderer.setAnimationLoop(animate);
+            
+    </script>
+  </body>
+</html>

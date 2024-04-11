@@ -1,4 +1,4 @@
-// topology7/empty-rmcantor-vrskybox7.ts
+// @test/post/pointcloudlinespost-rmexpt1-vrskybox7.ts
 // webGL2, es300 three.js ==0.125.2
 const config = {
     // rendering topology
@@ -132,16 +132,16 @@ const state = {
                         scaleY: 1.01,
                     }
                 },
-                'sgunitcube': {
-                    factory: 'Unitcube',
-                    url: '../models/stage/actors/objects/unitcube.js',
-                    options: { wireframe: false,
-                        color: 'white',
-                        opacity: 0.7,
-                        map: './app/media/images/glad.png',
-                        transform: { t: [0, 0, -2], e: [0.0, 0.0, 0.0], s: [0.5, 1, 0.5] }
-                    }
-                },
+                //                'sgunitcube': {
+                //                    factory: 'Unitcube',
+                //                    url: '../models/stage/actors/objects/unitcube.js',
+                //                    options: { wireframe: false,
+                //                        color: 'white',
+                //                        opacity: 0.7,
+                //                        map: './app/media/images/glad.png',
+                //                        transform: { t: [0, 0, -2], e: [0.0, 0.0, 0.0], s: [0.5, 1, 0.5] }
+                //                    }
+                //                },
                 'sgpointcloudlines': {
                     factory: 'Pointcloudlines',
                     url: '../models/stage/actors/cloud/pointcloud-lines.js',
@@ -211,9 +211,10 @@ const state = {
                     url: '../models/stage/actors/objects/unitcube.js',
                     options: { wireframe: false,
                         color: 'white',
-                        opacity: 0.7,
-                        map: './app/media/images/glad.png',
-                        transform: { t: [0, 0, -2], e: [0.0, 0.0, 0.0], s: [0.5, 1, 0.5] }
+                        transparent: true,
+                        opacity: 0.5,
+                        map: './app/media/images/cloud/sprite_redlight.png',
+                        transform: { t: [0, 0, -2], e: [0.0, 0.0, 0.0], s: [0.5, 8.0, 0.5] }
                     }
                 },
                 //                'vrground':{ 

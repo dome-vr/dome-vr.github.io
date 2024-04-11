@@ -10,7 +10,8 @@
       "dom",
       "dom.iterable",
       "esnext"
-    ]
+    ],
+    "baseUrl": "."
   },
   "include": ["./src/app/**/*"],
   "exclude": ["./test/**/*"]

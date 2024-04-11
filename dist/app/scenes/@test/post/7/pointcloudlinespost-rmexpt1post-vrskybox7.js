@@ -1,4 +1,4 @@
-// topology7/pointcloudlinespost-rmexpt1post-vrskybox7.ts
+// @test/post/7/pointcloudlinespost-rmexpt1post-vrskybox7.ts
 // webGL2, es300 three.js ==0.125.2
 const config = {
     // rendering topology
@@ -11,7 +11,7 @@ const config = {
         // render sgscene either to display, or to sgTarget offscreen for 
         // bg texturing in rmscene or texturing in vrscene
         _sg: true,
-        //use frame n-1 sgTarget.tex ('sg') 
+        //use frame n-1 sgTarget.tex  
         _sgpost: true,
         // rmstage or vrstage actors 
         sgTargetNames: ['rmquad'],
@@ -19,6 +19,7 @@ const config = {
         // in vrscene - either skybox/skydome/etc. or actors
         // NOTE! true=>must define rmquad and rmTargetName(s)
         _rm: true,
+        //use frame n-1 rmTarget.tex  
         _rmpost: true,
         rmTargetNames: ['vrskybox'],
         //skyfaces:string[];  //used if actor 'skyfaces' exists and is rmTgtName
@@ -168,7 +169,7 @@ const state = {
                     factory: 'Rmquad',
                     url: '../models/stage/actors/raymarch/rmquad.js',
                     options: {
-                        opacity: 1.0,
+                        opacity: .7,
                         //                      vsh:'../../../stage/shaders/webgl2/vertex/vsh_default.glsl.js',
                         //                      fsh:'../../../stage/shaders/webgl2/fragment/fsh_rm_texquad.glsl.js',
                         vsh: '../../../stage/shaders/webgl1/quad_vsh/vsh_default.glsl.js',
@@ -176,40 +177,21 @@ const state = {
                     }
                 },
                 'rmhud': {
-                    factory: 'Hud',
-                    url: '../models/stage/actors/post/hud.js',
+                    factory: 'Rmquad',
+                    url: '../models/stage/actors/raymarch/rmquad.js',
                     options: {
-                        color: 'white',
                         transparent: true,
                         opacity: 0.99,
                         //texture:'./app/media/images/hexagonal_tr.png',
                         // test ONLY! - not for production use!
-                        scaleX: 1.01,
-                        scaleY: 1.01,
+                        scaleX: 1.05,
+                        scaleY: 1.05,
                         //transform:{}
                         //vsh:'../../../stage/shaders/webgl2/vertex/vsh_default.glsl.js',
                         //fsh:'../../../stage/shaders/webgl2/fragment/fsh_rm_texquad.glsl.js',
-                        transform: { t: [0.0, 0.0, -0.001] }
+                        transform: { t: [0.0, 0.0, -0.001] } //must be behind rmquad?!
                     }
                 }
-                //                  'rmhud': {
-                //                    factory: 'Rmquad',
-                //                    //factory: 'Hud',
-                //                    url: '../models/stage/actors/raymarch/rmquad.js',
-                //                    //url: '../models/stage/actors/post/hud.js',
-                //                    options: {
-                //                      color:'white',
-                //                      opacity:.99, // 0.5
-                //                      scaleX:1.001, //1.0015,  //1.01, //default=1
-                //                      scaleY:1.001,  //1.03, //default=1
-                //                      vsh:'../../../stage/shaders/webgl2/vertex/vsh_default.glsl.js',
-                //                      fsh:'../../../stage/shaders/webgl2/fragment/fsh_rm_texquad.glsl.js',
-                ////                      vsh:'../../../stage/shaders/webgl1/quad_vsh/vsh_default.glsl.js',
-                ////                      fsh:'../../../stage/shaders/webgl1/quad_fsh/fsh_tDiffuse.glsl.js',
-                //                      texture:'./app/media/images/glad.png',
-                //                      transform:{t:[0.0,0.0,0.001]}
-                //                    }
-                //                  }
             } //actors
         },
         vrscene: {

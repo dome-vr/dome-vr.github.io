@@ -1,3 +1,5 @@
+// vrkeymap.ts - dolly x,y,z; rotate-examine via keys
+// assumes controlTarget, vrsecene or vrcsphere, is centered at origin
 // singleton closure-instance variable
 let vrkeymap;
 class Vrkeymap {
@@ -11,12 +13,11 @@ class Vrkeymap {
     }
     // start key-listening and identify controlTarget and optional dolly spped
     // typically controlTarget is vrscene, but can be individual actor for exp.
-    start(controlTarget, rotateTarget, speed = 0.01) {
+    start(controlTarget, speed = 0.01) {
         console.log(`+++ vrkeymap:  controlTarget = ${controlTarget}:`);
         console.dir(controlTarget);
-        console.log(`+++ vrkeymap:  rotateTarget = ${rotateTarget}:`);
-        console.dir(rotateTarget);
         document.addEventListener('keydown', (e) => {
+            console.log(`key pressed is ${e.key}`);
             switch (e.keyCode) {
                 // HOME = SPACEBAR
                 // restore controlTarget to position=origin, 
@@ -32,14 +33,16 @@ class Vrkeymap {
                     controlTarget.up.x = 0.0;
                     controlTarget.up.y = 0.0;
                     controlTarget.up.z = 0.0;
-                    // rotateTarget
-                    if (rotateTarget) {
-                        rotateTarget.position.x = 0.0;
-                        rotateTarget.position.y = 0.0;
-                        rotateTarget.position.z = 0.0;
-                        rotateTarget.rotation.x = 0.0;
-                        rotateTarget.rotation.y = 0.0;
-                        rotateTarget.rotation.z = 0.0;
+                    break;
+                // move fwd/backward i.e. negZ/posZ
+                case 90:
+                    //console.log(`controlTarget.position.z = ${controlTarget.position.z}`);
+                    //console.log(`key pressed is ${e.key} LEFT-ARROW`); 
+                    if (e.shiftKey) { // sh => FWD controlTarget.pos.z -= k                                          // NOTE: tgt=scene => BACKWD lens
+                        controlTarget.position.z -= speed;
+                    }
+                    else { // small-z => BKWD controlTarget.pos.z += k                                    // NOTE: tgt=scene => FWD lens
+                        controlTarget.position.z += speed;
                     }
                     break;
                 // DOLLY - arrows
@@ -48,16 +51,10 @@ class Vrkeymap {
                 case 37:
                     //console.log(`key pressed is ${e.key} LEFT-ARROW`);  
                     if (e.shiftKey) { // sh => UP Y+
-                        controlTarget.rotation.y -= speed;
-                        if (rotateTarget) {
-                            rotateTarget.rotation.y += speed;
-                        }
+                        controlTarget.rotation.y -= speed * .01;
                     }
                     else {
                         controlTarget.position.x += speed;
-                        if (rotateTarget) {
-                            rotateTarget.position.x -= speed;
-                        }
                     }
                     break;
                 // right arrow - RIGHT X+
@@ -65,16 +62,10 @@ class Vrkeymap {
                 case 39:
                     //console.log(`key pressed is ${e.key} RIGHT-ARROW`);  
                     if (e.shiftKey) { // sh => UP Y+
-                        controlTarget.rotation.y += speed;
-                        if (rotateTarget) {
-                            rotateTarget.rotation.y -= speed;
-                        }
+                        controlTarget.rotation.y += speed * .01;
                     }
                     else {
                         controlTarget.position.x -= speed;
-                        if (rotateTarget) {
-                            rotateTarget.position.x += speed;
-                        }
                     }
                     break;
                 // up arrow - UP Y+          
@@ -82,16 +73,10 @@ class Vrkeymap {
                 case 38:
                     //console.log(`key pressed is ${e.key} UP-ARROW`); 
                     if (e.shiftKey) { // sh => UP Y+
-                        controlTarget.rotation.x -= speed;
-                        if (rotateTarget) {
-                            rotateTarget.rotation.x += speed;
-                        }
+                        controlTarget.rotation.x -= speed * .01;
                     }
                     else { // no-sh => FWD Z-
                         controlTarget.position.y -= speed;
-                        if (rotateTarget) {
-                            rotateTarget.position.y += speed;
-                        }
                     }
                     break;
                 // down arrow - DOWN Y-          
@@ -99,22 +84,16 @@ class Vrkeymap {
                 case 40:
                     //console.log(`key pressed is ${e.key} DOWN-ARROW`); 
                     if (e.shiftKey) { // sh => UP Y+
-                        controlTarget.rotation.x += speed;
-                        if (rotateTarget) {
-                            rotateTarget.rotation.x -= speed;
-                        }
+                        controlTarget.rotation.x += speed * .01;
                     }
                     else {
                         controlTarget.position.y += speed;
-                        if (rotateTarget) {
-                            rotateTarget.position.y -= speed;
-                        }
                     }
                     break;
                 default:
                 //console.log(`key '${e.keyCode}' not associated with //c3d function`);
             }
-        });
+        }); //keydown
     } //start
 }
 //enforce singleton

@@ -9,6 +9,7 @@
 //
 //  gl_FragColor = vec4(col.b, col.r, col.g, 1.0);
 //}
+import * as THREE from '../../../../../../../node_modules/three/build/three.module.js';
 const uniforms = {
     tDiffuse: { type: 't', value: null },
     tDiffusePost: { type: 't', value: null },

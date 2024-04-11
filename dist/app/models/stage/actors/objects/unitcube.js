@@ -9,7 +9,7 @@ export const Unitcube = class {
         //console.log(`&&& Unitcube options:`);
         //console.dir(options);
         return new Promise((resolve, reject) => {
-            cube_g = new THREE.BoxBufferGeometry(1.0, 1.0, 1.0);
+            cube_g = new THREE.BoxGeometry(1.0, 1.0, 1.0);
             cube_m = (material === 'basic') ? new THREE.MeshBasicMaterial({
                 wireframe: wireframe,
                 color: color,

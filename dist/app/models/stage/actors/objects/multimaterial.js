@@ -32,10 +32,10 @@ export const Multimaterial = class {
                 let e;
                 switch (geometry) {
                     case 'quad':
-                        multimat_g = new THREE.PlaneBufferGeometry(width, height, quad_widthSegments, quad_heightSegments);
+                        multimat_g = new THREE.PlaneGeometry(width, height, quad_widthSegments, quad_heightSegments);
                         break;
                     case 'sphere':
-                        multimat_g = new THREE.SphereBufferGeometry(radius, quad_widthSegments, quad_heightSegments);
+                        multimat_g = new THREE.SphereGeometry(radius, quad_widthSegments, quad_heightSegments);
                         break;
                     default:
                         e = `unrecognized geometry = ${geometry}`;

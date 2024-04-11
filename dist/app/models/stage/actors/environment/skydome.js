@@ -15,7 +15,7 @@ export const Skydome = class {
         //    console.dir(transform);
         return new Promise((resolve, reject) => {
             try {
-                dome_g = new THREE.SphereBufferGeometry(1.0); // unit sphere
+                dome_g = new THREE.SphereGeometry(1.0); // unit sphere
                 dome_m = new THREE.MeshBasicMaterial({
                     color: color,
                     opacity: opacity,
@@ -41,7 +41,7 @@ export const Skydome = class {
                 //rotate dome
                 dome['animate'] = (et) => {
                     if (rotate) {
-                        dome.rotation.y = et * 0.00001;
+                        dome.rotation.y = et * 0.00005; //0.00001
                     }
                 };
                 // delta() for property modification required by Actor interface

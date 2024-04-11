@@ -5,7 +5,7 @@ export const Points = class {
         return new Promise((resolve, reject) => {
             // return actor ready to be added to scene
             // points
-            const positions = options['positions'] || [[0, 0, 0]], transform = options['transform'] || {}, vertices = [], pointsize = options['pointsize'] || 0.0, points_g = new THREE.BufferGeometry(), points_m = new THREE.PointsMaterial({ color: 'white', size: pointsize }); //size must be zero or visible!
+            const positions = options['positions'] || [[0, 0, 0]], transform = options['transform'] || {}, vertices = [], pointsize = options['pointsize'] || 0.0, points_g = new THREE.Geometry(), points_m = new THREE.PointsMaterial({ color: 'white', size: pointsize }); //size must be zero or visible!
             //vertices
             for (let i = 0; i < positions.length; i++) {
                 vertices.push(...positions[i]);

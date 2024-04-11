@@ -1,34 +1,36 @@
 // animation.ts
 // NOTE!: need TweenMax, TimelineMax Quad
 // gsap
-import { TweenMax, TimelineMax, Quad, Power1 } from '../../external/gsap/all.js';
+import { TweenMax, TimelineMax, Quad, Power1 } from '../../../node_modules/gsap/all.js';
+//import {gsap, TweenMax, TimelineMax, Quad, Power1} from '../../external/gsap/all.js';
 // singleton instance - exported
 let animation, actionsTargets, narrative; // source for actor methods
 const timeline = (anim) => {
+    //was const tlp = <Record<string, unknown>>anim['timeline'] || {},
     const tlp = anim['timeline'] || {}, actors = anim['actors'] || {}, startf = () => { console.log('start!!'); }, emptyf = () => { return; }, completef = () => { console.log('complete!!'); };
     let ntuple, target, // target obj for property to be tweened - animated
     tweens;
     // timeline ctor params - tlp
-    tlp.duration = tlp['duration'] || 10;
+    tlp['duration'] = tlp['duration'] || 10;
     //tlp.timeScale = <number>tlp['timeScale'] || 1.0;
-    tlp.repeat = tlp['repeat'] || 0;
-    tlp.repeatDelay = tlp['repeatDelay'] || 0;
-    tlp.yoyo = tlp['yoyo'] || true;
-    tlp.ease = tlp['ease'] || Power1.InOut;
-    tlp.paused = tlp['paused'] || false; // default
-    tlp.immediateRender = tlp['immediateRender'] || false; // default
+    tlp['repeat'] = tlp['repeat'] || 0;
+    tlp['repeatDelay'] = tlp['repeatDelay'] || 0;
+    tlp['yoyo'] = tlp['yoyo'] || true;
+    tlp['ease'] = tlp['ease'] || Power1.InOut;
+    tlp['paused'] = tlp['paused'] || false; // default
+    tlp['immediateRender'] = tlp['immediateRender'] || false; // default
     // callbacks & params
-    tlp.onStart = tlp['onStart'] || startf;
-    tlp.onStartParams = tlp['onStartParams'] || [];
+    tlp['onStart'] = tlp['onStart'] || startf;
+    tlp['onStartParams'] = tlp['onStartParams'] || [];
     // TEMP !!!!
     //tlp.onUpdate = tlp['onUpdate'] || emptyf;      
     //tlp.onUpdateParams = tlp['onUpdateParams'] || [];
     //tlp.onUpdate = console.log;      
     //tlp.onUpdateParams = [`timeline-update`];
-    tlp.onComplete = tlp['onComplete'] || completef;
-    tlp.onCompleteParams = tlp['onCompleteParams'] || [];
-    tlp.onReverseComplete = tlp['onReverseComplete'] || completef;
-    tlp.onReverseCompleteParams = tlp['onReverseCompleteParams'] || [];
+    tlp['onComplete'] = tlp['onComplete'] || completef;
+    tlp['onCompleteParams'] = tlp['onCompleteParams'] || [];
+    tlp['onReverseComplete'] = tlp['onReverseComplete'] || completef;
+    tlp['onReverseCompleteParams'] = tlp['onReverseCompleteParams'] || [];
     // iterate through actors on which one or more tweens are defined
     tlp['tweens'] = [];
     for (const a of Object.keys(actors)) {
