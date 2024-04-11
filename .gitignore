@@ -3,7 +3,7 @@
 
 
 # dependencies
-node_modules/
+#node_modules/
 
 # production
 #/dist - need js-files and dist/external modules
