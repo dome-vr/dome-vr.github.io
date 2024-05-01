@@ -176,7 +176,7 @@ class Narrative {
         narrative = this;
     }
     static create() {
-        //console.log(`\n\nnarrative.create !!!!!!!!!!!!!!!!!!!!!!!`);
+        console.log(`\n\nnarrative.create - using importmap !!!!!!!!!!!!!!!!!!!!!!!`);
         if (narrative === undefined) {
             narrative = new Narrative();
         }
