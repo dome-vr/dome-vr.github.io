@@ -9,14 +9,33 @@
 	</head>
 
 	<body>
+
+    <!--two scripts needed by imports or imports of imports to find files 
+        referenced by locations prefixed by 'three' or 'three/addons/'.
+        If omitted, generates error:
+        Uncaught TypeError: Failed to resolve module specifier "three". Relative references must start with either "/", "./", or "../". -->
+    <script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+    <script type="importmap">
+        {
+          "imports": {
+            "three": "../../../node_modules/three/build/three.module.js",
+            "three/addons/": "../../../node_modules/three/examples/jsm/"
+          }
+        }
+    </script>
+
+
+
         <script type='module'>
 
             //EXPT !!!!!!!!!!!!!!!
-            import * as THREE from '../../../../node_modules/three/build/three.module.js';
-            //import Stats from '../../../node_modules/three/examples/jsm/libs/stats.module.js'; //default export
-            import Stats from '../../../../node_modules/three/examples/jsm/libs/stats.module.js'; //default export
+            //import * as THREE from '../../../node_modules/three/build/three.module.js';
+            import * as THREE from 'three';
 
-            import {VRButton} from '../../../../node_modules/three/examples/jsm/webxr/VRButton.js';
+            //import Stats from '../../../node_modules/three/examples/jsm/libs/stats.module.js'; //default export
+            import Stats from 'three/addons/'; //default export
+
+            import {VRButton} from '../../../node_modules/three/examples/jsm/webxr/VRButton.js';
             //EXPT !!!!!!!!!!!!!!!
 
 
