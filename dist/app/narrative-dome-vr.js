@@ -12,25 +12,12 @@
 // Thus src/app/**/*.ts are transpiled to dist/app/**/*.js and j.map
 // modules exterior to dome-vr5
 // Three.js
-
-//EXPT !!!!!!!!!!!!!
-//import * as THREE from '../../../node_modules/three/build/three.module.js';
-import * as THREE from 'three';
-
+import * as THREE from '../../node_modules/three/build/three.module.js';
 //import * as THREE from '../external/three/build/three.module.js';
-
-import { VRButton } from 'three/addons/webxr/VRButton.js';
-//import { VRButton } from '../../../node_modules/three/examples/jsm/webxr/VRButton.js';
+import { VRButton } from '../../node_modules/three/examples/jsm/webxr/VRButton.js';
 //import {VRButton} from '../external/three/examples/jsm/webxr/VRButton.js';
-
-import Stats from 'three/addons/libs/stats.module.js'; //default export
-//import Stats from '../../../node_modules/three/examples/jsm/libs/stats.module.js'; //default export
+import Stats from '../../node_modules/three/examples/jsm/libs/stats.module.js'; //default export
 //import Stats from '../external/three/examples/jsm/libs/stats.module.js'; //default export
-//EXPT !!!!!!!!!!!!!
-
-
-
-
 //import {OrbitControls} from '../../node_modules/three/examples/jsm/controls/OrbitControls.js'; //FAILS-Failed to resolve module specifier "node_modules/three/examples/jsm/controls/OrbitControls.js". Relative references must start with either "/", "./", or "../".
 //import {OrbitControls, MapControls} from './node_modules/three/examples/jsm/controls/OrbitControls.js'; //FAILS-404 
 //import {OrbitControls, MapControls} from 'three/examples/jsm/controls/OrbitControls.js'; //FAILS-unexpected identifier THREE not found in test.html:78 - this is the dynamic import of narrative.js importing OrbitControls 
