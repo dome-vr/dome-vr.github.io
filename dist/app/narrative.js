@@ -28,6 +28,7 @@ import Stats from 'three/addons/libs/stats.module.js'; //default export
 //import Stats from '../external/three/examples/jsm/libs/stats.module.js'; //default export
 //EXPT !!!!!!!!!!!!!
 
+console.log(`\n\nnarrative imports using importmap !!!!!!!!!!!!!!!!!!`);
 
 
 
@@ -176,7 +177,7 @@ class Narrative {
         narrative = this;
     }
     static create() {
-        console.log(`\n\nnarrative.create - using importmap !!!!!!!!!!!!!!!!!!!!!!!`);
+        //console.log(`\n\nnarrative.create !!!!!!!!!!!!!!!!!!`);
         if (narrative === undefined) {
             narrative = new Narrative();
         }
