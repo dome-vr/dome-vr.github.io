@@ -13,6 +13,11 @@
 // modules exterior to dome-vr5
 // Three.js
 
+console.log(`\n\nnarrative imports using importmap !!!!!!!!!!!!!!!!!!`);
+
+
+
+
 //EXPT !!!!!!!!!!!!!
 //import * as THREE from '../../../node_modules/three/build/three.module.js';
 import * as THREE from 'three';
@@ -28,7 +33,6 @@ import Stats from 'three/addons/libs/stats.module.js'; //default export
 //import Stats from '../external/three/examples/jsm/libs/stats.module.js'; //default export
 //EXPT !!!!!!!!!!!!!
 
-console.log(`\n\nnarrative imports using importmap !!!!!!!!!!!!!!!!!!`);
 
 
 
