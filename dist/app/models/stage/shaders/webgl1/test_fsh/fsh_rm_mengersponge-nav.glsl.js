@@ -1,7 +1,8 @@
 // test/fsh_mengersponge-nav.glsl.ts
 // fragment shader
 // raymarch - expt3-infinite mengersponge - adapted from Roast
-import * as THREE from '../../../../../../../node_modules/three/build/three.module.js';
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.146.0/build/three.module.js';
+//import * as THREE from '../../../../../../../node_modules/three/build/three.module.js';
 //import * as THREE from '../../../../../../external/three/build/three.module.js';
 const uniforms = {
     tDiffuse: { type: 't', value: null },
