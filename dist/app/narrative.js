@@ -39,7 +39,7 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 // NEED gsap@3.6.0 NOT current >=gsap@3.11.0 !!
 //import {gsap} from '../external/gsap/all.js';
 //import { gsap } from '../../node_modules/gsap/all.js';
-import { gsap } from 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js';
+//import { gsap } from 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js';
 
 
 // tween.js
