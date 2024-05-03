@@ -3,9 +3,8 @@
 // gsap
 //import {gsap, TweenMax, TimelineMax, Quad, Power1} from '../../../node_modules/gsap/all.js';
 //import {gsap, TweenMax, TimelineMax, Quad, Power1} from '../../external/gsap/all.js';
-import { TweenMax, TimelineMax, Quad, Power1 } from 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.6.0/gsap.min.js';
-
-
+import { TweenMax, TimelineMax, Quad} from 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.6.0/gsap.min.js';
+import {Power1} from 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.6.0/EasePack.min.js';
 
 // singleton instance - exported
 let animation, actionsTargets, narrative; // source for actor methods
