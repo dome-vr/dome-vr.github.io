@@ -45,7 +45,7 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 // tween.js
 //import TWEEN from '../external/tween.js/tween.esm.js'; //dome-vr5 v0.9.0
 //import TWEEN from '../../node_modules/@tweenjs/tween.js/dist/tween.esm.js';
-import tween from 'https://cdn.jsdelivr.net/npm/tweenjs@1.0.2/lib/tweenjs.min.js';
+import TWEEN from 'https://cdn.jsdelivr.net/npm/tweenjs@1.0.2/lib/tweenjs.min.js';
 
 window['THREE'] = THREE;
 window['TWEEN'] = TWEEN;
