@@ -58,7 +58,7 @@ import { mediator } from './services/actions/mediator.js';
 import { director } from './services/actions/director.js';
 import { queue } from './services/actions/queue.js';
 import { transform3d } from './services/transform3d.js';
-//import { animation } from './services/animation.js';
+import { animation } from './services/animation.js';
 
 if (typeof queue !== undefined) {
     //console.log(`queue is defined!`);  //otherwise queue is NOT used - tsc warn
@@ -224,12 +224,12 @@ class Narrative {
         // initialize modules with set of possible actions targets {t:'target',...}
         // and with ref to narrative (contained in 'actionsTargets')
         actionsTargets['narrative'] = narrative;
-        //actionsTargets['animation'] = animation; // services
+        actionsTargets['animation'] = animation; // services
         actionsTargets['mediator'] = mediator;
         config['actionsTargets'] = actionsTargets;
         // initialize services
         director.initialize(config);
-        //animation.initialize(config);
+        animation.initialize(config);
         mediator.initialize(config);
         queue.initialize(config);
         transform3d.initialize(config);
