@@ -12,36 +12,41 @@
 // Thus src/app/**/*.ts are transpiled to dist/app/**/*.js and j.map
 // modules exterior to dome-vr5
 // Three.js
-import * as THREE from '../../node_modules/three/build/three.module.js';
+import * as THREE from 'three';
 //import * as THREE from '../external/three/build/three.module.js';
-import { VRButton } from '../../node_modules/three/examples/jsm/webxr/VRButton.js';
+import { VRButton } from 'three/addons/webxr/VRButton.js';
 //import {VRButton} from '../external/three/examples/jsm/webxr/VRButton.js';
-import Stats from '../../node_modules/three/examples/jsm/libs/stats.module.js'; //default export
+import Stats from 'three/addons/libs/stats.module.js'; //default export
 //import Stats from '../external/three/examples/jsm/libs/stats.module.js'; //default export
 //import {OrbitControls} from '../../node_modules/three/examples/jsm/controls/OrbitControls.js'; //FAILS-Failed to resolve module specifier "node_modules/three/examples/jsm/controls/OrbitControls.js". Relative references must start with either "/", "./", or "../".
 //import {OrbitControls, MapControls} from './node_modules/three/examples/jsm/controls/OrbitControls.js'; //FAILS-404 
 //import {OrbitControls, MapControls} from 'three/examples/jsm/controls/OrbitControls.js'; //FAILS-unexpected identifier THREE not found in test.html:78 - this is the dynamic import of narrative.js importing OrbitControls 
 //import {OrbitControls, MapControls} from 'node_modules/three/examples/jsm/controls/OrbitControls.js'; //FAILS-Relative references must start with either "/", "./", or "../".
-import { OrbitControls } from '../external/OrbitControls.js'; //GOOD
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js'; //GOOD
 //EffectComposer 
-import { EffectComposer } from '../../node_modules/three/examples/jsm/postprocessing/EffectComposer.js'; //default export
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js'; //default export
 //displayed effects-passes
-import { DotScreenPass } from '../../node_modules/three/examples/jsm/postprocessing/DotScreenPass.js';
-import { HalftonePass } from '../../node_modules/three/examples/jsm/postprocessing/HalftonePass.js';
-import { AfterimagePass } from '../../node_modules/three/examples/jsm/postprocessing/AfterimagePass.js';
-import { BloomPass } from '../../node_modules/three/examples/jsm/postprocessing/BloomPass.js';
-import { FilmPass } from '../../node_modules/three/examples/jsm/postprocessing/FilmPass.js';
+import { DotScreenPass } from 'three/addons/postprocessing/DotScreenPass.js';
+import { HalftonePass } from 'three/addons/postprocessing/HalftonePass.js';
+import { AfterimagePass } from 'three/addons/postprocessing/AfterimagePass.js';
+import { BloomPass } from 'three/addons/postprocessing/BloomPass.js';
+import { FilmPass } from 'three/addons/postprocessing/FilmPass.js';
 //final non-displayed (but necessary) pair of passes
 //The first is a non-displayed film2 pass and the 2nd-executed is rendering
 //It seems te final film2-pass is in the upcoming buffer but not displayed.
-import { RenderPass } from '../../node_modules/three/examples/jsm/postprocessing/RenderPass.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 // gsap
 // NEED gsap@3.6.0 NOT current >=gsap@3.11.0 !!
 //import {gsap} from '../external/gsap/all.js';
-import { gsap } from '../../node_modules/gsap/all.js';
+//import { gsap } from '../../node_modules/gsap/all.js';
+import { gsap } from 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js';
+
+
 // tween.js
 //import TWEEN from '../external/tween.js/tween.esm.js'; //dome-vr5 v0.9.0
-import TWEEN from '../../node_modules/@tweenjs/tween.js/dist/tween.esm.js';
+//import TWEEN from '../../node_modules/@tweenjs/tween.js/dist/tween.esm.js';
+import tween from 'https://cdn.jsdelivr.net/npm/tweenjs@1.0.2/lib/tweenjs.min.js';
+
 window['THREE'] = THREE;
 window['TWEEN'] = TWEEN;
 // at compile time tsc is smart enough to load <module>.ts even though the 
