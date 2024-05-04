@@ -1,4 +1,4 @@
-// fsh_mengersponge-nav.glsl.ts
+// fsh_mengersponge-static.glsl.ts
 // fragment shader
 // raymarch - expt3-infinite mengersponge - adapted from Roast
 //import * as THREE from '../../../../../../../node_modules/three/build/three.module.js';
