@@ -1,7 +1,8 @@
 // fsh_rm_expt1.glsl.ts
 // fragment shader
 // raymarch - expt1-fogcubes
-import * as THREE from '../../../../../../../node_modules/three/build/three.module.js';
+//import * as THREE from '../../../../../../../node_modules/three/build/three.module.js';
+import * as THREE from 'three';
 const uniforms = {
     uEyeX: { type: 'f', value: 0.0 },
     uEyeY: { type: 'f', value: 0.0 },
