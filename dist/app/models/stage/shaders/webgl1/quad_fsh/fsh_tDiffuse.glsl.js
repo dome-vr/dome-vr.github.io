@@ -1,7 +1,8 @@
 // fsh_tDiffuse.glsl.ts
 // Fragment shader program 
 // fsh_default - texture map
-import * as THREE from '../../../../../../../node_modules/three/build/three.module.js';
+//import * as THREE from '../../../../../../../node_modules/three/build/three.module.js';
+import * as THREE from 'three';
 const uniforms = {
     tDiffuse: { type: 't', value: null },
     uTime: { type: 'f', value: 0.0 },
