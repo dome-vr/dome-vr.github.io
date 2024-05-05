@@ -8,6 +8,10 @@
 #NOTE: roughly >0.134.0 => many! problems with texture re-size for mult objs
 dist/external/three/
 
+#utilities
+dist/app/media/image-links/@thumbnail.py/
+
+
 # various notes and dcoumentation
 &docs/
 
