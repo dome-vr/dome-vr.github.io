@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>_fsh_rm_expt1-6colors</title>
+  <title>_biocube from FragM</title>
   <style>
     html,body{margin:0;height:100%;background:#0e1116;color:#cfd6e6;font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
     #app{position:fixed;inset:0;overflow:hidden}
@@ -43,13 +43,13 @@
     // [1] PROPERTIES (14) used in narrative-sh.js AND NOT PASSED TO SHADER
 
     // [1.1] shader file to load (string path)
-    shader: '../../shaders/grimnight-cubes/_fsh_rm_expt1-6color.frag',    // no default
+    shader: '../../shaders/biocube-variations/biocube-cu-watercolor.frag',    // no default
 
     // [1.2] initial camera viewpoint in world coords (vec3)
-    initialView: [0, 0, 5],                     // default: [0,0,10]      • typical: [-100..100] each axis
+    initialView: [0,0,2],  //[0,0,-2]                // default: [0,0,10]      • typical: [-100..100] each axis
 
     // [1.3] initial yaw/pan in degrees (CCW looking down +Y)
-    initialPan: 180,                            // default: 0             • typical: [-180..180]
+    initialPan: 0.0,                            // default: 0             • typical: [-180..180]
 
     // [1.4] initial pitch/tilt in degrees (CCW looking down +X)
     initialTilt: 0.0,                           // default: 0             • typical: [-90..90]
@@ -57,22 +57,22 @@
     // [1.5] true=>navigation via raymarch 'eye' transforms; false=>worldNavigation - moving/rotating the world for relative camera navigation
     //Currently shaderNavigation:true does not support orbit-yaw or orbit-pitch
     //and is redundant in any case, so leave it false or undefined=>false
-    shaderNavigation: false,                    // default: false
+    shaderNavigation: false,                     // default: false
 
     // [1.6] dolly speed (world units per second)
-    navSpeed: 2.5,                              // default: 2.5           • typical: [0.1..20]
+    navSpeed: 0.25,                              // default: 2.5           • typical: [0.1..20]
 
     // [1.7] yaw speed (deg/sec) for Shift+Left/Right
-    yawDegPerSec: 45,                           // default: 45            • typical: [5..90]
+    yawDegPerSec: 15,                           // default: 45            • typical: [5..90]
 
     // [1.8] pitch speed (deg/sec) for Shift+Up/Down
-    pitchDegPerSec: 30,                         // default: 30            • typical: [5..90]
+    pitchDegPerSec: 15,                         // default: 30            • typical: [5..90]
 
     // [1.9] pitch speed (deg/sec) for Shift+Up/Down
-    zoomDegPerSec: 60,                          // default: 30            • typical: [5..60]
+    zoomDegPerSec: 30,                          // default: 30            • typical: [5..60]
 
     // [1.10] XR framebuffer scale (per-eye resolution scale)
-    fbscale: 0.75,                              // default: 0.90          • typical: [0.5..1.0]
+    fbscale: 0.90,                              // default: 0.90          • typical: [0.5..1.0]
 
     // [1.11] renderer pixel ratio
     pr: (window.devicePixelRatio || 1.0),       // default: devicePixelRatio||1.0 • typical: [0.5..2.0]
@@ -141,24 +141,22 @@
     */
     sky: {
       //mode: 'faceColors',
-      //faceColors: ['red','green','blue','yellow','white','orange']   // test default 6 color skybox
-      
+      //faceColors: ['red','green','blue','yellow','white','orange'],   // test default 6 color skybox
+
       mode: 'cubeTextures',
-      /*
-      cubeTextures: ['../../images/sakura-Hokusai/px.png',
-                     '../../images/sakura-Hokusai/nx.png',
-                     '../../images/sakura-Hokusai/py.png',
-                     '../../images/sakura-Hokusai/ny.png',
-                     '../../images/sakura-Hokusai/pz.png',
-                     '../../images/sakura-Hokusai/nz.png'
-      ]
-      */
-      cubeTextures: ['../../images/Byzantine-surreal-towers/px.png',
-                     '../../images/Byzantine-surreal-towers/nx.png',
-                     '../../images/Byzantine-surreal-towers/py.png',
-                     '../../images/Byzantine-surreal-towers/ny.png',
-                     '../../images/Byzantine-surreal-towers/pz.png',
-                     '../../images/Byzantine-surreal-towers/nz.png'
+//      cubeTextures: ['../images/pisa/px.png',
+//                     '../images/pisa/nx.png',
+//                     '../images/pisa/py.png',
+//                     '../images/pisa/ny.png',
+//                     '../images/pisa/pz.png',
+//                     '../images/pisa/nz.png'
+//      ]
+      cubeTextures: ['../../images/forest-watercolor/cube_right.png',
+                     '../../images/forest-watercolor/cube_left.png',
+                     '../../images/forest-watercolor/cube_up.png',
+                     '../../images/forest-watercolor/cube_down.png',
+                     '../../images/forest-watercolor/cube_back.png',
+                     '../../images/forest-watercolor/cube_front.png'
       ]
     },
 
@@ -170,69 +168,75 @@
     // suggested: farPlane
     far: 40000.0,                               // default: 40000.0       • typical: [1000..100000]
 
-
-    // efficiency-speed values:
-    //MAX
-    // steps:192,
-    // eps:.001,
-    // a0:0,
-    // pr:1,         (above)
-    // shadow:0,
-    //SECONDARY
-    // ndelta:0.001,
-    // fbscale:0.75, (above)
-    // aa:false,     (above)
-
-
     // [2.4] raymarch max steps
-    // reduced from 768 to 384 for greater fps (even 192 for speed)
+    // reduced from 768 to 384 for greater fps
     // suggested: maxMarchSteps
-    steps: 792,                                 // default: 768           • typical: [64..2048]
+    steps: 384,                                 // default: 768           • typical: [64..2048]
 
     // [2.5] surface hit epsilon
     // suggested: hitEpsilon
-    eps: 0.001,                               // default: 0.00022       • typical: [1e-6..3e-3]
+    eps: 0.00022,                               // default: 0.00022       • typical: [1e-6..3e-3]
 
-    // [2.6] ambient occlusion sample count
+    // [2.6] normal estimation epsilon
+    // suggested: normalEpsilon
+    ndelta: 0.00040,                            // default: 0.00040       • typical: [1e-5..1e-3]
+
+    // [2.7] ambient occlusion sample count
     // suggested: aoSamples
     // reduced from 14 to 6 for greater fps
-    ao: 0,                                     // default: 14            • typical: [0..32]
+    ao: 6,                                     // default: 14            • typical: [0..32]
 
-    // [2.7] shadow raymarch steps
+    // [2.8] shadow raymarch steps
     // suggested: shadowSteps
     // reduced from 96 to 64 for greater fps
-    shadow: 0 ,                                 // default: 96            • typical: [0..256]
-
-    // [2.8] normal estimation epsilon
-    // suggested: normalEpsilon
-    ndelta: 0.001,                            // default: 0.00040       • typical: [1e-5..1e-3]
+    shadow: 64 ,                                 // default: 96            • typical: [0..256]
 
     // [2.9] shader stereo debug (uniform toggle)
     // suggested: debugStereo
     stereo: false,                              // default: false         • typical: {true|false}
 
-
     // (4) uDome block - avoid name collisions
     // [2.10] fractal center (vec3)- where in scene-space the fractal center should be placed.
+    // NOTE: udomeFractalCenter !== (0,0,0) => tilt is destroyed. If you ned to
+    // move the relative position of the camera and the fractal center use
+    // alignTranslate insted since it is applied in the shader and does not
+    // affect the accumulated translatio-rotation matrix multiplications used
+    // to move the 'scene'.
     udomeFractalCenter: [0, 0, 0],              // default: [0,0,0]       • typical: scene-dependent
 
     // [2.11] udomeFractalSize = ratio of the scene-diameter/fractal-diameter.
     // The scene-diameter = fractal-diameter * udomeFractalSize so
     // udomeFractalSize = scene-diameter/fractal-diameter
-    udomeFractalSize: 0.04,                    // default: 5000             • typical: [100..100000]  
+    // NOTE: to increase fractal size, lower the udomeFractalSize!!
+    /* NOTE! fractal scaling inherently degrades detail quality, which is a 
+       fundamental mathematical property of how distance fields work with 
+       coordinate transformations.
+       Why Scaling Loses Detail:
+       When you scale coordinates in a distance field:
+
+       uDomeSize < 1.0 magnifies the fractal but samples fewer unique points 
+       in the original mathematical space
+
+       uDomeSize > 1.0 shrinks the fractal and compresses detail into a smaller visual area
+
+       uDomeSize = 1.0 preserves the original mathematical sampling density
+       
+       The detail loss isn't a bug in the converter - it's an inherent 
+       limitation of coordinate scaling in procedural fractals.
+    */
+    udomeFractalSize: 1.0,                    // default: 5000             • typical: [100..100000]  
     // fractals are typically constructed in [-1,1]^3, i.e. fractal-diameter=2
     // Then if we want the scene to be a 10000^3 volume, choose 
     // udomeFractalSize = 10000/2 = 5000
 
     // [2.12] ambient intensity (0..1)
-    udomeAmbient: 0.2,                          // default: 0.0 (0.0=>off)  • typical: [0..1]
+    udomeAmbient: 0.0,                          // default: 0.0 (0.0=>off)  • typical: [0..1]
 
     // [2.13] headlight intensity (0..1)
     udomeHeadlight: 0.0,                        // default: 0.0 (0.0=>off)  • typical: [0..1]
 
     // [2.14] use original shading&color(t) or dome-sh default-shading&color(f) 
-    useOriginalShadingAndColor: true,           // default: false
-
+    useOriginalShadingAndColor:true,           // default: false
 
 
     // [3] PROPERTIES (1) DEBUG ONLY, which may be passed to shader and CAN OVERRIDE SHADER BEHAVIOR in order to make diagnoses/confirmations.

@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>_cantor3D-sz1.5-circ</title>
+  <title>_cantor3D-fixed-gradient</title>
   <style>
     html,body{margin:0;height:100%;background:#0e1116;color:#cfd6e6;font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
     #app{position:fixed;inset:0;overflow:hidden}
@@ -43,7 +43,7 @@
     // [1] PROPERTIES (14) used in narrative-sh.js AND NOT PASSED TO SHADER
 
     // [1.1] shader file to load (string path)
-    shader: '../../shaders/cantor3D-variations/_cantor3D-variations&colorCycle.frag',    // no default
+    shader: '../../shaders/cantor3D-variations/cantor3D-fixed-gradient.frag',    // no default
 
     // [1.2] initial camera viewpoint in world coords (vec3)
     initialView: [0, 0, 5],                     // default: [0,0,10]      • typical: [-100..100] each axis
@@ -139,9 +139,27 @@
     NOTE: there are no url defaults - if no url(s) are given the skybox faces
     revert to the faceColors default.
     */
-    //***NOTE:cathedral is an early scene - it does NOT support config.sky 
     sky: {
-      mode:'faceColors'
+      mode: 'faceColors',
+      //mode: 'cubeTextures',
+      //faceColors: ['red']   // test default 6 color skybox
+      
+      cubeTextures: ['../images/pisa/px.png',
+                     '../images/pisa/nx.png',
+                     '../images/pisa/py.png',
+                     '../images/pisa/ny.png',
+                     '../images/pisa/pz.png',
+                     '../images/pisa/nz.png'
+      ]
+      /*
+      cubeTextures: ['../images/forest-watercolor/cube_right.png',
+                     '../images/forest-watercolor/cube_left.png',
+                     '../images/forest-watercolor/cube_up.png',
+                     '../images/forest-watercolor/cube_down.png',
+                     '../images/forest-watercolor/cube_back.png',
+                     '../images/forest-watercolor/cube_front.png'
+      ]
+      */
     },
 
     // [2.2] world-space translation nudge (vec3) passed to shader
@@ -193,81 +211,24 @@
 
     // [2.12] ambient intensity (0..1)
     // was 0.8
-    udomeAmbient: 0.9,                          // default: 0.0 (0.0=>off)  • typical: [0..1]
+    udomeAmbient: 0.0,                          // default: 0.0 (0.0=>off)  • typical: [0..1]
 
     // [2.13] headlight intensity (0..1)
-    udomeHeadlight: 0.1,                        // default: 0.0 (0.0=>off)  • typical: [0..1]
+    udomeHeadlight: 0.9,                        // default: 0.0 (0.0=>off)  • typical: [0..1]
 
     // [2.14] use original shading&color(t) or dome-sh default-shading&color(f) 
-    //***NOTE: cathedral is an early scene - it does NOT support useOrigSh&Col
     useOriginalShadingAndColor: true,           // default: false
 
-
-    // [2.15] colorCycle
-    /*
-     * Color Cycling Configuration
-     * 
-     * Adds temporal color animation to fractal shading when config.useOriginalShadingAndColor is true or false.
-     * Colors cycle smoothly over time while maintaining the fractal's spatial color patterns.
-     * 
-     * Properties:
-     * 
-     * active:(bool, default: true)
-     *
-     * speed (number, default: 1.0)
-     *   Controls how fast colors animate over time. Higher values = faster cycling.
-     *   Example: 0.5 = half speed, 2.0 = double speed
-     * 
-     * amplitude (number, default: 0.3, range: 0.0-1.0)
-     *   Controls the intensity of color changes. 0.0 = no cycling (static colors),
-     *   1.0 = maximum color variation. Higher values create more dramatic color shifts.
-     * 
-     * offset (array of 3 numbers, default: [0.0, 0.33, 0.67])
-     *   Sets the base color palette by shifting RGB channels to different regions of the
-     *   color spectrum. Each number represents a phase offset (0.0-1.0) for R, G, B channels.
-     *   Examples:
-     *   - [0.0, 0.33, 0.67] = balanced rainbow colors
-     *   - [0.0, 0.1, 0.2]   = warm colors (red/orange/yellow bias)
-     *   - [0.4, 0.6, 0.0]   = cool colors (blue/cyan/green bias)
-     *   - [0.5, 0.5, 0.5]   = neutral/monochrome base
-     * 
-     * phase (array of 3 numbers, default: [0.0, 2.094, 4.188])
-     *   Controls how RGB channels cycle relative to each other over time, creating
-     *   color transition patterns. Values are in radians (0 to 6.28).
-     *   
-     *   Default [0.0, 2.094, 4.188] spaces RGB channels 120° apart (2π/3 radians),
-     *   creating smooth rainbow transitions: red→yellow→green→cyan→blue→magenta→red
-     *   
-     *   Alternative patterns:
-     *   - [0.0, 0.0, 0.0]   = all channels in sync (brightness pulsing, no hue change)
-     *   - [0.0, 1.57, 3.14] = 90° spacing (different transition pattern)
-     *   - [0.0, 3.14, 6.28] = 180° R-G spacing, B matches R (red↔cyan dominance)
-     *   
-     *   The phase relationship determines what colors appear during the animation cycle.
-     *   Equal spacing (120°) typically looks most natural for rainbow effects.
-     */
-    
-    // Enable color cycling - set active:false to disable color-cycling, OR
-    // set set colorCycle:{}, or omit entire section
-    colorCycle: {
-      active:true,               // colorCycle on/off - default
-      speed: 0.1,               // Animation rate multiplier (0.0-1.0)
-      amplitude: 0.2,            // Color change intensity (0.0-1.0) default=0.7
-      //offset: [1.0, 0.33, 1.67], // RGB palette base positions. default=[0,.33,.67]
-      offset: [1.5, 0.0, 0.0], // RGB palette base positions. default=[0,.33,.67]
-      phase: [0.0, 2.094, 4.188] // RGB temporal phase relationships (radians) default=[0.0, 2.094, 4.188]  
-    },
-  
 
     // [3] PROPERTIES (1) DEBUG ONLY, which may be passed to shader and CAN OVERRIDE SHADER BEHAVIOR in order to make diagnoses/confirmations.
     // [3.1] temporary debug properties         // default - undefined      •
     debug: {
-       // 0=off, 1=skybox, 2=gradient, 3=red on raymarch hit
-       mode: 0                              // default: 0=>off          •
-       // optional future fields:
-       // color: '#ff2244',                      // default: red
-       // data: [a,b,c,d]   
-     }
+      // 0=off, 1=skybox, 2=gradient, 3=red on raymarch hit
+      mode: 0                              // default: 0=>off          •
+      // optional future fields:
+      // color: '#ff2244',                      // default: red
+      // data: [a,b,c,d]   
+    }
 
   }; // config
 

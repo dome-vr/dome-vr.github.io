@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>_fsh_rm_expt1-pisa-sunset</title>
+  <title>_cantor3D-moving-haloes</title>
   <style>
     html,body{margin:0;height:100%;background:#0e1116;color:#cfd6e6;font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
     #app{position:fixed;inset:0;overflow:hidden}
@@ -43,7 +43,7 @@
     // [1] PROPERTIES (14) used in narrative-sh.js AND NOT PASSED TO SHADER
 
     // [1.1] shader file to load (string path)
-    shader: '../../shaders/grimnight-cubes/_fsh_rm_expt1-pisa-sunset.frag',    // no default
+    shader: '../../shaders/cantor3D-variations/cantor3D-moving-haloes.frag',    // no default
 
     // [1.2] initial camera viewpoint in world coords (vec3)
     initialView: [0, 0, 5],                     // default: [0,0,10]      • typical: [-100..100] each axis
@@ -72,7 +72,7 @@
     zoomDegPerSec: 60,                          // default: 30            • typical: [5..60]
 
     // [1.10] XR framebuffer scale (per-eye resolution scale)
-    fbscale: 0.75,                              // default: 0.90          • typical: [0.5..1.0]
+    fbscale: 0.90,                              // default: 0.90          • typical: [0.5..1.0]
 
     // [1.11] renderer pixel ratio
     pr: (window.devicePixelRatio || 1.0),       // default: devicePixelRatio||1.0 • typical: [0.5..2.0]
@@ -139,25 +139,9 @@
     NOTE: there are no url defaults - if no url(s) are given the skybox faces
     revert to the faceColors default.
     */
+    //***NOTE:cathedral is an early scene - it does NOT support config.sky 
     sky: {
-      //mode: 'faceColors',
-      //faceColors: ['red','green','blue','yellow','white','orange']   // test default 6 color skybox
-      
-      mode: 'cubeTextures',
-      cubeTextures: ['../../images/pisa/px.png',
-                     '../../images/pisa/nx.png',
-                     '../../images/pisa/py.png',
-                     '../../images/pisa/ny.png',
-                     '../../images/pisa/pz.png',
-                   '../../images/pisa/nz.png'
-      ],
-//      cubeTextures: ['../images/forest-watercolor/cube_right.png',
-//                     '../images/forest-watercolor/cube_left.png',
-//                     '../images/forest-watercolor/cube_up.png',
-//                     '../images/forest-watercolor/cube_down.png',
-//                     '../images/forest-watercolor/cube_back.png',
-//                     '../images/forest-watercolor/cube_front.png'
-//      ]
+      mode:'faceColors'
     },
 
     // [2.2] world-space translation nudge (vec3) passed to shader
@@ -168,47 +152,32 @@
     // suggested: farPlane
     far: 40000.0,                               // default: 40000.0       • typical: [1000..100000]
 
-
-    // efficiency-speed values:
-    //MAX
-    // steps:192,
-    // eps:.003,
-    // a0:0,
-    // pr:1,         (above)
-    // shadow:0,
-    //SECONDARY
-    // ndelta:0.001,
-    // fbscale:0.75, (above)
-    // aa:false,     (above)
-
-
     // [2.4] raymarch max steps
-    // reduced from 768 to 384 for greater fps (even 192 for speed)
+    // reduced from 768 to 384 for greater fps
     // suggested: maxMarchSteps
-    steps: 792, // default: 768           • typical: [64..2048]
+    steps: 384,                                 // default: 768           • typical: [64..2048]
 
     // [2.5] surface hit epsilon
     // suggested: hitEpsilon
-    eps: 0.001,                               // default: 0.00022       • typical: [1e-6..3e-3]
+    eps: 0.00022,                               // default: 0.00022       • typical: [1e-6..3e-3]
 
-    // [2.6] ambient occlusion sample count
+    // [2.6] normal estimation epsilon
+    // suggested: normalEpsilon
+    ndelta: 0.00040,                            // default: 0.00040       • typical: [1e-5..1e-3]
+
+    // [2.7] ambient occlusion sample count
     // suggested: aoSamples
     // reduced from 14 to 6 for greater fps
-    ao: 0,                                     // default: 14            • typical: [0..32]
+    ao: 6,                                     // default: 14            • typical: [0..32]
 
-    // [2.7] shadow raymarch steps
+    // [2.8] shadow raymarch steps
     // suggested: shadowSteps
     // reduced from 96 to 64 for greater fps
-    shadow: 0 ,                                 // default: 96            • typical: [0..256]
-
-    // [2.8] normal estimation epsilon
-    // suggested: normalEpsilon
-    ndelta: 0.001,                            // default: 0.00040       • typical: [1e-5..1e-3]
+    shadow: 64 ,                                 // default: 96            • typical: [0..256]
 
     // [2.9] shader stereo debug (uniform toggle)
     // suggested: debugStereo
     stereo: false,                              // default: false         • typical: {true|false}
-
 
     // (4) uDome block - avoid name collisions
     // [2.10] fractal center (vec3)- where in scene-space the fractal center should be placed.
@@ -217,20 +186,21 @@
     // [2.11] udomeFractalSize = ratio of the scene-diameter/fractal-diameter.
     // The scene-diameter = fractal-diameter * udomeFractalSize so
     // udomeFractalSize = scene-diameter/fractal-diameter
-    udomeFractalSize: 0.2,                    // default: 5000             • typical: [100..100000]  
+    udomeFractalSize: 1.0,                    // default: 5000             • typical: [100..100000]  
     // fractals are typically constructed in [-1,1]^3, i.e. fractal-diameter=2
     // Then if we want the scene to be a 10000^3 volume, choose 
     // udomeFractalSize = 10000/2 = 5000
 
     // [2.12] ambient intensity (0..1)
-    udomeAmbient: 0.3,                          // default: 0.0 (0.0=>off)  • typical: [0..1]
+    // was 0.8
+    udomeAmbient: 0.9,                          // default: 0.0 (0.0=>off)  • typical: [0..1]
 
     // [2.13] headlight intensity (0..1)
-    udomeHeadlight: 1.0,                        // default: 0.0 (0.0=>off)  • typical: [0..1]
+    udomeHeadlight: 0.1,                        // default: 0.0 (0.0=>off)  • typical: [0..1]
 
     // [2.14] use original shading&color(t) or dome-sh default-shading&color(f) 
-    useOriginalShadingAndColor: true,
-
+    //***NOTE: cathedral is an early scene - it does NOT support useOrigSh&Col
+    useOriginalShadingAndColor: true,           // default: false
 
 
     // [2.15] colorCycle
@@ -281,23 +251,22 @@
     // set set colorCycle:{}, or omit entire section
     colorCycle: {
       active:true,               // colorCycle on/off - default
-      speed: 0.05,               // Animation rate multiplier (0.0-1.0)
-      amplitude: 0.3,            // Color change intensity (0.0-1.0) default=0.7
-      offset: [0.5, 0.33, 1.67], // RGB palette base positions. default=[0,.33,.67]
-      phase: [1.0, 2.094, 4.188] // RGB temporal phase relationships (radians) default=[0.0, 2.094, 4.188]  
+      speed: 0.1,               // Animation rate multiplier (0.0-1.0)
+      amplitude: 0.1,            // Color change intensity (0.0-1.0) default=0.7
+      offset: [1.0, 0.33, 1.67], // RGB palette base positions. default=[0,.33,.67]
+      phase: [0.0, 2.094, 4.188] // RGB temporal phase relationships (radians) default=[0.0, 2.094, 4.188]  
     },
   
-
 
     // [3] PROPERTIES (1) DEBUG ONLY, which may be passed to shader and CAN OVERRIDE SHADER BEHAVIOR in order to make diagnoses/confirmations.
     // [3.1] temporary debug properties         // default - undefined      •
     debug: {
-      // 0=off, 1=skybox, 2=gradient, 3=red on raymarch hit
-      mode: 0                              // default: 0=>off          •
-      // optional future fields:
-      // color: '#ff2244',                      // default: red
-      // data: [a,b,c,d]   
-    }
+       // 0=off, 1=skybox, 2=gradient, 3=red on raymarch hit
+       mode: 0                              // default: 0=>off          •
+       // optional future fields:
+       // color: '#ff2244',                      // default: red
+       // data: [a,b,c,d]   
+     }
 
   }; // config
 

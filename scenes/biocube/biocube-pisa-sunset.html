@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>_biocube</title>
+  <title>_biocube-pisa</title>
   <style>
     html,body{margin:0;height:100%;background:#0e1116;color:#cfd6e6;font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
     #app{position:fixed;inset:0;overflow:hidden}
@@ -43,7 +43,7 @@
     // [1] PROPERTIES (14) used in narrative-sh.js AND NOT PASSED TO SHADER
 
     // [1.1] shader file to load (string path)
-    shader: '../../shaders/biocube/_biocube.frag',    // no default
+    shader: '../../shaders/biocube-variations/biocube-pisa.frag',    // no default
 
     // [1.2] initial camera viewpoint in world coords (vec3)
     initialView: [0, 0, 5],                     // default: [0,0,10]      • typical: [-100..100] each axis
@@ -140,16 +140,16 @@
     revert to the faceColors default.
     */
     sky: {
-      //mode: 'faceColors'
-      mode: 'cubeTextures',
-      //faceColors: ['red']   // test default 6 color skybox
+      //mode: 'faceColors',
+      //faceColors: []   // test default 6 color skybox
       
-      cubeTextures: ['../images/pisa/px.png',
-                     '../images/pisa/nx.png',
-                     '../images/pisa/py.png',
-                     '../images/pisa/ny.png',
-                     '../images/pisa/pz.png',
-                     '../images/pisa/nz.png'
+      mode: 'cubeTextures',
+      cubeTextures: ['../../images/pisa/px.png',
+                     '../../images/pisa/nx.png',
+                     '../../images/pisa/py.png',
+                     '../../images/pisa/ny.png',
+                     '../../images/pisa/pz.png',
+                     '../../images/pisa/nz.png'
       ]
       /*
       cubeTextures: ['../images/forest-watercolor/cube_right.png',
@@ -214,6 +214,9 @@
 
     // [2.13] headlight intensity (0..1)
     udomeHeadlight: 0.0,                        // default: 0.0 (0.0=>off)  • typical: [0..1]
+
+    // [2.14] use original shading&color(t) or dome-sh default-shading&color(f) 
+    useOriginalShadingAndColor:false,           // default: false
 
 
     // [3] PROPERTIES (1) DEBUG ONLY, which may be passed to shader and CAN OVERRIDE SHADER BEHAVIOR in order to make diagnoses/confirmations.
