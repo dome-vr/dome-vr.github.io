@@ -1,3 +1,5 @@
+//vrcontrols.js
+
 // singleton closure-instance variable
 let vrcontrols, deltaQ, isDragging = false, prevMousePos = { x: 0, y: 0 }, deltaMove = { x: 0, y: 0 };
 class Vrcontrols {

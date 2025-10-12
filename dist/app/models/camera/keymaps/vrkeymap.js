@@ -1,95 +1,172 @@
-// vrkeymap.ts - dolly x,y,z; rotate-examine via keys
+// vrkeymap.ts 
+
+//dolly x,y,z; rotate-examine via keys
 // assumes controlTarget, vrsecene or vrcsphere, is centered at origin
 // singleton closure-instance variable
+
+//TEST:
+//dist/app/models/camera/keymaps/vrkeymap:
+//
+//@/@T4/capri-vrcontrols.html
+//(scenes/@T4/capri-vrcontrols.js)
+
+
 let vrkeymap;
 class Vrkeymap {
     constructor() {
         //console.log(`private Vrkeymap ctor`
     }
-    static create() {
+  
+  static create() {
         if (vrkeymap === undefined) {
             vrkeymap = new Vrkeymap();
         }
     }
+
     // start key-listening and identify controlTarget and optional dolly spped
     // typically controlTarget is vrscene, but can be individual actor for exp.
-    start(controlTarget, speed = 0.01) {
-        console.log(`+++ vrkeymap:  controlTarget = ${controlTarget}:`);
-        console.dir(controlTarget);
+    start(controlTarget, speed = 0.01, camera) {
+
+        let fov = camera.getFocalLength();
+        const initial_fov = fov;
+        console.log(`**********vrkeymap: camera initial_fov=${initial_fov}:`);
+        //console.log(`vrkeymap: camera=${camera}:`);
+        //console.dir(camera);
+        //console.log(`+++ vrkeymap:  controlTarget = ${controlTarget}:`);
+        //console.dir(controlTarget);
+
         document.addEventListener('keydown', (e) => {
-            console.log(`key pressed is ${e.key}`);
+            //console.log(`key pressed is ${e.key}`);
             switch (e.keyCode) {
-                // HOME = SPACEBAR
-                // restore controlTarget to position=origin, 
-                // with default up and orientation, and scale,
-                // and if using zoom by fov, set fov=90 (original) 
+
+                // SPACEBAR = unwind camera roll, standard up-vector
+                // SHIFT-SPACEBAR = initial 'home' position and orientation
                 case 32:
-                    controlTarget.position.x = 0.0;
-                    controlTarget.position.y = 0.0;
-                    controlTarget.position.z = 0.0;
-                    controlTarget.rotation.x = 0.0;
-                    controlTarget.rotation.y = 0.0;
-                    controlTarget.rotation.z = 0.0;
-                    controlTarget.up.x = 0.0;
-                    controlTarget.up.y = 0.0;
-                    controlTarget.up.z = 0.0;
+                    if (e.shiftKey) { // sh => home
+                        controlTarget.position.x = 0.0;
+                        controlTarget.position.y = 0.0;
+                        controlTarget.position.z = 0.0;
+                        controlTarget.rotation.x = 0.0;
+                        controlTarget.rotation.y = 0.0;
+                        controlTarget.rotation.z = 0.0;
+                        controlTarget.up.x = 0.0;
+                        controlTarget.up.y = 1.0;
+                        controlTarget.up.z = 0.0;
+                        camera.setFocalLength(initial_fov);
+                    }else{
+                        controlTarget.rotation.z = 0.0;
+                        controlTarget.up.x = 0.0;
+                        controlTarget.up.y = 1.0;
+                        controlTarget.up.z = 0.0;
+                    }
                     break;
-                // move fwd/backward i.e. negZ/posZ
+
+
+                // Z-KEY
                 case 90:
-                    //console.log(`controlTarget.position.z = ${controlTarget.position.z}`);
-                    //console.log(`key pressed is ${e.key} LEFT-ARROW`); 
-                    if (e.shiftKey) { // sh => FWD controlTarget.pos.z -= k                                          // NOTE: tgt=scene => BACKWD lens
-                        controlTarget.position.z -= speed;
+                    //console.log(`key pressed is ${e.key} z-key`); 
+                    //CTRL=ZOOM
+                    if(e.ctrlKey){
+                      fov = camera.getFocalLength();
+                      if (e.shiftKey) { 
+                        //ZOOM-OUT - lower bound
+                        fov -= speed*0.1;
+                        if(fov > 1.0){
+                          camera.setFocalLength(fov);
+                        }
+                      }else{
+                        //ZOOM-IN - lower bound
+                        fov += speed*0.1;
+                        if(fov < 170.0){
+                          camera.setFocalLength(fov);
+                        }
+                      }
                     }
-                    else { // small-z => BKWD controlTarget.pos.z += k                                    // NOTE: tgt=scene => FWD lens
-                        controlTarget.position.z += speed;
+                    //DOLLY-Z
+                    else {
+                      if (e.shiftKey) { 
+                        //DOLLY+Z (BACK)
+                        controlTarget.position.z -= speed*2.0;
+                      }else{
+                        //DOLLY-Z (FWD)
+                        controlTarget.position.z += speed*2.0;
+                      }
                     }
                     break;
-                // DOLLY - arrows
-                // left arrow - LEFT X-         
-                // SHIFT-left arrow - yaw cw         
+
+
+                // LEFT-ARROW
                 case 37:
-                    //console.log(`key pressed is ${e.key} LEFT-ARROW`);  
-                    if (e.shiftKey) { // sh => UP Y+
-                        controlTarget.rotation.y -= speed * .01;
+                    //console.log(`key pressed is ${e.key} LEFT-ARROW`); 
+                    if (e.shiftKey) {
+                      if(e.ctrlKey){
+                        //PAN-L (CCW)
+                        controlTarget.rotation.y -= speed*.005;
+                      }else{
+                        //ORBIT-CCW: orbit ccw around y-axis at scene origin
+                      }
                     }
                     else {
-                        controlTarget.position.x += speed;
+                        //DOLLY -X
+                        controlTarget.position.x += speed*2.0;
                     }
                     break;
-                // right arrow - RIGHT X+
-                // SHIFT-right arrow - yaw ccw         
+
+
+                // RIGHT-ARROW         
                 case 39:
-                    //console.log(`key pressed is ${e.key} RIGHT-ARROW`);  
-                    if (e.shiftKey) { // sh => UP Y+
-                        controlTarget.rotation.y += speed * .01;
+                    //console.log(`key pressed is ${e.key} RIGHT-ARROW`); 
+                    if (e.shiftKey) { 
+                      if(e.ctrlKey){
+                        //PAN-R (CW)
+                        controlTarget.rotation.y += speed*.005;
+                      }else{
+                        //ORBIT-CW: orbit cw around y-axis at scene origin
+                      }
                     }
                     else {
-                        controlTarget.position.x -= speed;
+                        //DOLLY +X
+                        controlTarget.position.x -= speed*2.0;
                     }
                     break;
-                // up arrow - UP Y+          
-                // SHIFT-up arrow - pitch ccw         
+
+
+                // UP-ARROW
                 case 38:
                     //console.log(`key pressed is ${e.key} UP-ARROW`); 
-                    if (e.shiftKey) { // sh => UP Y+
-                        controlTarget.rotation.x -= speed * .01;
-                    }
-                    else { // no-sh => FWD Z-
-                        controlTarget.position.y -= speed;
-                    }
-                    break;
-                // down arrow - DOWN Y-          
-                // SHIFT-down arrow - pitch cw         
-                case 40:
-                    //console.log(`key pressed is ${e.key} DOWN-ARROW`); 
-                    if (e.shiftKey) { // sh => UP Y+
-                        controlTarget.rotation.x += speed * .01;
+                    if (e.shiftKey) { 
+                      if(e.ctrlKey){
+                        //TILT-UP (CCW looking down +X-axis)
+                        controlTarget.rotation.x -= speed*.005;
+                      }else{
+                        //ORBIT-CCW: orbit ccw around x-axis at scene origin
+                      }
                     }
                     else {
-                        controlTarget.position.y += speed;
+                        //DOLLY +Y
+                        controlTarget.position.y -= speed*2.0;
                     }
                     break;
+
+
+                // DOWN-ARROW
+                case 40:
+                    //console.log(`key pressed is ${e.key} DOWN-ARROW`); 
+                    if (e.shiftKey) { 
+                      if(e.ctrlKey){
+                        //TILT-DOWN (CW looking down +X-axis)
+                        controlTarget.rotation.x += speed*.005;
+                      }else{
+                        //ORBIT-CW: orbit cw around x-axis at scene origin
+                      }
+                    }
+                    else {
+                        //DOLLY -Y
+                        controlTarget.position.y += speed*2.0;
+                    }
+                    break;
+
+
                 default:
                 //console.log(`key '${e.keyCode}' not associated with //c3d function`);
             }

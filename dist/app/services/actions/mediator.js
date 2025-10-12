@@ -1,7 +1,6 @@
 // mediator.ts 
 // socket.io.js
-//import * as io from '../../../../node_modules/socket.io-client/dist/socket.io.js';
-import * as io from 'https://cdn.socket.io/4.7.5/socket.io.min.js'
+import * as io from '../../../../node_modules/socket.io-client/dist/socket.io.js';
 import { queue } from './queue.js';
 // singleton instance - exported
 let mediator, config;

@@ -1,22 +1,15 @@
 {
-  "name": "dome-vr5",
+  "name": "dome-vr",
   "version": "1.0.0",
-  "main": "./dist/narrative.js",
+  "main": "./index.html",
   "description": "3D/VR framework",
-  "author": "mark rudolph",
+  "author": "Mark Rudolph",
   "repository": {
     "type": "git",
     "url": "https://github.com/josefK128/dome-vr5.git"
   },
   "scripts": {
     "live-server": "live-server --port=8081",
-    "live-server-https": "live-server --port=8081 --https=./https.conf.js",
-    "eslint": "eslint . --config ./.eslintrc.js --ext .ts",
-    "tsc": "tsc|sed '/TS2307/d;/TS2304/d;/TS2503/d' ",
-    "tsc-log": "tsc|sed '/TS2307/d;/TS2304/d;/TS2503/d' > ./@logs/tsc.log",
-    "tsc-log-name-errors": "tsc > ./@logs/tsc-name-errors.log",
-    "eslint-tsc": "npm run eslint && npm run tsc",
-    "eslint-tsc-log": "npm run eslint && npm run tsc-log",
     "list": "npm list --depth=0",
     "listg": "npm -g list --depth=0",
     "webpack": "webpack --mode=production"
@@ -26,18 +19,5 @@
     "gsap": "3.6.0",
     "socket.io-client": "^4.5.4",
     "three": "^0.146.0"
-  },
-  "devDependencies": {
-    "@types/gsap": "^3.0.0",
-    "@types/socket.io-client": "^3.0.0",
-    "@typescript-eslint/eslint-plugin": "^5.44.0",
-    "@typescript-eslint/parser": "^5.44.0",
-    "eslint": "^8.28.0",
-    "eslint-plugin-async-await": ">=0.0.0",
-    "eslint-plugin-import": "^2.26.0",
-    "eslint-plugin-json": "^3.1.0",
-    "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^6.1.1",
-    "typescript": "3.9.10"
   }
 }

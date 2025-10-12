@@ -125,16 +125,16 @@ const state = {
                         transform: { t: [0, 0, 0] }
                     }
                 },
-                'unitcube': {
-                    factory: 'Unitcube',
-                    url: '../models/stage/actors/objects/unitcube.js',
-                    options: { wireframe: false,
-                        color: 'white',
-                        opacity: 0.7,
-                        map: './app/media/images/glad.png',
-                        transform: { t: [0, 0, -3], e: [0.0, 0.0, 0.0], s: [0.5, 1, 0.5] }
-                    }
-                },
+//                'unitcube': {
+//                    factory: 'Unitcube',
+//                    url: '../models/stage/actors/objects/unitcube.js',
+//                    options: { wireframe: false,
+//                        color: 'white',
+//                        opacity: 0.7,
+//                        map: './app/media/images/glad.png',
+//                        transform: { t: [0, 0, -3], e: [0.0, 0.0, 0.0], s: [0.5, 1, 0.5] }
+//                    }
+//                },
                 // spritecloud
                 'vrcloud': {
                     factory: 'Spritecloud',

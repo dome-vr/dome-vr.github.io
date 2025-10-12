@@ -200,10 +200,9 @@ const state = {
                         urls: [
                             //"./app/media/images/cloud/sprite_redlight.png",
                             //"./app/media/images/sprites/fireParticle.png",
-                            //"./app/media/images/illusions_transparent/necker_cube2.png" ,
+                            //"./app/media/images/sprites/newPetal2.png",
+                            //"./app/media/images/sprites/ball.png",
                             "./app/media/images/sprites/snowflake7_alpha.png",
-
-
                             "./app/media/images/sprites/newCorolla3.png",
                             //"./app/media/images/cloud/lotus_64.png" ,
                             "./app/media/images/sprites/snowflake7_alpha.png",
@@ -232,14 +231,10 @@ const state = {
                             './app/media/images/cube_maps/pen_ink_forest/p2.jpg',
                             './app/media/images/cube_maps/pen_ink_forest/p4.jpg',
                             null,
-
-
                             //ground
                             //'./app/media/images/maps/boundaries_8k.png',
+                            //'./app/media/images/illusions_transparent/vertex_tr.png',
                             './app/media/images/cloud/wolf-flipX.png',
-
-
-                            //'./app/media/images/maps/water_2k.jpg',
                             './app/media/images/cube_maps/pen_ink_forest/p1.jpg',
                             './app/media/images/cube_maps/pen_ink_forest/p3.jpg'
                             //                       './app/media/images/cube_maps/pruned_versailles_garden/p2.jpg',

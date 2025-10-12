@@ -1,4 +1,6 @@
-//Nodejs HTTP server
+//Nodejs HTTP server for local testting
+//Usage> node http-server [port] (default is 8081)
+//Browser: localhost:8081/index.html
 
 const http = require('http');
 const url = require('url');

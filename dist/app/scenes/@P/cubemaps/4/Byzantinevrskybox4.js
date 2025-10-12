@@ -96,7 +96,11 @@ const state = {
                 //transform: { 't': [0, 0.01, 2] } //y=.01 allows blue z-axis to be seen
                 transform: { 't': [2, 0.01, 0] } //y=.01 allows blue z-axis to be seen
             },
-        }
+            controls:{
+              _keymap:'vr',
+              keymap_speed:1.0
+            }
+        },
     },
     // stage - initialization and management of stats performance meter,
     // and actors in one of two possible scenes, sgscene and/or vrscene

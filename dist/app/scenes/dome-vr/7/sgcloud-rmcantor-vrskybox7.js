@@ -116,6 +116,10 @@ const state = {
                 far: 100000,
                 transform: { 't': [0, 0.01, 2] } //y=.01 allows blue z-axis to be seen
             },
+            controls:{
+              _keymap: 'vr',
+              keymap_speed: 1.0
+            }
         }
     },
     // stage - initialization and management of stats performance meter,
@@ -271,7 +275,7 @@ const state = {
                     factory: 'Skybox',
                     url: '../models/stage/actors/environment/skybox.js',
                     options: {
-                        size: 10000,
+                        size: 8000,
                         color: 'white',
                         opacity: 1.0,
                         textures: [null, null, null, null, null, null]

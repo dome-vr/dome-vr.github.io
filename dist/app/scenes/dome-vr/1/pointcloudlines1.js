@@ -95,7 +95,7 @@ const state = {
                 //            transform: {'t':[0,-60,0]}  //y=.01 allows blue z-axis to be seen
                 //            transform: {'t':[0,1.6, 20]} //y=.01 allows blue z-axis to be seen
                 transform: { 't': [0, .01, 1] } //y=.01 allows blue z-axis to be seen
-            },
+            }
         }
     },
     // stage - initialization and management of stats performance meter,

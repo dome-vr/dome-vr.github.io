@@ -19,21 +19,26 @@
                -moz-osx-font-smoothing: grayscale;
       }
       #canvas-container{ position: relative; width: 100vw; height: 100vh;}
-      #startAudio {position:absolute; z-index:10; left:2%; top:93.5%;
-        padding:0;
-        margin:0;
-        border-radius:0em;
+      #startAudio {
+        position: absolute;
+        z-index:10;
+        top: 90.5%;          
+        left: 1%;      
+        padding: 8px 16px;   
+        margin: 0;
+        border-radius: 4px;    
         box-sizing: border-box;
-        text-decoration:none;
+        text-decoration: none;
         font-family:'Roboto',sans-serif;
-        font-weight:300;
-        color:gray;
-        /*color:#FFFFFF;*/
-        /*background-color:#4eb5f1;*/
-        background-color:black;
-        text-align:center;
+        font-weight: 400;      
+        color: #FFFFFF;       
+        background-color: #1a1a1a; 
+        border: 2px solid #bbb;   
+        text-align: center;
         transition: all 0.2s;
-      }
+        cursor: pointer;       
+      }  
+
       code {
         font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
           monospace;
@@ -48,10 +53,10 @@
     <div id='canvas-container'>
       <canvas id='webgl' style='width:100vw; height:100vh; background-color:black; position:absolute; left:0px; top:0px;'/>
     </div>
-    <!-- <div id='overlay' style='width:100vw; height:100vh; display:none'>-->  
-    <!-- <div id='overlay'> --> 
-    <button id='startAudio'>enable audio</button>
-    <!-- </div> -->
+    
+    <!-- <button id='startAudio'>enable audio</button> -->
+
+
 
     <!--two scripts needed by imports or imports of imports to find files 
         referenced by locations prefixed by 'three' or 'three/addons/'.

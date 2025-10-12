@@ -1,8 +1,7 @@
 // fsh_rm_expt2.glsl.ts
 // fragment shader
 // raymarch - expt2-infinite cubes/toruses - adapted from Roast
-//import * as THREE from '../../../../../../../node_modules/three/build/three.module.js';
-import * as THREE from 'three';
+import * as THREE from '../../../../../../../node_modules/three/build/three.module.js';
 const uniforms = {
     uEyeX: { type: 'f', value: 0.0 },
     uEyeY: { type: 'f', value: 0.0 },

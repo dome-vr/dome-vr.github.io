@@ -170,9 +170,10 @@ class Camera {
         }
     } //create_csphere
     create_controls(cs, scene, narrative, scenename) {
-        console.log('camera.create_controls(cs,scene,narrative,scenename) ');
-        //console.log(`scenename = ${scenename}`);
-        //console.log(`scene = ${scene}`);
+        console.log('***camera.create_controls(cs,scene,narrative,scenename) ');
+        //console.log(`cs = ${cs}:`);
+        //console.dir(cs);
+
         let controlTarget = scene; //vrscene - default
         //NOTE:controls/keymap used only in output scene (given by scenename)
         //     exp. vrscene
@@ -200,17 +201,20 @@ class Camera {
             if (cs['_keymap']) {
                 if (cs['_keymap'] === 'rm') {
                     const keymap_speed = cs['keymap_speed'] || 0.1;
-                    //console.log(`\n\n!!!! _keymap='rm' speed=${keymap_speed} !!!!\n\n`);
+                    console.log(`\n\n!!!! _keymap='rm' speed=${keymap_speed} !!!!`);
                     rmkeymap.start(narrative, keymap_speed);
                 }
                 if (cs['_keymap'] === 'vr') {
                     const keymap_speed = cs['keymap_speed'] || 0.1;
-                    const canvas = narrative['canvas'];
-                    vrkeymap.start(controlTarget, keymap_speed);
+                    console.log(`\n\n!!!! _keymap='vr' speed=${keymap_speed} !!!!`);
+                    //rmkeymap.start(narrative, keymap_speed);
+                    vrkeymap.start(controlTarget, keymap_speed, vrlens);
                 }
             }
         }
     } //create_controls
+
+
     // create objects specified in arg camera-state === state['camera']
     // returns new Promise<object>((resolve, reject) => {});
     delta(state, narrative) {
@@ -274,14 +278,22 @@ class Camera {
                 else {
                     //console.log(`state['vr']['csphere'] is undefined or empty`);
                 }
+
+
+
                 // controls
                 const vrc = (state_vr['controls']);
+                console.log(`vrc = ${vrc}:`);
+                console.dir(vrc);
                 if (vrc && Object.keys(vrc).length > 0) {
                     camera.create_controls(vrc, scene, narrative, 'vr');
                 }
                 else {
                     //console.log(`state['vr']['controls'] is undefined or empty`);
                 }
+
+
+
                 //HACK!!! attach audioListener to lens from displayed scene
                 const dslens = narrative[narrative['displayed_scene']]['lens'];
                 //console.log(`\n\n ### camera: dslens = ${dslens}`);

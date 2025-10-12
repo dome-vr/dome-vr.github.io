@@ -121,7 +121,7 @@ const state = {
                 controls_speed: 0.1,
                 _keymap: 'vr',
                 keymap_speed: 10. //default 1.0 dolly => rotation spd=k_sp/100.=.01
-            },
+            }
         }
     },
     // stage - initialization and management of stats performance meter,
