@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>test_renderTarget_rmcantor_glad.html</title>
+		<style>
+			body { margin: 0; }
+		</style>
+	</head>
+
+	<body>
+        <script type='module'>
+            import * as THREE from '../../node_modules/three/build/three.module.js';
+            import {VRButton} from '../../node_modules/three/examples/jsm/webxr/VRButton.js';
+            import Stats from '../../node_modules/three/examples/jsm/libs/stats.module.js'; //default export
+            import {OrbitControls} from '../../dist/external/OrbitControls.js'; 
+            import {transform3d} from '../../dist/app/services/transform3d.js';
+
+            import {vsh} from '../../dist/app/models/stage/shaders/webgl1/quad_vsh/vsh_default.glsl.js';
+            //import {fsh} from '../../dist/app/models/stage/shaders/webgl1/quad_fsh/fsh_minimal.glsl.js';
+            //import {uniforms} from '../../dist/app/models/stage/shaders/webgl1/quad_fsh/fsh_minimal.glsl.js';
+            import {fsh} from '../../dist/app/models/stage/shaders/webgl1/test_fsh/fsh_rm_mengersponge-nav.glsl.js';
+            import {uniforms} from '../../dist/app/models/stage/shaders/webgl1/test_fsh/fsh_rm_mengersponge-nav.glsl.js';
+
+            //make THREE global
+            window['THREE'] = THREE;
+
+
+            //diagnostics
+            console.log(`webxr - rmrenderTarget.texture!!!`);
+
+
+            //BASICS
+            const clock = new THREE.Clock();
+
+            //renderer
+			const renderer = new THREE.WebGLRenderer();
+			renderer.setSize( window.innerWidth, window.innerHeight );
+            const canvas = renderer.domElement;
+			document.body.appendChild( renderer.domElement );
+            let aspect = window.innerWidth/window.innerHeight;
+
+
+
+            // RM ------------------------
+            //rm - rmscene, rmlens&rmorbit
+            const rmscene = new THREE.Scene();
+			const rmlens = new THREE.PerspectiveCamera( 90, aspect, 0.1, 1000);
+            rmlens.position.z = 1;
+
+            //rmaxes
+            //const rmaxes = new THREE.AxesHelper(10000);
+            //rmaxes.position.z = .001;
+            //rmscene.add(rmaxes);
+
+            //rmquad
+			const rmquad_g = new THREE.PlaneGeometry(2,2);
+            const rmloader = new THREE.TextureLoader();
+            const rmtexture = rmloader.load('../../dist/app/media/images/glad.png');
+            const rmtexture2 = rmloader.load('../../dist/app/media/images/escher.jpg');
+            const rmtexture3 = rmloader.load('../../dist/app/media/images/chess.png');
+            const rmquad_m = new THREE.MeshBasicMaterial({
+              map:rmtexture3,
+              visible:true,
+              transparent:true,
+              side:THREE.DoubleSide
+            });
+			const rmquad = new THREE.Mesh(rmquad_g, rmquad_m);
+            transform3d.apply({s:[aspect,1.0,1.0], e:[0.0,Math.PI,0.0]}, rmquad);
+			//rmscene.add(rmquad);
+
+
+            //plane
+            const plane_g = new THREE.PlaneBufferGeometry(2,2,1),
+                  plane_m = new THREE.ShaderMaterial({
+                    opacity:1.0,
+                    vertexShader: vsh,
+                    uniforms: uniforms, 
+                    fragmentShader: fsh,
+                    transparent:true,
+                    side:THREE.DoubleSide,
+                  });
+
+            //texture
+            plane_m.uniforms.tDiffuse.value = rmtexture;
+            plane_m.uniforms.tDiffuse.needsUpdate = true;
+    
+            // blending - check: need gl.enable(gl.BLEND)
+            plane_m.blendSrc = THREE.SrcAlphaFactor; // default
+            plane_m.blendDst = THREE.OneMinusSrcAlphaFactor; //default
+            //plane_m.depthTest = true;  //default is f
+    
+            // plane
+            const plane = new THREE.Mesh(plane_g, plane_m);
+            rmscene.add(plane);
+
+
+            //rmrenderTarget
+            const rmrenderTarget = new THREE.WebGLRenderTarget();
+			rmrenderTarget.setSize( window.innerWidth, window.innerHeight );
+
+
+
+            //VR ------------------------
+            //vr - vrscene, vrlens&vrorbit
+            const vrscene = new THREE.Scene();
+			const vrlens = new THREE.PerspectiveCamera( 90, aspect, 0.1, 100000 );
+            vrlens.position.z = 10;
+            const vrorbit = new OrbitControls(vrlens, renderer.domElement);
+            vrorbit.update();
+            vrorbit.enableDamping = true;
+            vrorbit.dampingFactor = 0.25;
+            vrorbit.enableZoom = true;
+
+            //vraxes
+            const vraxes = new THREE.AxesHelper(10000);
+            vrscene.add(vraxes);
+
+            // vrskybox
+            const vrskybox_g = new THREE.BoxGeometry(10000,10000,10000),
+                  vrskybox_m = new THREE.MeshBasicMaterial({
+                    color:'white',
+                    visible:true,
+                    transparent:true,
+                    side:THREE.BackSide
+                  }),
+                  vrskybox = new THREE.Mesh(vrskybox_g, vrskybox_m);
+            // blending - check: need gl.enable(gl.BLEND)
+            vrskybox_m.blendSrc = THREE.SrcAlphaFactor; // default
+            vrskybox_m.blendDst = THREE.OneMinusSrcAlphaFactor; //default
+            vrskybox.scale.x *= aspect;
+			vrscene.add(vrskybox);
+
+
+            //vrquad
+//			const vrquad_g = new THREE.PlaneBufferGeometry(20,20,1);
+//            const vrquad_m = new THREE.MeshBasicMaterial({
+//              color:'red',
+//              opacity:0.5,
+//              visible:true,
+//              transparent:true,
+//              side:THREE.DoubleSide
+//            });
+//            //const vrquad_m = new THREE.ShaderMaterial({
+//            //});
+//			const vrquad = new THREE.Mesh(vrquad_g, vrquad_m);
+//            vrquad_m.blendSrc = THREE.SrcAlphaFactor; // default
+//            vrquad_m.blendDst = THREE.OneMinusSrcAlphaFactor; //default
+//            //transform3d.apply({s:[aspect,1.0,1.0]}, vrquad);
+//			vrscene.add(vrquad);
+
+
+
+
+            // webxr
+            renderer.xr.enabled = true;
+            renderer.xr.setReferenceSpaceType('local');
+      
+            // webXR VRButton
+            document.body.append(VRButton.createButton(renderer));
+      
+            // stats - display fps performance
+            const stats = new Stats();
+            document.body.appendChild(stats.dom);
+            stats.dom.style.display = 'block';  // show
+   
+
+
+
+            //window re-size
+            function onWindowResize(){
+              const width_ = window.innerWidth,
+                    height_ = window.innerHeight;
+          
+              canvas.width = width_;
+              canvas.height = height_;
+              renderer.setSize(width_, height_);
+            }
+            window.addEventListener( 'resize', onWindowResize, false );
+
+
+
+
+            //render
+			const animate = function () {
+
+                //uTime, stats
+                stats.update();
+                let et = clock.elapsedTime;
+                if(rmquad_m.uniforms && rmquad_m.uniforms['uTime']){
+                  rmquad_m.uniforms.uTime.value = et/1000.;
+                  rmquad_m.uniforms.uTime.needsUpdate = true;
+                }
+                if(plane_m.uniforms && plane_m.uniforms['uTime']){
+                  plane_m.uniforms.uTime.value = et/1000.;
+                  plane_m.uniforms.uTime.needsUpdate = true;
+                }
+
+                //render rmscene to rmrenderTarget
+                //first turn off xr.enabled so as to make a mono image
+                renderer.xr.enabled = false;
+                renderer.setRenderTarget(rmrenderTarget);
+				renderer.render(rmscene, rmlens);
+
+                //texture skybox
+                vrskybox.material.map = rmrenderTarget.texture;
+                //vrskybox.material.needsUpdate = true;
+
+                //render vrscene
+                //first turn back on xr.enabled so as to make a stereo image
+                renderer.xr.enabled = true;
+                renderer.setRenderTarget(null);
+                renderer.render(vrscene, vrlens)
+			};
+
+            //begin render-loop
+            renderer.setAnimationLoop(animate);
+
+		</script>
+	</body>
+</html>

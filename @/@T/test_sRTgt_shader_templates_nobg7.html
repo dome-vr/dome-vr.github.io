@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <base href="/dist/"> <!-- all urls relative to base href='./dist/'> -->
+    <title>
+      test_sRTgt_1fsh_panorama
+      (based on bridge-rmminimal-vrskybox7:three0.147.02-webGL2-es300:base-href-dist)
+    </title>
+    <!--<link href="./index.css" rel="stylesheet"> - same as below -->
+    <style>
+      body { margin: 0;
+             padding: 0;
+             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 
+               'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 
+               'Droid Sans', 'Helvetica Neue', sans-serif;
+               -webkit-font-smoothing: antialiased;
+               -moz-osx-font-smoothing: grayscale;
+      }
+      #canvas-container{ position: relative; width: 100vw; height: 100vh;}
+      #startAudio {position:absolute; z-index:10; left:2%; top:93.5%;
+        padding:0;
+        margin:0;
+        border-radius:0em;
+        box-sizing: border-box;
+        text-decoration:none;
+        font-family:'Roboto',sans-serif;
+        font-weight:300;
+        color:gray;
+        /*color:#FFFFFF;*/
+        /*background-color:#4eb5f1;*/
+        background-color:black;
+        text-align:center;
+        transition: all 0.2s;
+      }
+      code {
+        font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+          monospace;
+      }    
+    </style>
+  </head>
+
+
+
+  <body>
+    <!-- NOTE:canvas is styled exactly as Singularity.css -->
+    <div id='canvas-container'>
+      <canvas id='webgl' style='width:100vw; height:100vh; background-color:black; position:absolute; left:0px; top:0px;'/>
+    </div>
+    <!-- <div id='overlay' style='width:100vw; height:100vh; display:none'>-->  
+    <!-- <div id='overlay'> --> 
+    <button id='startAudio'>enable audio</button>
+    <!-- </div> -->
+
+
+    <!--two scripts needed by imports or imports of imports to find files 
+        referenced by locations prefixed by 'three' or 'three/addons/'.
+        If omitted, generates error:
+        Uncaught TypeError: Failed to resolve module specifier "three". Relative references must start with either "/", "./", or "../". -->
+    <script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+    <script type="importmap">
+        {
+          "imports": {
+            "three": "../../node_modules/three/build/three.module.js",
+            "three/addons/": "../../node_modules/three/examples/jsm/"
+          }
+        }
+    </script>
+
+
+
+    <script type='module'> 
+
+      // SCENE and BOOTSTRAP-CONTROLLER modules - variable by url
+      // NOTE: modules imported by html-files are from dist/**/*.js
+      // i.e. they are never ts-files
+      //const _scene = './app/scenes/topology1/rmquad1.js',
+      const _scene = './app/scenes/@T/rm/empty-rmtemplates-vrskybox7.js',
+            _narrative = './app/narrative.js';
+            // FAILS - these are dynamic imports but same for static imports
+            //_narrative = '../src/app/narrative.ts'; // incorrect mime type 
+            //_narrative = '../src/app/narrative';   // 404
+            //_narrative = '../src/app/narrative.js'; // 404
+      
+      // load needed fundamental application modules - these are the exports 
+      // from the varaible scene and bootstrap-controller (urls above)
+      async function load() {
+        let a = await Promise.all([
+          import(_scene),
+          import(_narrative)
+        ]).catch((e) => {
+          console.error(`error loading module: ${e.toString()}`);
+        });
+
+        // diagnostics
+        //console.log(`\nindex: a is type ${typeof(a)}`);
+        //console.log(`a is an Array is ${Array.isArray(a)}`);
+        //console.log(`dynamically loaded module-array a:`);
+        //console.dir(a);
+        //for(let p in a){
+          //console.log(`\na[${p}] is type ${typeof(a[p])}`);
+          //console.log(`module[${p}] has value:`)
+          //console.dir(a[p]);
+        //}
+
+        let config = a[0].config;
+        let state = a[0].state;
+        let narrative = a[1].narrative;
+
+        // load config.imports
+        narrative.bootstrap(config, state);
+      };
+
+      console.log(`\n*** src/*.html starting scene ${_scene} using controller ${_narrative}`);
+      console.log(`*** NOTE: <base href='/dist/'> so src/*.html imports ./dist/**/*.js\n\n`);
+      load();
+    </script>
+  </body>
+</html>

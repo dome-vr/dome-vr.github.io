@@ -1,0 +1,68 @@
+#dome-vr6 .gitignore
+#See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+#dome-vr.com
+#/dist - need js-files and dist/external modules
+#external copy three_0.147.0 - makes CubeCamera-CubeMap work - no real value!
+#NOTE: roughly >0.134.0 => many! problems with texture re-size for mult objs
+dist/external/three/
+
+# shader dev-tests 
+# domeshaders.html; domeshaders-skybox.html
+**/domeshaders/
+
+
+
+#dev-development
+scenes/&scenes-dev/
+images/&images-dev/
+
+#alternatives - GLSL1.0
+shaders-1.0/
+shaders-3.0/
+shaders/@shaders-is-3.0-lint3/
+
+#alternative narrative-sh.js
+narrative-sh-1.0.js
+narrative-sh-3.0.js
+narrative-sh-3.0-local-imports.js
+narrative-sh-is-3.0-local-imports.js
+
+#utilities
+utilities/
+
+#various notes and dcoumentation
+&docs/
+
+#tsc logs, console diagnostics
+&logs/
+
+#music, shader exps, technique exps, dev-tests
+&examples/
+
+#inessential archives (mainly failing or less efficient code versions)
+**/archive*/
+
+
+#https certificates and https.conf.js
+ca.crt
+ca.key
+cert.crt
+cert.key
+https.conf.js
+
+#Vim swp-files
+*.swp
+*.swo
+
+#npm-debug
+npm-debug.log*
+
+#docs/notes
+*.txt
+
+
+#don't ignore .md
+!*.md
+
+

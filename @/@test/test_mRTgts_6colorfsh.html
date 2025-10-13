@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>test_mrtgts_6colorfsh</title>
+		<style>
+			body { margin: 0; }
+		</style>
+	</head>
+
+	<body>
+        <script type='module'>
+            import * as THREE from '../../node_modules/three/build/three.module.js';
+            import {VRButton} from '../../node_modules/three/examples/jsm/webxr/VRButton.js';
+            import Stats from '../../node_modules/three/examples/jsm/libs/stats.module.js'; //default export
+            import {OrbitControls} from '../../dist/external/OrbitControls.js'; 
+
+            //shaders
+            import {vsh} from './mrtgts_shaders/vsh_default.glsl.js';
+            
+            import {fsh_front} from './mrtgts_shaders/fsh_front.glsl.js';
+            import {fsh_back} from './mrtgts_shaders/fsh_back.glsl.js';
+            import {fsh_right} from './mrtgts_shaders/fsh_right.glsl.js';
+            import {fsh_left} from './mrtgts_shaders/fsh_left.glsl.js';
+            import {fsh_ground} from './mrtgts_shaders/fsh_ground.glsl.js';
+            import {fsh_sky} from './mrtgts_shaders/fsh_sky.glsl.js';
+
+            import {uniforms_front} from './mrtgts_shaders/fsh_front.glsl.js';
+            import {uniforms_back} from './mrtgts_shaders/fsh_back.glsl.js';
+            import {uniforms_right} from './mrtgts_shaders/fsh_right.glsl.js';
+            import {uniforms_left} from './mrtgts_shaders/fsh_left.glsl.js';
+            import {uniforms_ground} from './mrtgts_shaders/fsh_ground.glsl.js';
+            import {uniforms_sky} from './mrtgts_shaders/fsh_sky.glsl.js';
+
+
+            //make THREE global
+            window['THREE'] = THREE;
+
+
+            //diagnostics
+            console.log(`test_mRtgts.html...`);
+
+
+            //renderer
+			const renderer = new THREE.WebGLRenderer();
+			renderer.setSize( window.innerWidth, window.innerHeight );
+
+            //canvas
+            const canvas = renderer.domElement;
+			document.body.appendChild( renderer.domElement );
+            let aspect = window.innerWidth/window.innerHeight;
+
+
+
+            // RM ------------------------
+            //plane with ShaderMaterial using fsh which generates one of six
+            //views in the six coordinate axes directions forward and backward.
+            //The RenderTarget textures hold dynamic views of the implicitly
+            //defined raymarch space.
+            //rmscenes - one per coordinate direction
+            const rmscene_front = new THREE.Scene(),
+                  rmscene_back = new THREE.Scene(),
+                  rmscene_right = new THREE.Scene(),
+                  rmscene_left = new THREE.Scene(),
+                  rmscene_ground = new THREE.Scene(),
+                  rmscene_sky = new THREE.Scene();
+
+			//rmlens
+            const rmlens = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 0.1, 10000 );
+            rmlens.position.z = 1;
+
+            //RenderTargets - one per rmscene
+            //rmscene_X renders to rt_X
+            const rt_front = new THREE.WebGLRenderTarget(2,2),
+                  rt_back = new THREE.WebGLRenderTarget(2,2),
+                  rt_right = new THREE.WebGLRenderTarget(2,2),
+                  rt_left = new THREE.WebGLRenderTarget(2,2),
+                  rt_ground = new THREE.WebGLRenderTarget(2,2),
+                  rt_sky = new THREE.WebGLRenderTarget(2,2);
+
+
+            //plane geometry
+            //raymarch near-plane intersected with view frustrum 
+            const rmplane_g = new THREE.PlaneBufferGeometry(2,2,1);
+
+            //plane materials - one per cube-vrskybox side
+            //NOTE: each face material has a unique directional raymarch fsh
+            const rmplane_mfront = new THREE.ShaderMaterial({
+              vertexShader: vsh,
+              uniforms: uniforms_front, 
+              fragmentShader: fsh_front,
+              side:THREE.DoubleSide,  //default - need DoubleSide?
+            }),
+            rmplane_mback = new THREE.ShaderMaterial({
+              vertexShader: vsh,
+              uniforms: uniforms_back, 
+              fragmentShader: fsh_back,
+              side:THREE.DoubleSide,  //default - need DoubleSide?
+            }),
+            rmplane_mright = new THREE.ShaderMaterial({
+              vertexShader: vsh,
+              uniforms: uniforms_right, 
+              fragmentShader: fsh_right,
+              side:THREE.DoubleSide,  //default - need DoubleSide?
+            }),
+            rmplane_mleft = new THREE.ShaderMaterial({
+              vertexShader: vsh,
+              uniforms: uniforms_left, 
+              fragmentShader: fsh_left,
+              side:THREE.DoubleSide,  //default - need DoubleSide?
+            }),
+            rmplane_mground = new THREE.ShaderMaterial({
+              vertexShader: vsh,
+              uniforms: uniforms_ground, 
+              fragmentShader: fsh_ground,
+              side:THREE.DoubleSide,  //default - need DoubleSide?
+            }),
+            rmplane_msky = new THREE.ShaderMaterial({
+              vertexShader: vsh,
+              uniforms: uniforms_sky, 
+              fragmentShader: fsh_sky,
+              side:THREE.DoubleSide,  //default - need DoubleSide?
+            });
+
+            //rmplanes - one per rmscene - locus of raymarch view of space,
+            //in each of 6 directions of the coordinate axes and negatives.
+            const rmplane_front = new THREE.Mesh(rmplane_g, rmplane_mfront),
+                  rmplane_back = new THREE.Mesh(rmplane_g, rmplane_mback),
+                  rmplane_right = new THREE.Mesh(rmplane_g, rmplane_mright),
+                  rmplane_left = new THREE.Mesh(rmplane_g, rmplane_mleft),
+                  rmplane_ground = new THREE.Mesh(rmplane_g, rmplane_mground),
+                  rmplane_sky = new THREE.Mesh(rmplane_g, rmplane_msky);
+
+            //add rmplanes to corresponding rmscenes
+            rmscene_front.add(rmplane_front);
+            rmscene_back.add(rmplane_back);
+            rmscene_right.add(rmplane_right);
+            rmscene_left.add(rmplane_left);
+            rmscene_ground.add(rmplane_ground);
+            rmscene_sky.add(rmplane_sky);
+
+
+//            //NOTE:update rmplanes raymarch object positions dynamically
+//            //in narrative.render via a positions update method in
+//            //actors/environmrnt/mrtgts_vrskybox
+//            //
+//            //animated positions of dynamic raymarch objects 
+//            rmplane_front.uniforms.positions.needsUpdate = true;
+//            rmplane_front.uniforms.positions.value = [];
+//...    
+
+
+
+
+            //VR ------------------------
+            //vr - vrscene, vrlens&vrorbit
+            const vrscene = new THREE.Scene();
+			const vrlens = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 0.1, 10000 );
+            vrlens.position.z = 10;
+            const vrorbit = new OrbitControls(vrlens, renderer.domElement);
+            vrorbit.update();
+            vrorbit.enableDamping = true;
+            vrorbit.dampingFactor = 0.25;
+            vrorbit.enableZoom = true;
+
+
+            //vraxes
+            const vraxes = new THREE.AxesHelper(10000);
+            vrscene.add(vraxes);
+
+            //vrskybox
+            //NOTE:BoxGeometry is buffered
+            const vrskybox_g = new THREE.BoxGeometry(10000,10000,10000),
+                  vrskybox_ma = [
+                    new THREE.MeshBasicMaterial({side:THREE.BackSide}),
+                    new THREE.MeshBasicMaterial({side:THREE.BackSide}),
+                    new THREE.MeshBasicMaterial({side:THREE.BackSide}),
+                    new THREE.MeshBasicMaterial({side:THREE.BackSide}),
+                    new THREE.MeshBasicMaterial({side:THREE.BackSide}),
+                    new THREE.MeshBasicMaterial({side:THREE.BackSide}),
+                  ];
+
+            //textured mRtgts_vrskybox
+            const vrskybox = new THREE.Mesh(vrskybox_g, vrskybox_ma);
+
+            //adjust box for aspect ratio
+            vrskybox.scale.x *= aspect;
+
+            //flip texture map for viewing correctly on inside of cube vrskybox
+            vrskybox.scale.x = -1;
+
+            //add vrskybox to scene
+			vrscene.add(vrskybox);
+
+
+      
+            // webXR VRButton
+            document.body.append(VRButton.createButton(renderer));
+      
+            // stats - display fps performance
+            const stats = new Stats();
+            document.body.appendChild(stats.dom);
+            stats.dom.style.display = 'block';  // show
+   
+
+
+            //window re-size
+            function onWindowResize(){
+              const width_ = window.innerWidth,
+                    height_ = window.innerHeight;
+          
+              canvas.width = width_;
+              canvas.height = height_;
+              renderer.setSize(width_, height_);
+            }
+            window.addEventListener( 'resize', onWindowResize, false );
+
+
+
+            //render
+			const animate = function () {
+                //stats
+                stats.update();
+
+                //render rmscene_X
+                //webxr - set renderer.xr.enabled false so produce 2D image
+                renderer.xr.enabled = false;
+                renderer.xr.setReferenceSpaceType('local');
+                renderer.setRenderTarget(rt_front);
+                renderer.render(rmscene_front, rmlens)
+                renderer.setRenderTarget(rt_back);
+                renderer.render(rmscene_back, rmlens)
+                renderer.setRenderTarget(rt_right);
+                renderer.render(rmscene_right, rmlens)
+                renderer.setRenderTarget(rt_left);
+                renderer.render(rmscene_left, rmlens)
+                renderer.setRenderTarget(rt_ground);
+                renderer.render(rmscene_ground, rmlens)
+                renderer.setRenderTarget(rt_sky);
+                renderer.render(rmscene_sky, rmlens)
+
+                //update textures in vskybox_ma
+                vrskybox_ma[0].map = rt_front.texture;
+                vrskybox_ma[1].map = rt_back.texture;
+                vrskybox_ma[2].map = rt_right.texture;
+                vrskybox_ma[3].map = rt_left.texture;
+                vrskybox_ma[4].map = rt_ground.texture;
+                vrskybox_ma[5].map = rt_sky.texture;
+
+                //render vrscene
+                //webxr- set renderer.xr.enabled true so produce 3D-VR
+                renderer.xr.enabled = true;
+                renderer.xr.setReferenceSpaceType('local');
+                renderer.setRenderTarget(null);
+                renderer.render(vrscene, vrlens);
+			};
+
+            //begin render-loop
+            renderer.setAnimationLoop(animate);
+
+		</script>
+	</body>
+</html>

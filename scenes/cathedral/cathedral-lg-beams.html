@@ -1,0 +1,233 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>cathedral-lg-beams</title>
+  <style>
+    html,body{margin:0;height:100%;background:#0e1116;color:#cfd6e6;font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+    #app{position:fixed;inset:0;overflow:hidden}
+    .hud{position:fixed;top:8px;left:92px;z-index:20;display:flex;align-items:center;gap:10px;
+         background:rgba(0,0,0,.35);backdrop-filter:blur(4px);border:1px solid #334;border-radius:10px;padding:6px 8px;font-size:12px;line-height:1.2;}
+    .hud.min{padding:2px 6px}
+    .hud .tag{padding:.15em .6em;border-radius:999px;background:#1b2030;border:1px solid #334}
+    .hud .content{display:flex;gap:12px;align-items:center}
+    .hud.min .content{display:none}
+    .hud button{all:unset;cursor:pointer;border:1px solid #556; background:#1b2030; padding:2px 6px; border-radius:6px; font-size:11px}
+    .hint{opacity:.7}
+  </style>
+</head>
+<body>
+<div id="app"></div>
+<div class="hud" id="hud">
+  <button id="hud-toggle" title="Minimize/Maximize">–</button>
+  <div class="content">
+    <div><strong>Mode:</strong> <span id="mode" class="tag">world</span></div>
+    <div class="hint">Arrows=dolly • Sh+Arrows=pan/tilt • ctrl+Sh+Arrows eye pan/tilt • Z/Sh+Z=zoom space=home</div>
+  </div>
+</div>
+
+<script type="module">
+  import { bootstrap } from '../../narrative-sh.js';
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // config sent via bootstrap to narrative-sh.js
+  // Notes:
+  // - Typical ranges are guidelines; scene authors can exceed as needed.
+  // - Suggested new property names are included as comments.
+  // - Shader-only compile-time constants (not overrideable) are intentionally
+  //   NOT included here.
+  // ───────────────────────────────────────────────────────────────────────────
+  const config = {
+    // [1] PROPERTIES (14) used in narrative-sh.js AND NOT PASSED TO SHADER
+
+    // [1.1] shader file to load (string path)
+    shader: '../../shaders/cathedral/cathedral-lg-beams.frag',        // default: '../shaders/cathedral.frag'
+
+    // [1.2] initial camera viewpoint in world coords (vec3)
+    initialView: [0, 0, 5],                    // default: [0,0,10]      • typical: [-100..100] each axis
+
+    // [1.3] initial yaw/pan in degrees (CCW looking down +Y), rotation around fractal center, i.e. 'orbit'
+    initialPan: 0.0,                            // default: 0             • typical: [-180..180]
+
+    // [1.4] initial pitch/tilt in degrees (CCW looking down +X), rotation around fractal center, i.e. 'orbit'
+    initialTilt: 0.0,                           // default: 0             • typical: [-90..90]
+
+    // [1.5] true=>navigation via raymarch 'eye' transforms; false=>worldNavigation - moving/rotating the world for relative camera navigation
+    //Currently shaderNavigation:true does not support orbit-yaw or orbit-pitch
+    //and is redundant in any case, so leave it false or undefined=>false
+    shaderNavigation: false,
+
+    // [1.6] dolly speed (world units per second)
+    navSpeed: 2.5,                              // default: 2.5           • typical: [0.1..20]
+
+    // [1.7] yaw speed (deg/sec) for Shift+Left/Right
+    yawDegPerSec: 45,                           // default: 45            • typical: [5..90]
+
+    // [1.8] pitch speed (deg/sec) for Shift+Up/Down
+    pitchDegPerSec: 30,                         // default: 30            • typical: [5..90]
+
+    // [1.9] pitch speed (deg/sec) for Shift+Up/Down
+    zoomDegPerSec: 60,                          // default: 30            • typical: [5..60]
+
+    // [1.10] XR framebuffer scale (per-eye resolution scale)
+    fbscale: 0.90,                              // default: 0.90          • typical: [0.5..1.0]
+
+    // [1.11] renderer pixel ratio
+    pr: (window.devicePixelRatio || 1.0),       // default: devicePixelRatio||1.0 • typical: [0.5..2.0]
+
+    // [1.12] antialias flag for WebGL context
+    aa: true,                                  // default: false         • typical: {true|false}
+
+    // [1.13] headlight intensity (0..1)
+    animation: {                                // default: {} - no animation
+      loop: false,
+      // Use either long keys (mode,startTime,duration) or short keys (a,t,dur).
+      // Action names must be strings because the functions are exposed on
+      // `window` only after narrative-sh.js initialises.
+      anim: [
+//        { a: 'wDollyXLeft',  t: 0 },           // start dolly left at t=0s (duration 0 means instantaneous)
+//        { a: 'wDollyXRight', t: 5, dur: 5 }   // start dolly right at t=15s and run for 5 seconds
+      ]
+    },
+    
+    // [1.14] audio  url and properties
+    audio: {                                // default: {} - no audio
+      //url:'../../dist/app/media/audio/music/test2.mp3',
+      url:'',                               // no defualt
+      volume:1.0,                           // default: 0.0
+      playbackRate:1.0,                     // default: 1.0
+      loop: true                           // default: false
+    },
+
+
+
+    // [2] PROPERTIES (13) THAT may be passed to shader and CAN OVERRIDE SHADER DEFAULTS (defines | uniforms)
+    /*
+    [2.1] sky
+  
+    sky: {
+      mode: 'faceColors' | 'cubeTextures',
+      faceColors: (string|number)[],
+      urls: string[]
+    }
+ 
+    NOTE: mode 'faceColors' uses faceColors[] and ignores urls[]
+    NOTE: mode 'cubeTextures' uses urls[] and ignores faceColors[]
+ 
+    NOTE: for both faceColors and texture-urls the order is according to the
+    cube faces listed by half-axis (the half-axis pointing at the face, given a
+    right-hand coordinate system in which the eye/camera is somewhere on the
+    positive Z-axis looking toward the origin. Then the order is the following:
+    +X(right),-X(left), +Y(up),-Y(down), +Z(behind),-Z(front).
+ 
+    A faceColors exp: ['red','green', 'blue','yellow', 'magenta','cyan'] which
+    permits direction orientation even inside a fractal (if there are openings) 
+    If a single color is desired for all faces faceColors should contain a
+    single color, exp: ['black'].
+    NOTE: the 6 colors given are the default faceColors if no color(s)
+    are specified.
+ 
+    A cubeTextures exp: [ '../textures/tx-pos.png',
+                          '../textures/tx-neg.png',
+                          '../textures/ty-pos.png',
+                          '../textures/ty-neg.png',
+                          '../textures/tz-pos.png',
+                          '../textures/tz-neg.png' ]
+ 
+    NOTE: there are no url defaults - if no url(s) are given the skybox faces
+    revert to the faceColors default.
+    */
+    sky: {
+      //mode: 'faceColors'
+      mode: 'cubeTextures',
+      //faceColors: ['red']   // test default 6 color skybox
+      
+      cubeTextures: ['../images/pisa/px.png',
+                     '../images/pisa/nx.png',
+                     '../images/pisa/py.png',
+                     '../images/pisa/ny.png',
+                     '../images/pisa/pz.png',
+                     '../images/pisa/nz.png'
+      ]
+      /*
+      cubeTextures: ['../images/forest-watercolor/cube_right.png',
+                     '../images/forest-watercolor/cube_left.png',
+                     '../images/forest-watercolor/cube_up.png',
+                     '../images/forest-watercolor/cube_down.png',
+                     '../images/forest-watercolor/cube_back.png',
+                     '../images/forest-watercolor/cube_front.png'
+      ]
+      */
+    },
+
+    // [2.2] world-space translation nudge (vec3) passed to shader
+    // suggested: alignOffset
+    alignTranslate: [3.75, 3.5, 0.0],           // default: [0,0,0]       • typical: [-50..50] each axis
+
+    // [2.3] camera far plane distance (also injected as FAR_PLANE for shader)
+    // suggested: farPlane
+    far: 40000.0,                               // default: 40000.0       • typical: [1000..100000]
+
+    // [2.4] raymarch max steps
+    // suggested: maxMarchSteps
+    steps: 768,                                 // default: 768           • typical: [64..2048]
+
+    // [2.5] surface hit epsilon
+    // suggested: hitEpsilon
+    eps: 0.00022,                               // default: 0.00022       • typical: [1e-6..3e-3]
+
+    // [2.6] normal estimation epsilon
+    // suggested: normalEpsilon
+    ndelta: 0.00040,                            // default: 0.00040       • typical: [1e-5..1e-3]
+
+    // [2.7] ambient occlusion sample count
+    // suggested: aoSamples
+    ao: 14,                                     // default: 14            • typical: [0..32]
+
+    // [2.8] shadow raymarch steps
+    // suggested: shadowSteps
+    shadow: 96,                                 // default: 96            • typical: [0..256]
+
+    // [2.9] shader stereo debug (uniform toggle)
+    // suggested: debugStereo
+    stereo: false,                              // default: false         • typical: {true|false}
+
+    // (4) uDome block - avoid name collisions
+    // [2.10] fractal center (vec3)- where in scene-space the fractal center should be placed.
+    udomeFractalCenter: [0, 0, 0],              // default: [0,0,0]       • typical: scene-dependent
+
+    // [2.11] udomeFractalSize = ratio of the scene-diameter/fractal-diameter.
+    // The scene-diameter = fractal-diameter * udomeFractalSize so
+    // udomeFractalSize = scene-diameter/fractal-diameter
+    udomeFractalSize: 1.0,                    // default: 5000             • typical: [100..100000]  
+    // fractals are typically constructed in [-1,1]^3, i.e. fractal-diameter=2
+    // Then if we want the scene to be a 10000^3 volume, choose 
+    // udomeFractalSize = 10000/2 = 5000
+
+    // [2.12] ambient intensity (0..1)
+    udomeAmbient: 0.8,                          // default: 0.0 (0.0=>off)  • typical: [0..1]
+
+    // [2.13] headlight intensity (0..1)
+    udomeHeadlight: 1.0                        // default: 0.0 (0.0=>off)  • typical: [0..1]
+
+  }; // config
+
+
+
+  // Min/Max toggle
+  const hud = document.getElementById('hud');
+  const btn = document.getElementById('hud-toggle');
+  let minimized = false;
+  btn.addEventListener('click', ()=>{
+    minimized = !minimized;
+    hud.classList.toggle('min', minimized);
+    btn.textContent = minimized ? '+' : '–';
+  });
+
+  // Boot
+  bootstrap(config);
+</script>
+</body>
+</html>
