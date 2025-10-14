@@ -8,17 +8,36 @@
 		</style>
 	</head>
 
+
 	<body>
+
+    <!--two scripts needed by imports or imports of imports to find files 
+        referenced by locations prefixed by 'three' or 'three/addons/'.
+        If omitted, generates error:
+        Uncaught TypeError: Failed to resolve module specifier "three". Relative references must start with either "/", "./", or "../". -->
+    <script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+    <script type="importmap">
+        {
+          "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.146.0/build/three.module.js",
+            
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.146.0/examples/jsm"
+          }
+        }
+    </script>
+
+
         <script type='module'>
-            import * as THREE from '../../../node_modules/three/build/three.module.js';
-            import {VRButton} from '../../../node_modules/three/examples/jsm/webxr/VRButton.js';
-            import Stats from '../../../node_modules/three/examples/jsm/libs/stats.module.js'; //default export
-            import {OrbitControls} from '../../../dist/external/OrbitControls.js'; 
+
+            import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.146.0/build/three.module.js';
+            import {VRButton} from 'https://cdn.jsdelivr.net/npm/three@0.146.0/examples/jsm/webxr/VRButton.js';
+            import Stats from 'https://cdn.jsdelivr.net/npm/three@0.146.0/examples/jsm/libs/stats.module.js';
+            import {OrbitControls} from 'https://cdn.jsdelivr.net/npm/three@0.146.0/examples/jsm/controls/OrbitControls.js';
+
+
+            //import {OrbitControls} from '../../../dist/external/OrbitControls.js'; 
             import {transform3d} from '../../../dist/app/services/transform3d.js';
 
-            //import {vsh} from '../../../dist/app/models/stage/shaders/webgl1/quad_vsh/vsh_default.glsl.js';
-            //import {fsh} from '../../../dist/app/models/stage/shaders/webgl1/quad_fsh/fsh_minimal.glsl.js';
-            //import {uniforms} from '../../../dist/app/models/stage/shaders/webgl1/quad_fsh/fsh_minimal.glsl.js';
 
             import {vsh} from '../../../dist/app/models/stage/shaders/webgl1/quad_vsh/vsh_default.glsl.js';
             import {fsh} from '../../../dist/app/models/stage/shaders/webgl1/test_fsh/fsh_rm_mengersponge-nav.glsl.js';

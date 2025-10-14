@@ -1,6 +1,9 @@
 #dome-vr6 .gitignore
 #See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
+#redundant - incorrect three and three/addons
+@-PREV/
+
 #dome-vr.com
 #/dist - need js-files and dist/external modules
 #external copy three_0.147.0 - makes CubeCamera-CubeMap work - no real value!
