@@ -2,7 +2,7 @@
 #See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 #redundant - incorrect three and three/addons
-@-PREV/
+@PREV-REL-PATH-IMPORT-MAP/
 
 #dome-vr.com
 #/dist - need js-files and dist/external modules
