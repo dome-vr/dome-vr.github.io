@@ -2,7 +2,7 @@
 // Fragment shader program 
 // fsh_default - varying vAlpha
 //NOTE! - use with quad_vsh/vsh_pointcloud2.glsl.ts
-import * as THREE from '../../../../../../../node_modules/three/build/three.module.js';
+import * as THREE from 'three';
 const uniforms = {
     uColor: { type: 'v3', value: new THREE.Color(0xff0000) }
 };
