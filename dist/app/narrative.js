@@ -40,7 +40,7 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 //import {gsap} from '../external/gsap/all.js';
 //import { gsap } from '../../node_modules/gsap/all.js';
 //import { gsap } from 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js';
-
+import { gsap, TweenMax, TimelineMax, Quad, Power1 } from "https://cdn.jsdelivr.net/npm/gsap@3.12.5/+esm";
 
 // tween.js
 //import TWEEN from '../external/tween.js/tween.esm.js'; //dome-vr5 v0.9.0
