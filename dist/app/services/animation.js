@@ -3,7 +3,7 @@
 // gsap
 //import { TweenMax, TimelineMax, Quad, Power1 } from '../../../node_modules/gsap/all.js';
 //import {gsap, TweenMax, TimelineMax, Quad, Power1} from '../../external/gsap/all.js';
-import { gsap, TweenMax, TimelineMax, Power1 } from "https://cdn.jsdelivr.net/npm/gsap@3.12.5/+esm";
+import { gsap, TweenMax, TimelineMax, Quad, Power1 } from "https://cdn.jsdelivr.net/npm/gsap@3.12.5/+esm";
 
 
 // singleton instance - exported
