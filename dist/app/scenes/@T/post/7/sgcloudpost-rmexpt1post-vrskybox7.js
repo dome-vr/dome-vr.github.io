@@ -264,7 +264,7 @@ const state = {
                  },
                 'audio': {
                     factory: 'Globalaudio',
-                    url: '../models/stage/actors/audio/globalaudio.js',
+                    url: './app/models/stage/actors/audio/globalAudio.js',
                     options: {
                         url: './app/media/audio/music/test2.mp3',
                         //url: './app/media/audio/music/Mar18_mox.m4a',//m4a works!
