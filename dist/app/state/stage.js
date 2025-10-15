@@ -36,11 +36,17 @@ class Stage {
         // asignable
         let m, actor;
         // process actors one by one
+        console.log(`&&&&&&&&&&&&&&&no. of actors = ${Object.keys(actors).length}`);
         if (actors && Object.keys(actors).length > 0) {
             for (const name of Object.keys(actors)) {
-                const descriptor = actors[name], factory = descriptor['factory'], url = descriptor['url'], options = descriptor['options'];
+                const descriptor = actors[name], 
+                      factory = descriptor['factory'], 
+                      url = descriptor['url'], 
+                      options = descriptor['options'];
                 //console.log(`\n\n*************************************`);
-                //console.log(`actors[${name}] = ${actors[name]}`);
+                console.log(`actors name = ${name}`);
+                console.log(`_actors = ${_actors}`);
+                console.log(`factory = ${factory}`);
                 //console.dir(actors[name]);
                 //console.log(`options = ${options}`);
                 //console.dir(options);
@@ -50,13 +56,60 @@ class Stage {
                         if (url) {
                             console.log(`\nstage.scene() creating actor ${url}`);
                             try {
-                                //console.log(`attempting to import module at ${url}`);
+                                console.log(`attempting to import module at ${url}`);
                                 m = await import(url);
                                 //console.log(`m:`);
                                 //console.dir(m);
                                 //console.log(`m[${factory}]:`);
                                 //console.dir(m[factory]);
-                                try {
+
+                                  //create 'enable audio' button
+                                  console.log(`@@@@@@@@@@@@@@scene_name = ${scene_name}`);
+                                  console.log(`factory = ${factory}`);
+                                  if(scene_name === 'vr'){
+                                    if((factory === 'Globalaudio')||(factory === 'Pointaudio')) {
+  let startAudio = document.getElementById('startAudio');
+  console.log(`startAudio = ${startAudio}`);
+  if (!startAudio) {
+    console.log('[stage] ***********  Creating audio button dynamically');
+    startAudio = document.createElement('button');
+    startAudio.id = 'startAudio';
+    startAudio.textContent = 'enable audio';
+    
+    Object.assign(startAudio.style, {
+      position: 'absolute',
+      zIndex: '10',
+      //left: '0%',       //under stats
+      //top: '9.25%',      
+      //left: '13.25%',       //under Mode:world
+      //top: '9.25%',      
+      top: '90.5%',              // ? Changed: lower-left corner of page
+      left: '1%',      
+
+      padding: '8px 16px',    // ? Changed: added padding for better visibility
+      margin: '0',
+      borderRadius: '4px',    // ? Changed: slightly rounded corners
+      boxSizing: 'border-box',
+      textDecoration: 'none',
+      fontFamily: "'Roboto',sans-serif",
+      fontWeight: '400',      // ? Changed: slightly bolder
+      color: '#FFFFFF',       // ? Changed: bright white text
+      backgroundColor: '#1a1a1a', // ? Changed: dark but not pure black
+      //border: '1px solid #444',   // ? Added: subtle border for definition
+      border: '2px solid #bbb',   // ? Added: subtle border for definition
+      textAlign: 'center',
+      transition: 'all 0.2s',
+      cursor: 'pointer'       // ? Added: shows it's clickable
+    });   
+
+    document.body.appendChild(startAudio);
+    console.log('[stage] Audio button created and added to DOM');
+  }
+
+                                      }//Globalaudio or Pointaudio
+                                    }//url==='vr' - create 'enable audio' button
+
+
                                     // Panorama is *special case*
                                     if (factory === 'Panorama') {
                                         //console.log(`\nPanorama - adding scene['lens'] to options`);
@@ -79,10 +132,6 @@ class Stage {
                                         //console.log(`add actor = ${actor}`);
                                         narrative.addActor(scene, name, actor);
                                     }
-                                }
-                                catch (e) {
-                                    //console.log(`factory.create(${options}) error:${e}`);
-                                }
                             }
                             catch (e) {
                                 console.log(`import(${url}) error:${e}`);
@@ -108,6 +157,7 @@ class Stage {
                         console.log(`stage.scene ${scene_name} modifying actor ${name}`);
                         actors[name].delta(options);
                 } //switch(_actors)
+                console.log(`switch DONE!`);
             } //for(name)
         } //if(actors.l >0
         //      console.log(`\nafter stage.scene():`);

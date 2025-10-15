@@ -57,50 +57,6 @@ class Stage {
                                 //console.log(`m[${factory}]:`);
                                 //console.dir(m[factory]);
                                 try {
-                                  //create 'enable audio' button
-                                  if(scene_name === 'vr'){
-                                    if((factory === 'Globalaudio')||(factory === 'Pointaudio')) {
-  let startAudio = document.getElementById('startAudio');
-  if (!startAudio) {
-    console.log('[stage] ***********  Creating audio button dynamically');
-    startAudio = document.createElement('button');
-    startAudio.id = 'startAudio';
-    startAudio.textContent = 'enable audio';
-    
-    Object.assign(startAudio.style, {
-      position: 'absolute',
-      zIndex: '10',
-      //left: '0%',       //under stats
-      //top: '9.25%',      
-      //left: '13.25%',       //under Mode:world
-      //top: '9.25%',      
-      top: '90.5%',              // ? Changed: lower-left corner of page
-      left: '1%',      
-
-      padding: '8px 16px',    // ? Changed: added padding for better visibility
-      margin: '0',
-      borderRadius: '4px',    // ? Changed: slightly rounded corners
-      boxSizing: 'border-box',
-      textDecoration: 'none',
-      fontFamily: "'Roboto',sans-serif",
-      fontWeight: '400',      // ? Changed: slightly bolder
-      color: '#FFFFFF',       // ? Changed: bright white text
-      backgroundColor: '#1a1a1a', // ? Changed: dark but not pure black
-      //border: '1px solid #444',   // ? Added: subtle border for definition
-      border: '2px solid #bbb',   // ? Added: subtle border for definition
-      textAlign: 'center',
-      transition: 'all 0.2s',
-      cursor: 'pointer'       // ? Added: shows it's clickable
-    });   
-
-    document.body.appendChild(startAudio);
-    console.log('[stage] Audio button created and added to DOM');
-  }
-
-                                      }//Globalaudio or Pointaudio
-                                    }//url==='vr' - create 'enable audio' button
-
-
                                     // Panorama is *special case*
                                     if (factory === 'Panorama') {
                                         //console.log(`\nPanorama - adding scene['lens'] to options`);
