@@ -2,8 +2,8 @@
 #See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 #Internet Computer files
-.ic-assets.json5
-dfx.json
+#.ic-assets.json5
+#dfx.json
 
 #redundant - incorrect three and three/addons
 @PREV-REL-PATH-IMPORT-MAP/

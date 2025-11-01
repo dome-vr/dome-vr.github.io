@@ -1,0 +1,25 @@
+
+{
+  "version": 1,
+  "canisters": {
+    "website": {
+      "type": "assets",
+      "source": ["assets"],
+      "build": null
+    }
+  },
+  "networks": {
+    "local": {
+      "bind": "127.0.0.1:4943",
+      "type": "ephemeral"
+    },
+    "ic": {
+      "type": "persistent"
+    }
+  },
+  "defaults": {
+    "deploy": {
+      "timeout": 1800
+    }
+  }
+}

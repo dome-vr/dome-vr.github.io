@@ -1,0 +1,9 @@
+{
+  "disable_security_policy_warning": true,
+  "entries": [
+    {
+      "match": "**/*",
+      "security_policy": "standard"
+    }
+  ]
+}
